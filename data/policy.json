@@ -1,0 +1,124 @@
+{
+  "meta": {
+    "version": "2026.07",
+    "updated_at": "2026-07-14",
+    "updated_by": "seed",
+    "source_note": "2026년 7월 기준 정부 정책(6·27 대책, 스트레스 DSR, 정책대출 금리). 모든 값은 참고용 추정치.",
+    "next_review": "매일 06:00 KST GitHub Actions 자동 갱신"
+  },
+  "headline": "2026년 하반기 기준: 수도권 규제지역 LTV 40%, 스트레스 DSR 3.0%p, 6억 대출한도 적용 중",
+  "highlights": [
+    {
+      "title": "6·27 대책 — 수도권 대출한도 6억",
+      "summary": "수도권 15억 이하 주택은 주담대 절대한도 6억원 적용. 15~25억 4억, 25억 초과 2억.",
+      "tag": "대출한도",
+      "date": "2026-06-27",
+      "url": ""
+    },
+    {
+      "title": "스트레스 DSR 3단계 적용",
+      "summary": "수도권 가산금리 3.0%p, 지방 1.5%p를 더해 상환능력을 보수적으로 심사합니다.",
+      "tag": "DSR",
+      "date": "2026-01-01",
+      "url": ""
+    },
+    {
+      "title": "신생아 특례대출 금리 1.8~4.5%",
+      "summary": "최근 2년 내 출산 가구 대상, 한도 4억. 소득 2억·주택 9억·전용 85㎡ 이하 요건.",
+      "tag": "정책대출",
+      "date": "2026-01-01",
+      "url": ""
+    }
+  ],
+  "ltv": {
+    "생애최초": { "수도권_비규제": 0.80, "수도권_규제": 0.70, "지방_규제": 0.70, "지방_비규제": 0.80 },
+    "일반":     { "수도권_비규제": 0.70, "수도권_규제": 0.40, "지방_규제": 0.70, "지방_비규제": 0.70 }
+  },
+  "dsr": { "은행": 0.40, "2금융": 0.50 },
+  "stress_rate": { "수도권": 3.0, "지방": 1.5 },
+  "loan_abs_cap": {
+    "수도권": [
+      { "max_price": 150000, "cap": 60000 },
+      { "max_price": 250000, "cap": 40000 },
+      { "max_price": 999999999, "cap": 20000 }
+    ],
+    "지방": []
+  },
+  "acquisition_tax": {
+    "under_6eok": 0.011,
+    "over_9eok": 0.033,
+    "first_home_max_discount_man": 200
+  },
+  "policy_loans": [
+    {
+      "id": "didimdol",
+      "name": "디딤돌",
+      "rate_min": 2.45,
+      "rate_max": 3.55,
+      "limit_general_man": 20000,
+      "limit_first_man": 24000,
+      "limit_special_man": 32000,
+      "house_cap_man": 50000,
+      "house_cap_special_man": 60000,
+      "note": "일반 2억 / 생애최초 2.4억 / 신혼·2자녀 3.2억, 주택 5억(신혼·2자녀 6억)"
+    },
+    {
+      "id": "youth_didimdol",
+      "name": "청년 디딤돌",
+      "rate_min": 2.0,
+      "rate_max": 3.1,
+      "limit_general_man": 15000,
+      "limit_first_man": 15000,
+      "limit_special_man": 15000,
+      "house_cap_man": 30000,
+      "house_cap_special_man": 30000,
+      "age_max": 34,
+      "income_cap_man": 7000,
+      "note": "만 34세 이하 청년 전용, 금리 우대. 주택 3억·전용 60㎡ 이하, 소득 6~7천 이하, 한도 1.5억 (참고용)"
+    },
+    {
+      "id": "bogeumjari",
+      "name": "보금자리론",
+      "rate_min": 4.2,
+      "rate_max": 4.2,
+      "limit_general_man": 36000,
+      "limit_first_man": 42000,
+      "limit_special_man": 42000,
+      "house_cap_man": 60000,
+      "house_cap_special_man": 60000,
+      "note": "일반 3.6억 / 생애최초 4.2억, 주택 6억 이하 (2026.1 금리 인상 반영)"
+    },
+    {
+      "id": "newborn",
+      "name": "신생아 특례",
+      "rate_min": 1.8,
+      "rate_max": 4.5,
+      "limit_general_man": 40000,
+      "limit_first_man": 40000,
+      "limit_special_man": 40000,
+      "house_cap_man": 90000,
+      "house_cap_special_man": 90000,
+      "requires_newborn": true,
+      "income_cap_man": 20000,
+      "note": "한도 4억, 소득 2억·주택 9억·전용 85㎡, 최근 2년 내 출산"
+    }
+  ],
+  "savings_products": [
+    {
+      "id": "cheongnyeon_doyak",
+      "name": "청년도약계좌",
+      "monthly_max_man": 70,
+      "gov_match_rate": 0.06,
+      "term_months": 60,
+      "note": "월 최대 70만원 납입, 정부기여금 최대 6% 매칭, 5년 만기 (소득구간별 상이)"
+    },
+    {
+      "id": "cheongnyeon_mirae",
+      "name": "청년미래적금",
+      "monthly_max_man": 50,
+      "gov_match_rate": 0.04,
+      "term_months": 24,
+      "note": "월 최대 50만원, 우대·정부기여 반영 (상품 조건은 은행별 확인)"
+    }
+  ]
+}

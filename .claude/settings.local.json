@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/72949/Downloads/**)",
+      "Bash(python -c ' *)",
+      "Bash(python3 -c ' *)",
+      "Skill(claude-api)",
+      "Skill(claude-api:*)",
+      "Bash(python -m http.server 8777 --bind 127.0.0.1)",
+      "Bash(curl -s -o /dev/null -w \"index: %{http_code}\\\\n\" http://127.0.0.1:8777/index.html)",
+      "Bash(curl -s -o /dev/null -w \"policy: %{http_code}\\\\n\" http://127.0.0.1:8777/data/policy.json)",
+      "Bash(curl -s -o /dev/null -w \"home calc: %{http_code}\\\\n\" http://127.0.0.1:8777/calculators/home.html)",
+      "Bash(curl -s -o /dev/null -w \"thumb HTTP: %{http_code}  size: %{size_download} bytes  type: %{content_type}\\\\n\" \"https://res.cloudinary.com/dirocerek/image/upload/c_fill,g_auto,w_800,h_600,q_auto,f_auto/v1776697880/designfor_portfolio/qkcbqivcmnyqow8b3v1x.jpg\")"
+    ]
+  }
+}

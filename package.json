@@ -1,0 +1,14 @@
+{
+  "name": "homeplaning",
+  "version": "1.0.0",
+  "description": "2030 사회초년생 자산형성·내집마련 계산기 플랫폼",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "update-policy": "node scripts/update-policy.mjs",
+    "serve": "npx --yes serve@14 -l 3000 ."
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.70.0"
+  }
+}

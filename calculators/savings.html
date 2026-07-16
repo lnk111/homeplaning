@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>적금·배당 계산기 | 청년도약계좌 만기·배당금 재투자 — 홈플래닝</title>
+  <meta name="description" content="청년도약계좌·청년적금 만기 수령액과 배당주 연 배당금·재투자 수익을 계산합니다. 정부기여금 반영." />
+  <meta name="keywords" content="청년도약계좌 계산기, 청년적금 만기, 배당금 계산기, 배당 재투자, 정부기여금" />
+  <link rel="canonical" href="https://homeplaning.kr/calculators/savings.html" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+  <main class="wrap" style="padding-top:32px">
+    <div class="eyebrow">적금·배당 계산기</div>
+    <h1 style="font-size:clamp(26px,4.5vw,36px);color:var(--navy)">청년적금 · 배당, 얼마 받을까?</h1>
+    <p class="muted" style="margin:10px 0 24px;max-width:640px">청년도약계좌 만기 수령액과 배당주 수익을 계산합니다.</p>
+
+    <div class="field" style="max-width:360px">
+      <div class="chips" id="tab">
+        <button class="chip on" data-v="youth">청년적금</button>
+        <button class="chip" data-v="dividend">배당 투자</button>
+      </div>
+    </div>
+
+    <!-- 청년적금 -->
+    <div id="panel-youth" class="calc-layout">
+      <div class="card card-pad">
+        <div class="field">
+          <label>상품</label>
+          <select class="input" id="product"></select>
+        </div>
+        <div class="field">
+          <label>월 납입액</label>
+          <div class="range-row"><input type="range" id="y-monthly" min="10" max="70" step="5" value="50"><span class="range-val" id="y-monthly-val"></span></div>
+        </div>
+        <div class="field">
+          <label>은행 기본 금리 <span class="hint">연</span></label>
+          <div class="input-suffix"><input class="input" type="number" id="y-rate" value="4.5" step="0.1" min="0"><span class="suffix">%</span></div>
+        </div>
+        <p class="note" id="y-desc"></p>
+      </div>
+      <div>
+        <div class="result-hero">
+          <div class="label">만기 예상 수령액</div>
+          <div class="big"><span id="y-final">–</span></div>
+          <div class="small" id="y-term" style="color:#aeb7cc;margin-top:6px"></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat"><div class="k">총 납입 원금</div><div class="v" id="y-principal">–</div></div>
+          <div class="stat"><div class="k">이자+정부기여</div><div class="v accent" id="y-bonus">–</div></div>
+        </div>
+        <p class="note">※ 정부기여금·우대금리는 소득구간·상품조건에 따라 달라집니다. 참고용 추정치입니다.</p>
+      </div>
+    </div>
+
+    <!-- 배당 -->
+    <div id="panel-dividend" class="calc-layout" style="display:none">
+      <div class="card card-pad">
+        <div class="field">
+          <label>투자 원금</label>
+          <div class="input-suffix"><input class="input" type="number" id="d-principal" value="3000" min="0" step="100"><span class="suffix">만원</span></div>
+        </div>
+        <div class="field">
+          <label>배당 수익률 <span class="hint">연</span></label>
+          <div class="range-row"><input type="range" id="d-yield" min="1" max="12" step="0.1" value="4"><span class="range-val" id="d-yield-val"></span></div>
+        </div>
+        <div class="field">
+          <label>연 배당 성장률</label>
+          <div class="range-row"><input type="range" id="d-growth" min="0" max="15" step="0.5" value="5"><span class="range-val" id="d-growth-val"></span></div>
+        </div>
+        <div class="field">
+          <label>보유 기간</label>
+          <div class="range-row"><input type="range" id="d-years" min="1" max="30" step="1" value="10"><span class="range-val" id="d-years-val"></span></div>
+        </div>
+        <div class="field">
+          <label class="switch"><input type="checkbox" id="d-reinvest" checked><span class="track"></span>배당 재투자 (복리)</label>
+        </div>
+      </div>
+      <div>
+        <div class="result-hero">
+          <div class="label">첫 해 예상 배당금</div>
+          <div class="big"><span id="d-first">–</span></div>
+          <div class="small" id="d-monthly" style="color:#aeb7cc;margin-top:6px"></div>
+        </div>
+        <div class="stat-row" style="margin-bottom:12px">
+          <div class="stat"><div class="k" id="d-lastyr-k">최종 연 배당금</div><div class="v accent" id="d-last">–</div></div>
+          <div class="stat"><div class="k">누적 배당 총액</div><div class="v" id="d-total">–</div></div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:16px;color:var(--navy);margin-bottom:10px">연도별 배당금</h3>
+          <div id="d-chart" class="chart-box"></div>
+        </div>
+        <p class="note">※ 배당·주가는 변동하며 미래를 보장하지 않습니다. 세금(배당소득세 15.4%)은 미반영. 참고용 추정치입니다.</p>
+      </div>
+    </div>
+
+    <div class="lead-cta" style="max-width:900px">
+      <h3>모은 돈으로 내 집까지</h3>
+      <p>적금·배당으로 만든 종잣돈으로 살 수 있는 집을 확인하세요.</p>
+      <a class="btn btn-ghost" href="home-afford.html">내 집 찾기 →</a>
+    </div>
+  </main>
+  <div id="app-footer"></div>
+
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/policy.js"></script>
+  <script>
+    let PROD = [];
+    const YS = { idx: 0, monthly: 50, rate: 4.5 };
+    const DS = { principal: 3000, yield: 4, growth: 5, years: 10, reinvest: true };
+
+    function renderYouth() {
+      const p = PROD[YS.idx];
+      if (!p) return;
+      const n = p.term_months;
+      const monthlyCap = Math.min(YS.monthly, p.monthly_max_man);
+      // 적금 이자(단리 근사, 예치기간 가중) + 정부기여
+      const principal = monthlyCap * n;
+      const r = YS.rate / 100;
+      const interest = monthlyCap * r * ((n + 1) / 2) / 12 * n / n; // 월적립 단리 근사
+      const interestApprox = monthlyCap * (n * (n + 1) / 2) / 12 * (r / n) * n / n;
+      const simpleInterest = monthlyCap * r / 12 * (n * (n + 1) / 2);
+      const govMatch = monthlyCap * p.gov_match_rate * n; // 정부기여 근사
+      const bonus = simpleInterest + govMatch;
+      const final = principal + bonus;
+      document.getElementById("y-final").innerHTML = HP.fmtMan(final) + '<span class="unit"> 원</span>';
+      document.getElementById("y-term").textContent = `${p.name} · ${Math.round(n / 12)}년 만기 · 월 ${HP.fmtMan(monthlyCap)}`;
+      document.getElementById("y-principal").textContent = HP.fmtMan(principal);
+      document.getElementById("y-bonus").textContent = HP.fmtMan(bonus);
+      document.getElementById("y-desc").textContent = p.note || "";
+    }
+    function renderDividend() {
+      const yrs = DS.years;
+      let totalDiv = 0, firstDiv = 0, lastDiv = 0, base = DS.principal;
+      const series = [];
+      for (let y = 1; y <= yrs; y++) {
+        const yieldOnBase = DS.yield / 100 * Math.pow(1 + DS.growth / 100, y - 1);
+        const div = base * yieldOnBase;
+        if (y === 1) firstDiv = div;
+        lastDiv = div;
+        totalDiv += div;
+        if (DS.reinvest) base += div;
+        series.push({ label: y + "년", value: div });
+      }
+      document.getElementById("d-first").innerHTML = HP.fmtMan(firstDiv) + '<span class="unit"> 원</span>';
+      document.getElementById("d-monthly").textContent = `월 평균 약 ${HP.fmtManWon(firstDiv / 12)}`;
+      document.getElementById("d-last").textContent = HP.fmtMan(lastDiv);
+      document.getElementById("d-total").textContent = HP.fmtMan(totalDiv);
+      const step = Math.max(1, Math.round(series.length / 8));
+      const shown = series.filter((_, i) => i % step === 0 || i === series.length - 1);
+      HP.growthBars(document.getElementById("d-chart"), shown);
+    }
+
+    function bindRange(id, obj, key, fmt, cb) {
+      const el = document.getElementById(id), lab = document.getElementById(id + "-val");
+      const upd = () => { obj[key] = +el.value; lab.textContent = fmt(obj[key]); cb(); };
+      el.oninput = upd; upd();
+    }
+    // tabs
+    document.querySelectorAll("#tab .chip").forEach((c) => c.onclick = () => {
+      document.querySelectorAll("#tab .chip").forEach((x) => x.classList.remove("on"));
+      c.classList.add("on");
+      document.getElementById("panel-youth").style.display = c.dataset.v === "youth" ? "" : "none";
+      document.getElementById("panel-dividend").style.display = c.dataset.v === "dividend" ? "" : "none";
+    });
+
+    HP.mount("savings");
+    HPPolicy.loadPolicy().then((data) => {
+      PROD = data.savings_products || [];
+      const sel = document.getElementById("product");
+      sel.innerHTML = PROD.map((p, i) => `<option value="${i}">${p.name}</option>`).join("");
+      sel.onchange = (e) => { YS.idx = +e.target.value; renderYouth(); };
+      bindRange("y-monthly", YS, "monthly", (v) => HP.fmtMan(v), renderYouth);
+      document.getElementById("y-rate").oninput = (e) => { YS.rate = +e.target.value || 0; renderYouth(); };
+      renderYouth();
+    });
+    // dividend
+    document.getElementById("d-principal").oninput = (e) => { DS.principal = +e.target.value || 0; renderDividend(); };
+    document.getElementById("d-reinvest").onchange = (e) => { DS.reinvest = e.target.checked; renderDividend(); };
+    bindRange("d-yield", DS, "yield", (v) => v + "%", renderDividend);
+    bindRange("d-growth", DS, "growth", (v) => v + "%", renderDividend);
+    bindRange("d-years", DS, "years", (v) => v + "년", renderDividend);
+    renderDividend();
+  </script>
+</body>
+</html>

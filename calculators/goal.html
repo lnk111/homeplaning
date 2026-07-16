@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>자산목표 계산기 | 1억 모으려면 매달 얼마씩·몇 년? — 홈플래닝</title>
+  <meta name="description" content="목표 금액을 정하면 매달 얼마씩 저축해야 하는지, 또는 몇 년이 걸리는지 역산해 드립니다. 수익률까지 반영." />
+  <meta name="keywords" content="자산목표 계산기, 1억 모으기, 저축 계획, 목표 저축액 계산, 종잣돈 계산" />
+  <link rel="canonical" href="https://homeplaning.kr/calculators/goal.html" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+  <div id="app-header"></div>
+  <main class="wrap" style="padding-top:32px">
+    <div class="eyebrow">자산목표 계산기</div>
+    <h1 style="font-size:clamp(26px,4.5vw,36px);color:var(--navy)">목표까지, 매달 얼마씩 · 몇 년?</h1>
+    <p class="muted" style="margin:10px 0 24px;max-width:640px">모으고 싶은 금액을 정하면 필요한 월 저축액과 도달 기간을 역산합니다.</p>
+
+    <div class="calc-layout">
+      <div class="card card-pad">
+        <div class="field">
+          <label>모드</label>
+          <div class="chips" id="mode">
+            <button class="chip on" data-v="monthly">필요 월 저축액</button>
+            <button class="chip" data-v="years">도달 기간</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>목표 금액</label>
+          <div class="input-suffix"><input class="input" type="number" id="target" value="10000" min="100" step="500"><span class="suffix">만원</span></div>
+        </div>
+        <div class="field">
+          <label>현재 보유 자산</label>
+          <div class="input-suffix"><input class="input" type="number" id="current" value="2000" min="0" step="100"><span class="suffix">만원</span></div>
+        </div>
+        <div class="field">
+          <label>연 수익률 <span class="hint">저축·투자 기대치</span></label>
+          <div class="range-row"><input type="range" id="rate" min="0" max="15" step="0.5" value="4"><span class="range-val" id="rate-val"></span></div>
+        </div>
+        <div class="field" id="years-field">
+          <label>목표 기간</label>
+          <div class="range-row"><input type="range" id="years" min="1" max="40" step="1" value="10"><span class="range-val" id="years-val"></span></div>
+        </div>
+        <div class="field" id="monthly-field" style="display:none">
+          <label>매월 저축 가능액</label>
+          <div class="input-suffix"><input class="input" type="number" id="monthly" value="80" min="1" step="5"><span class="suffix">만원</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="result-hero">
+          <div class="label" id="out-label">필요 월 저축액</div>
+          <div class="big"><span id="r-main">–</span></div>
+          <div class="small" id="r-sub" style="color:#aeb7cc;margin-top:6px"></div>
+        </div>
+        <div class="stat-row" style="margin-bottom:12px">
+          <div class="stat"><div class="k">목표 금액</div><div class="v" id="r-target">–</div></div>
+          <div class="stat"><div class="k">투자 수익 기여</div><div class="v accent" id="r-yield">–</div></div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:16px;color:var(--navy);margin-bottom:10px">자산 성장 경로</h3>
+          <div id="chart" class="chart-box"></div>
+        </div>
+        <div class="lead-cta">
+          <h3>목표 달성 후엔 내 집?</h3>
+          <p>모은 종잣돈으로 살 수 있는 집과 대출 한도를 내집마련 계산기에서 확인하세요.</p>
+          <a class="btn btn-ghost" href="home-afford.html">내 집 찾기 →</a>
+        </div>
+        <p class="note">※ 결과는 참고용 추정치입니다. 실제 수익률은 변동합니다.</p>
+      </div>
+    </div>
+  </main>
+  <div id="app-footer"></div>
+
+  <script src="../assets/js/app.js"></script>
+  <script>
+    const S = { mode: "monthly", target: 10000, current: 2000, rate: 4, years: 10, monthly: 80 };
+
+    // 필요 월 저축액: FV = current*(1+r)^n + PMT*[((1+r)^n -1)/r]
+    function requiredMonthly() {
+      const r = S.rate / 100 / 12, n = S.years * 12;
+      const fvCurrent = S.current * Math.pow(1 + r, n);
+      const need = S.target - fvCurrent;
+      if (need <= 0) return 0;
+      if (r === 0) return need / n;
+      return need / ((Math.pow(1 + r, n) - 1) / r);
+    }
+    // 도달 기간(개월): 매월 monthly 저축 시 target 도달까지
+    function monthsToReach() {
+      const r = S.rate / 100 / 12;
+      let bal = S.current, m = 0;
+      while (bal < S.target && m < 12 * 80) { bal = bal * (1 + r) + S.monthly; m++; }
+      return m >= 12 * 80 ? null : m;
+    }
+    function pathSeries(monthly, months) {
+      const r = S.rate / 100 / 12;
+      let bal = S.current; const yearly = [];
+      for (let m = 1; m <= months; m++) { bal = bal * (1 + r) + monthly; if (m % 12 === 0 || m === months) yearly.push({ m, bal }); }
+      const step = Math.max(1, Math.round(yearly.length / 8));
+      const out = [];
+      for (let i = 0; i < yearly.length; i += step) out.push({ label: Math.round(yearly[i].m / 12) + "년", value: yearly[i].bal });
+      const last = yearly[yearly.length - 1];
+      if (out[out.length - 1].value !== last.bal) out.push({ label: (last.m / 12).toFixed(0) + "년", value: last.bal });
+      return out;
+    }
+    function render() {
+      document.getElementById("r-target").textContent = HP.fmtMan(S.target);
+      if (S.mode === "monthly") {
+        const pmt = requiredMonthly();
+        const months = S.years * 12;
+        const principal = S.current + pmt * months;
+        const yieldPart = S.target - principal;
+        document.getElementById("out-label").textContent = "필요 월 저축액";
+        document.getElementById("r-main").innerHTML = HP.fmtManWon(pmt).replace("원", "") + '<span class="unit"> 원/월</span>';
+        document.getElementById("r-sub").textContent = `${S.years}년간 매달 저축하면 목표 ${HP.fmtMan(S.target)} 달성`;
+        document.getElementById("r-yield").textContent = HP.fmtMan(Math.max(0, yieldPart));
+        HP.growthBars(document.getElementById("chart"), pathSeries(pmt, months));
+      } else {
+        const months = monthsToReach();
+        if (months === null) {
+          document.getElementById("r-main").innerHTML = "80년+";
+          document.getElementById("r-sub").textContent = "월 저축액을 늘려야 현실적인 기간에 도달합니다.";
+          document.getElementById("r-yield").textContent = "–";
+          document.getElementById("chart").innerHTML = "";
+        } else {
+          const y = Math.floor(months / 12), mo = months % 12;
+          document.getElementById("out-label").textContent = "목표 도달 기간";
+          document.getElementById("r-main").innerHTML = y + '<span class="unit">년</span> ' + mo + '<span class="unit">개월</span>';
+          const principal = S.current + S.monthly * months;
+          document.getElementById("r-sub").textContent = `매달 ${HP.fmtMan(S.monthly)}씩 저축 시`;
+          document.getElementById("r-yield").textContent = HP.fmtMan(Math.max(0, S.target - principal));
+          HP.growthBars(document.getElementById("chart"), pathSeries(S.monthly, months));
+        }
+      }
+    }
+    function setMode(v) {
+      S.mode = v;
+      document.getElementById("years-field").style.display = v === "monthly" ? "" : "none";
+      document.getElementById("monthly-field").style.display = v === "years" ? "" : "none";
+      render();
+    }
+    document.querySelectorAll("#mode .chip").forEach((c) => c.onclick = () => {
+      document.querySelectorAll("#mode .chip").forEach((x) => x.classList.remove("on"));
+      c.classList.add("on"); setMode(c.dataset.v);
+    });
+    ["target", "current", "monthly"].forEach((id) =>
+      document.getElementById(id).oninput = (e) => { S[id] = +e.target.value || 0; render(); });
+    function bindRange(id, key, fmt) {
+      const el = document.getElementById(id), lab = document.getElementById(id + "-val");
+      const upd = () => { S[key] = +el.value; lab.textContent = fmt(S[key]); render(); };
+      el.oninput = upd; upd();
+    }
+    HP.mount("goal");
+    bindRange("rate", "rate", (v) => v + "%");
+    bindRange("years", "years", (v) => v + "년");
+    render();
+  </script>
+</body>
+</html>
