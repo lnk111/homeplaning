@@ -24,10 +24,17 @@ jobs:
       - name: 의존성 설치
         run: npm install --no-audit --no-fund
 
+      - name: 시크릿 존재 확인
+        run: |
+          if [[ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]]; then
+            echo "::error::ANTHROPIC_API_KEY 시크릿이 비어 있습니다. Settings → Secrets and variables → Actions → Repository secrets 에 등록하세요."
+            exit 1
+          fi
+          echo "시크릿 확인됨 (길이 표시 안 함)"
+
       - name: AI 정책 갱신 실행
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          RUN_DATE: ${{ github.run_id && '' }}
         run: npm run update-policy
 
       - name: 변경사항 커밋 & 푸시

@@ -23,6 +23,15 @@ function fail(msg) {
 
 const current = JSON.parse(fs.readFileSync(POLICY_PATH, "utf-8"));
 
+if (!process.env.ANTHROPIC_API_KEY || !process.env.ANTHROPIC_API_KEY.trim()) {
+  fail(
+    "ANTHROPIC_API_KEY 가 비어 있습니다.\n" +
+      "  GitHub 저장소 → Settings → Secrets and variables → Actions →\n" +
+      "  'Secrets' 탭의 'Repository secrets' 에 이름 'ANTHROPIC_API_KEY' 로 등록됐는지 확인하세요.\n" +
+      "  (Variables 탭 아님 / Environment secret 아님 / 이름 대소문자·공백 주의)"
+  );
+}
+
 const client = new Anthropic(); // ANTHROPIC_API_KEY 환경변수 사용
 
 const SYSTEM = `당신은 대한민국 부동산·금융 정책 분석가입니다.
