@@ -92,16 +92,31 @@
       while (bal < S.target && m < 12 * 80) { bal = bal * (1 + r) + S.monthly; m++; }
       return m >= 12 * 80 ? null : m;
     }
+    const CHART_LEGEND = { legend: [
+      { label: "원금", color: "var(--navy)" },
+      { label: "투자수익", color: "var(--accent)" },
+    ]};
     function pathSeries(monthly, months) {
       const r = S.rate / 100 / 12;
       let bal = S.current; const yearly = [];
       for (let m = 1; m <= months; m++) { bal = bal * (1 + r) + monthly; if (m % 12 === 0 || m === months) yearly.push({ m, bal }); }
       const step = Math.max(1, Math.round(yearly.length / 8));
-      const out = [];
-      for (let i = 0; i < yearly.length; i += step) out.push({ label: Math.round(yearly[i].m / 12) + "년", value: yearly[i].bal });
+      const pts = [];
+      for (let i = 0; i < yearly.length; i += step) pts.push(yearly[i]);
       const last = yearly[yearly.length - 1];
-      if (out[out.length - 1].value !== last.bal) out.push({ label: (last.m / 12).toFixed(0) + "년", value: last.bal });
-      return out;
+      if (pts[pts.length - 1] !== last) pts.push(last);
+      // 원금(현재자산+누적납입) 아래 + 투자수익 위로 누적
+      return pts.map((p) => {
+        const principal = S.current + monthly * p.m;
+        const profit = Math.max(0, p.bal - principal);
+        return {
+          label: Math.round(p.m / 12) + "년",
+          parts: [
+            { value: Math.min(principal, p.bal), color: "var(--navy)" },
+            { value: profit, color: "var(--accent)" },
+          ],
+        };
+      });
     }
     function render() {
       document.getElementById("r-target").textContent = HP.fmtMan(S.target);
@@ -114,7 +129,7 @@
         document.getElementById("r-main").innerHTML = HP.fmtManWon(pmt).replace("원", "") + '<span class="unit"> 원/월</span>';
         document.getElementById("r-sub").textContent = `${S.years}년간 매달 저축하면 목표 ${HP.fmtMan(S.target)} 달성`;
         document.getElementById("r-yield").textContent = HP.fmtMan(Math.max(0, yieldPart));
-        HP.growthBars(document.getElementById("chart"), pathSeries(pmt, months));
+        HP.stackedBars(document.getElementById("chart"), pathSeries(pmt, months), CHART_LEGEND);
       } else {
         const months = monthsToReach();
         if (months === null) {
@@ -129,7 +144,7 @@
           const principal = S.current + S.monthly * months;
           document.getElementById("r-sub").textContent = `매달 ${HP.fmtMan(S.monthly)}씩 저축 시`;
           document.getElementById("r-yield").textContent = HP.fmtMan(Math.max(0, S.target - principal));
-          HP.growthBars(document.getElementById("chart"), pathSeries(S.monthly, months));
+          HP.stackedBars(document.getElementById("chart"), pathSeries(S.monthly, months), CHART_LEGEND);
         }
       }
     }
