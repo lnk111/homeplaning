@@ -85,12 +85,30 @@
       document.getElementById("r-principal").textContent = HP.fmtMan(principal);
       document.getElementById("r-profit").textContent = HP.fmtMan(profit);
       document.getElementById("yr-label").textContent = S.years;
-      // chart: pick ~8 checkpoints
+      // chart: pick ~8 checkpoints, 원금(아래)+투자수익(위) 누적 막대
       const step = Math.max(1, Math.round(yearly.length / 8));
       const series = [];
-      for (let i = step - 1; i < yearly.length; i += step) series.push({ label: (i + 1) + "년", value: yearly[i] });
-      if (series[series.length - 1].label !== yearly.length + "년") series.push({ label: yearly.length + "년", value: yearly[yearly.length - 1] });
-      HP.growthBars(document.getElementById("chart"), series);
+      const addPoint = (i) => {
+        const y = i + 1;
+        const principal = S.initial + S.monthly * 12 * y; // 그해까지 납입 원금
+        const total = yearly[i];
+        const profit = Math.max(0, total - principal);
+        series.push({
+          label: y + "년",
+          parts: [
+            { value: Math.min(principal, total), color: "var(--navy)" },
+            { value: profit, color: "var(--accent)" },
+          ],
+        });
+      };
+      for (let i = step - 1; i < yearly.length; i += step) addPoint(i);
+      if (series[series.length - 1].label !== yearly.length + "년") addPoint(yearly.length - 1);
+      HP.stackedBars(document.getElementById("chart"), series, {
+        legend: [
+          { label: "원금", color: "var(--navy)" },
+          { label: "투자수익", color: "var(--accent)" },
+        ],
+      });
       // 단리 비교
       const simple = S.initial * (1 + (S.rate / 100) * S.years) + S.monthly * 12 * S.years; // 대략 단리(원금 이자 미포함 근사)
       const diff = final - simple;

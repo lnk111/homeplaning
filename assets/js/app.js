@@ -211,6 +211,42 @@ function growthBars(el, series, opts = {}) {
     <div style="display:flex;font-size:11px;color:var(--text-3);margin-top:6px">${labels}</div>`;
 }
 
+/* ---------- 누적(스택) 막대 차트 (SVG) ---------- */
+function stackedBars(el, series, opts = {}) {
+  // series: [{label, parts:[{value, color}]}] — parts는 아래에서 위로 쌓임(원금→수익)
+  const totals = series.map((s) => s.parts.reduce((a, p) => a + Math.max(0, p.value), 0));
+  const max = Math.max(...totals, 1);
+  const W = 100 / series.length;
+  const bars = series
+    .map((s, i) => {
+      let acc = 0; // 바닥부터 누적 높이(%)
+      const last = s.parts.length - 1;
+      return s.parts
+        .map((p, j) => {
+          const h = (Math.max(0, p.value) / max) * 100;
+          const y = 100 - acc - h;
+          acc += h;
+          // 맨 위 조각만 위쪽 모서리 둥글게
+          const rx = j === last ? 'rx="3"' : "";
+          return `<rect x="${i * W + W * 0.18}%" y="${y}%" width="${W * 0.64}%" height="${h}%" ${rx} fill="${p.color}"/>`;
+        })
+        .join("");
+    })
+    .join("");
+  const labels = series
+    .map((s) => `<span style="flex:1;text-align:center">${s.label}</span>`)
+    .join("");
+  const legend = (opts.legend || [])
+    .map((l) => `<div class="li"><span class="sw" style="background:${l.color}"></span>${l.label}</div>`)
+    .join("");
+  el.innerHTML = `
+    <div style="position:relative;height:160px;background:var(--surface-2);border-radius:10px;padding:8px">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" width="100%" height="100%">${bars}</svg>
+    </div>
+    <div style="display:flex;font-size:11px;color:var(--text-3);margin-top:6px">${labels}</div>
+    ${legend ? `<div class="legend" style="justify-content:center;margin-top:8px">${legend}</div>` : ""}`;
+}
+
 /* ---------- 스크롤 리빌 ---------- */
 function initReveal() {
   const els = document.querySelectorAll(".reveal");
@@ -234,5 +270,5 @@ function initReveal() {
 
 window.HP = {
   mount, fmtMan, fmtWon, fmtManWon, fmtPct, clamp,
-  donut, growthBars, linkFor, basePrefix,
+  donut, growthBars, stackedBars, linkFor, basePrefix,
 };
