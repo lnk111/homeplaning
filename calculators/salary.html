@@ -26,56 +26,58 @@
           <label>배분 원칙</label>
           <div class="chips" id="rule">
             <button class="chip on" data-v="503020">50·30·20 법칙</button>
-            <button class="chip" data-v="save40">저축 강화 (40%)</button>
+            <button class="chip" data-v="save80">저축 강화 (80%)</button>
             <button class="chip" data-v="custom">직접 조정</button>
           </div>
         </div>
         <div id="alloc">
           <div class="field">
-            <label>고정지출 <span class="hint">월세·통신·보험</span></label>
+            <label><span class="cat-dot" style="background:var(--navy)"></span>고정지출 <span class="hint">월세·통신·보험</span></label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-              <div class="input-suffix"><input class="input" type="number" id="fixed-amt" min="0" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
-              <div class="input-suffix"><input class="input" type="number" id="fixed-pct" min="0" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">%</span></div>
+              <div class="input-suffix"><input class="input" type="number" id="fixed-amt" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">만원</span></div>
+              <div class="input-suffix"><input class="input" type="number" id="fixed-pct" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">%</span></div>
             </div>
           </div>
           <div class="field">
-            <label>생활·여가 <span class="hint">식비·문화·쇼핑</span></label>
+            <label><span class="cat-dot" style="background:#a9b2c3"></span>생활·여가 <span class="hint">식비·쇼핑·취미</span></label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-              <div class="input-suffix"><input class="input" type="number" id="life-amt" min="0" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
-              <div class="input-suffix"><input class="input" type="number" id="life-pct" min="0" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">%</span></div>
+              <div class="input-suffix"><input class="input" type="number" id="life-amt" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">만원</span></div>
+              <div class="input-suffix"><input class="input" type="number" id="life-pct" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">%</span></div>
             </div>
           </div>
           <div class="field">
-            <label>저축·투자 <span class="hint">미래 자산</span></label>
+            <label><span class="cat-dot" style="background:var(--accent)"></span>저축·투자 <span class="hint">적금·펀드·비상금</span></label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-              <div class="input-suffix"><input class="input" type="number" id="save-amt" min="0" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
-              <div class="input-suffix"><input class="input" type="number" id="save-pct" min="0" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">%</span></div>
+              <div class="input-suffix"><input class="input" type="number" id="save-amt" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">만원</span></div>
+              <div class="input-suffix"><input class="input" type="number" id="save-pct" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">%</span></div>
             </div>
           </div>
-          <p class="note" id="sum-note"></p>
+          <div class="sum-box" id="sum-box"><span id="sum-msg"></span><span class="total" id="sum-total"></span></div>
         </div>
       </div>
 
       <div>
+        <div class="card card-pad" style="margin-bottom:14px">
+          <h3 style="font-size:16px;color:var(--navy);margin-bottom:14px">월급 배분 구성</h3>
+          <div id="donut"></div>
+        </div>
+
         <div class="result-hero">
-          <div class="label">매달 저축·투자</div>
+          <div class="label">매달 저축·투자하는 금액</div>
           <div class="big"><span id="r-save">–</span></div>
-          <div class="small" id="r-year" style="color:#aeb7cc;margin-top:6px"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+            <div class="hero-stat"><div class="k">연간 저축액</div><div class="v" id="r-year">–</div></div>
+            <div class="hero-stat"><div class="k">저축률</div><div class="v accent" id="r-rate">–</div></div>
+          </div>
         </div>
-        <div class="card" style="margin-bottom:12px">
-          <h3 style="font-size:16px;color:var(--navy);margin-bottom:10px">배분 구성</h3>
-          <div id="donut" class="chart-box"></div>
-        </div>
-        <div class="stat-row">
-          <div class="stat"><div class="k">고정지출</div><div class="v" id="r-fixed">–</div></div>
-          <div class="stat"><div class="k">생활·여가</div><div class="v" id="r-life">–</div></div>
-        </div>
-        <div class="lead-cta">
-          <h3>저축액, 어떻게 굴릴까?</h3>
-          <p>매달 저축액을 복리로 굴리면 얼마가 되는지 복리 계산기에서 확인하세요.</p>
-          <a class="btn btn-ghost" href="compound.html">복리 계산 →</a>
-        </div>
-        <p class="note">※ 50·30·20 법칙: 필수지출 50% · 여가 30% · 저축·투자 20%. 상황에 맞게 조정하세요.</p>
+
+        <a href="goal.html" class="cta-orange">
+          <div>
+            <div class="t">이 저축액이면, 내 집 마련까지?</div>
+            <div class="s">집 마련 시뮬레이터로 목표 시점 확인하기</div>
+          </div>
+          <span class="arrow">→</span>
+        </a>
       </div>
     </div>
   </main>
@@ -85,8 +87,9 @@
   <script>
     // 상태: 각 항목은 '퍼센트'가 기준값(정확한 실수). 금액 = 실수령액 × %/100.
     const S = { net: 280, rule: "503020", fixed: 50, life: 30, save: 20 };
-    const PRESETS = { "503020": [50, 30, 20], save40: [40, 20, 40] };
+    const PRESETS = { "503020": [50, 30, 20], save80: [15, 5, 80] };
     const KEYS = ["fixed", "life", "save"];
+    const LIFE_COLOR = "#a9b2c3";
 
     // 상태 → 입력칸(금액·%) 동기화
     function syncInputs() {
@@ -105,18 +108,19 @@
       const A = (k) => (S.net * S[k]) / 100;
       const fixedAmt = A("fixed"), lifeAmt = A("life"), saveAmt = A("save");
       document.getElementById("r-save").innerHTML = HP.fmtMan(saveAmt) + '<span class="unit"> 원</span>';
-      document.getElementById("r-year").textContent = `연 ${HP.fmtMan(saveAmt * 12)} · 저축률 ${Math.round(S.save)}%`;
-      document.getElementById("r-fixed").textContent = HP.fmtMan(fixedAmt);
-      document.getElementById("r-life").textContent = HP.fmtMan(lifeAmt);
-      HP.donut(document.getElementById("donut"), [
-        { value: fixedAmt, color: "var(--navy)", label: "고정지출" },
-        { value: lifeAmt, color: "#8a94ac", label: "생활·여가" },
-        { value: saveAmt, color: "var(--accent)", label: "저축·투자" },
-      ]);
+      document.getElementById("r-year").textContent = HP.fmtMan(saveAmt * 12) + "원";
+      document.getElementById("r-rate").textContent = Math.round(S.save) + "%";
+      HP.donutPanel(document.getElementById("donut"), [
+        { value: fixedAmt, color: "var(--navy)", label: "고정지출", display: HP.fmtMan(fixedAmt) + "원" },
+        { value: lifeAmt, color: LIFE_COLOR, label: "생활·여가", display: HP.fmtMan(lifeAmt) + "원" },
+        { value: saveAmt, color: "var(--accent)", label: "저축·투자", display: HP.fmtMan(saveAmt) + "원" },
+      ], { centerLabel: Math.round(S.save) + "%", centerSub: "저축률" });
       const rt = Math.round(total);
-      const note = document.getElementById("sum-note");
-      note.textContent = rt === 100 ? "합계 100% — 배분 완료 ✓" : `합계 ${rt}% — 100%가 되도록 맞춰보세요.`;
-      note.style.color = rt === 100 ? "var(--good)" : "var(--accent)";
+      const box = document.getElementById("sum-box");
+      box.className = "sum-box " + (rt === 100 ? "ok" : "warn");
+      document.getElementById("sum-msg").textContent =
+        rt === 100 ? "배분 완료 — 남는 돈 없이 100%" : "합계가 100%가 되도록 맞춰보세요";
+      document.getElementById("sum-total").textContent = `합계 ${rt}%`;
     }
 
     // 월 실수령액 변경 → 비율 유지하며 금액 재계산

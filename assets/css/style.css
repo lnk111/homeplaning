@@ -279,6 +279,25 @@ table.compare tr.best td:first-child { font-weight: 800; color: var(--accent); }
 .lead-cta h3 { color: var(--navy); font-size: 20px; }
 .lead-cta p { color: var(--text-2); font-size: 14px; margin: 8px 0 16px; }
 
+/* ---------- 월급배분 전용 ---------- */
+.hero-stat { background: rgba(255,255,255,.07); border-radius: 10px; padding: 12px 14px; }
+.hero-stat .k { font-size: 12px; color: #aeb7cc; font-weight: 600; }
+.hero-stat .v { font-size: 18px; font-weight: 800; color: #fff; margin-top: 3px; }
+.hero-stat .v.accent { color: var(--accent); }
+
+.sum-box { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; margin-top: 6px; }
+.sum-box.ok { background: rgba(22,163,74,.10); color: var(--good); }
+.sum-box.warn { background: rgba(232,73,47,.10); color: var(--accent); }
+.sum-box .total { font-weight: 800; white-space: nowrap; }
+
+.cat-dot { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 7px; vertical-align: middle; }
+
+.cta-orange { display: flex; align-items: center; gap: 12px; background: var(--accent); color: #fff; border-radius: var(--radius); padding: 20px 22px; margin-top: 14px; transition: background .15s, transform .15s; }
+.cta-orange:hover { background: var(--accent-dark); transform: translateY(-1px); }
+.cta-orange .t { font-weight: 800; font-size: 17px; }
+.cta-orange .s { font-size: 13px; opacity: .92; margin-top: 3px; }
+.cta-orange .arrow { margin-left: auto; font-size: 24px; flex: none; }
+
 /* ---------- Portfolio (시공사례) ---------- */
 .portfolio-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;

@@ -185,6 +185,45 @@ function donut(el, parts) {
     <div class="legend" style="justify-content:center">${legend}</div>`;
 }
 
+/* ---------- 도넛 패널 (가운데 라벨 + 측면 금액 범례) ---------- */
+function donutPanel(el, parts, opts = {}) {
+  const total = parts.reduce((s, p) => s + Math.max(0, p.value), 0) || 1;
+  const R = 55, C = 2 * Math.PI * R;
+  let off = 0;
+  const rings = parts
+    .map((p) => {
+      const len = (Math.max(0, p.value) / total) * C;
+      const seg = `<circle r="${R}" cx="70" cy="70" fill="none" stroke="${p.color}"
+        stroke-width="19" stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-off}"
+        transform="rotate(-90 70 70)"/>`;
+      off += len;
+      return seg;
+    })
+    .join("");
+  const center = opts.centerLabel
+    ? `<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-size:26px;font-weight:800;color:var(--accent);line-height:1.05">${opts.centerLabel}</div>
+        <div style="font-size:12px;color:var(--text-2);margin-top:2px">${opts.centerSub || ""}</div>
+      </div>`
+    : "";
+  const legend = parts
+    .map(
+      (p) => `<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
+        <span style="width:11px;height:11px;border-radius:3px;background:${p.color};flex:none"></span>
+        <span style="font-size:14px;color:var(--text-2)">${p.label}</span>
+        <span style="margin-left:auto;font-weight:800;color:var(--navy);font-size:14px">${p.display}</span>
+      </div>`
+    )
+    .join("");
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+      <div style="position:relative;width:150px;height:150px;flex:none">
+        <svg viewBox="0 0 140 140" width="150" height="150">${rings}</svg>${center}
+      </div>
+      <div style="flex:1;min-width:180px">${legend}</div>
+    </div>`;
+}
+
 /* ---------- 막대 성장 차트 (SVG) ---------- */
 function growthBars(el, series, opts = {}) {
   // series: [{label, value}] value in 만원
@@ -270,5 +309,5 @@ function initReveal() {
 
 window.HP = {
   mount, fmtMan, fmtWon, fmtManWon, fmtPct, clamp,
-  donut, growthBars, stackedBars, linkFor, basePrefix,
+  donut, donutPanel, growthBars, stackedBars, linkFor, basePrefix,
 };
