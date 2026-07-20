@@ -201,26 +201,26 @@ function donutPanel(el, parts, opts = {}) {
     })
     .join("");
   const center = opts.centerLabel
-    ? `<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-        <div style="font-size:26px;font-weight:800;color:var(--accent);line-height:1.05">${opts.centerLabel}</div>
-        <div style="font-size:12px;color:var(--text-2);margin-top:2px">${opts.centerSub || ""}</div>
+    ? `<div class="dp-center">
+        <div class="dp-center-v">${opts.centerLabel}</div>
+        <div class="dp-center-s">${opts.centerSub || ""}</div>
       </div>`
     : "";
   const legend = parts
     .map(
-      (p) => `<div style="display:flex;align-items:center;gap:8px;padding:7px 0">
-        <span style="width:11px;height:11px;border-radius:3px;background:${p.color};flex:none"></span>
-        <span style="font-size:14px;color:var(--text-2)">${p.label}</span>
-        <span style="margin-left:auto;font-weight:800;color:var(--navy);font-size:14px">${p.display}</span>
+      (p) => `<div class="dp-row">
+        <span class="dp-dot" style="background:${p.color}"></span>
+        <span class="dp-label">${p.label}</span>
+        <span class="dp-amt">${p.display}</span>
       </div>`
     )
     .join("");
   el.innerHTML = `
-    <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
-      <div style="position:relative;width:150px;height:150px;flex:none">
+    <div class="dp-wrap">
+      <div class="dp-chart">
         <svg viewBox="0 0 140 140" width="150" height="150">${rings}</svg>${center}
       </div>
-      <div style="flex:1;min-width:180px">${legend}</div>
+      <div class="dp-legend">${legend}</div>
     </div>`;
 }
 
