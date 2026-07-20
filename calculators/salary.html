@@ -14,13 +14,13 @@
   <main class="wrap" style="padding-top:32px">
     <div class="eyebrow">월급배분 계산기</div>
     <h1 style="font-size:clamp(26px,4.5vw,36px);color:var(--navy)">월급, 어떻게 나눠야 할까?</h1>
-    <p class="muted" style="margin:10px 0 24px;max-width:640px">실수령액을 넣으면 검증된 예산 원칙으로 자동 배분합니다. 비율은 직접 조정할 수 있어요.</p>
+    <p class="muted" style="margin:10px 0 24px;max-width:640px">실수령액을 넣고, <strong>금액이나 비율 중 편한 쪽을 입력</strong>하세요. 하나를 바꾸면 나머지가 자동으로 계산되고 그래프가 조절됩니다.</p>
 
     <div class="calc-layout">
       <div class="card card-pad">
         <div class="field">
           <label>월 실수령액 <span class="hint">세후</span></label>
-          <div class="input-suffix"><input class="input" type="number" id="net" value="280" min="0" step="10"><span class="suffix">만원</span></div>
+          <div class="input-suffix"><input class="input" type="number" id="net" value="280" min="0" step="10" autocomplete="off"><span class="suffix">만원</span></div>
         </div>
         <div class="field">
           <label>배분 원칙</label>
@@ -30,18 +30,27 @@
             <button class="chip" data-v="custom">직접 조정</button>
           </div>
         </div>
-        <div id="sliders">
+        <div id="alloc">
           <div class="field">
             <label>고정지출 <span class="hint">월세·통신·보험</span></label>
-            <div class="range-row"><input type="range" id="fixed" min="0" max="80" step="1" value="50"><span class="range-val" id="fixed-val"></span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div class="input-suffix"><input class="input" type="number" id="fixed-amt" min="0" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
+              <div class="input-suffix"><input class="input" type="number" id="fixed-pct" min="0" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">%</span></div>
+            </div>
           </div>
           <div class="field">
-            <label>생활·여가</label>
-            <div class="range-row"><input type="range" id="life" min="0" max="80" step="1" value="30"><span class="range-val" id="life-val"></span></div>
+            <label>생활·여가 <span class="hint">식비·문화·쇼핑</span></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div class="input-suffix"><input class="input" type="number" id="life-amt" min="0" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
+              <div class="input-suffix"><input class="input" type="number" id="life-pct" min="0" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">%</span></div>
+            </div>
           </div>
           <div class="field">
-            <label>저축·투자</label>
-            <div class="range-row"><input type="range" id="save" min="0" max="80" step="1" value="20"><span class="range-val" id="save-val"></span></div>
+            <label>저축·투자 <span class="hint">미래 자산</span></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div class="input-suffix"><input class="input" type="number" id="save-amt" min="0" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
+              <div class="input-suffix"><input class="input" type="number" id="save-pct" min="0" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">%</span></div>
+            </div>
           </div>
           <p class="note" id="sum-note"></p>
         </div>
@@ -74,20 +83,27 @@
 
   <script src="../assets/js/app.js"></script>
   <script>
+    // 상태: 각 항목은 '퍼센트'가 기준값(정확한 실수). 금액 = 실수령액 × %/100.
     const S = { net: 280, rule: "503020", fixed: 50, life: 30, save: 20 };
     const PRESETS = { "503020": [50, 30, 20], save40: [40, 20, 40] };
-    function setSliders(a) {
-      S.fixed = a[0]; S.life = a[1]; S.save = a[2];
-      ["fixed", "life", "save"].forEach((k, i) => {
-        document.getElementById(k).value = a[i];
-        document.getElementById(k + "-val").textContent = a[i] + "%";
+    const KEYS = ["fixed", "life", "save"];
+
+    // 상태 → 입력칸(금액·%) 동기화
+    function syncInputs() {
+      KEYS.forEach((k) => {
+        document.getElementById(k + "-amt").value = Math.round((S.net * S[k]) / 100);
+        document.getElementById(k + "-pct").value = Math.round(S[k]);
       });
+    }
+    function markCustom() {
+      document.querySelectorAll("#rule .chip").forEach((x) => x.classList.remove("on"));
+      document.querySelector('#rule .chip[data-v="custom"]').classList.add("on");
+      S.rule = "custom";
     }
     function render() {
       const total = S.fixed + S.life + S.save;
-      const fixedAmt = (S.net * S.fixed) / 100;
-      const lifeAmt = (S.net * S.life) / 100;
-      const saveAmt = (S.net * S.save) / 100;
+      const A = (k) => (S.net * S[k]) / 100;
+      const fixedAmt = A("fixed"), lifeAmt = A("life"), saveAmt = A("save");
       document.getElementById("r-save").innerHTML = HP.fmtMan(saveAmt) + '<span class="unit"> 원</span>';
       document.getElementById("r-year").textContent = `연 ${HP.fmtMan(saveAmt * 12)} · 저축률 ${Math.round(S.save)}%`;
       document.getElementById("r-fixed").textContent = HP.fmtMan(fixedAmt);
@@ -97,26 +113,41 @@
         { value: lifeAmt, color: "#8a94ac", label: "생활·여가" },
         { value: saveAmt, color: "var(--accent)", label: "저축·투자" },
       ]);
+      const rt = Math.round(total);
       const note = document.getElementById("sum-note");
-      note.textContent = total === 100 ? "합계 100% ✓" : `합계 ${total}% — 100%가 되도록 조정하세요.`;
-      note.style.color = total === 100 ? "var(--good)" : "var(--accent)";
+      note.textContent = rt === 100 ? "합계 100% — 배분 완료 ✓" : `합계 ${rt}% — 100%가 되도록 맞춰보세요.`;
+      note.style.color = rt === 100 ? "var(--good)" : "var(--accent)";
     }
-    document.getElementById("net").oninput = (e) => { S.net = +e.target.value || 0; render(); };
+
+    // 월 실수령액 변경 → 비율 유지하며 금액 재계산
+    document.getElementById("net").oninput = (e) => { S.net = +e.target.value || 0; syncInputs(); render(); };
+
+    // 프리셋(50·30·20 등)
     document.querySelectorAll("#rule .chip").forEach((c) => c.onclick = () => {
       document.querySelectorAll("#rule .chip").forEach((x) => x.classList.remove("on"));
       c.classList.add("on"); S.rule = c.dataset.v;
-      if (PRESETS[S.rule]) setSliders(PRESETS[S.rule]);
+      if (PRESETS[S.rule]) { const a = PRESETS[S.rule]; S.fixed = a[0]; S.life = a[1]; S.save = a[2]; syncInputs(); }
       render();
     });
-    ["fixed", "life", "save"].forEach((k) => document.getElementById(k).oninput = (e) => {
-      S[k] = +e.target.value;
-      document.getElementById(k + "-val").textContent = e.target.value + "%";
-      document.querySelectorAll("#rule .chip").forEach((x) => x.classList.remove("on"));
-      document.querySelector('#rule .chip[data-v="custom"]').classList.add("on");
-      S.rule = "custom"; render();
+
+    // 양방향 연동: 금액 입력 → % 자동 / % 입력 → 금액 자동
+    KEYS.forEach((k) => {
+      document.getElementById(k + "-amt").oninput = (e) => {
+        const a = +e.target.value || 0;
+        S[k] = S.net > 0 ? (a / S.net) * 100 : 0;
+        document.getElementById(k + "-pct").value = Math.round(S[k]); // 반대편만 갱신
+        markCustom(); render();
+      };
+      document.getElementById(k + "-pct").oninput = (e) => {
+        const p = +e.target.value || 0;
+        S[k] = p;
+        document.getElementById(k + "-amt").value = Math.round((S.net * p) / 100); // 반대편만 갱신
+        markCustom(); render();
+      };
     });
+
     HP.mount("salary");
-    setSliders(PRESETS["503020"]);
+    syncInputs();
     render();
   </script>
 </body>
