@@ -73,8 +73,8 @@
 
         <a href="goal.html" class="cta-orange">
           <div>
-            <div class="t">이 저축액이면, 내 집 마련까지?</div>
-            <div class="s">집 마련 시뮬레이터로 목표 시점 확인하기</div>
+            <div class="t">1년동안 이 금액을 저축하면?</div>
+            <div class="s" id="cta-sub">연간 – 저축</div>
           </div>
           <span class="arrow">→</span>
         </a>
@@ -110,6 +110,7 @@
       document.getElementById("r-save").innerHTML = HP.fmtMan(saveAmt) + '<span class="unit"> 원</span>';
       document.getElementById("r-year").textContent = HP.fmtMan(saveAmt * 12) + "원";
       document.getElementById("r-rate").textContent = Math.round(S.save) + "%";
+      document.getElementById("cta-sub").textContent = "연간 " + HP.fmtMan(saveAmt * 12) + "원 저축";
       HP.donutPanel(document.getElementById("donut"), [
         { value: fixedAmt, color: "var(--navy)", label: "고정지출", display: HP.fmtMan(fixedAmt) + "원" },
         { value: lifeAmt, color: LIFE_COLOR, label: "생활·여가", display: HP.fmtMan(lifeAmt) + "원" },
