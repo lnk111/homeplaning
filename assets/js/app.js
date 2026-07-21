@@ -3,17 +3,19 @@
    네비/푸터 주입, 포맷 유틸, 스크롤 애니메이션
    ========================================================= */
 
+/* 사회초년생이 실제로 겪는 순서대로 배치한다.
+   첫 월급 배분 → 목표 설정 → 모으는 수단 → 집 → 인테리어 → 참고 자료 */
 const NAV = [
+  { href: "salary",   label: "월급배분" },
+  { href: "goal",     label: "자산목표" },
+  { href: "savings",  label: "적금·배당" },
+  { href: "compound", label: "복리" },
   { label: "내집마련", children: [
     { href: "home-afford", label: "부동산 적정 매매가" },
     { href: "home-goal",   label: "부동산 필요 자금" },
     { href: "jeonse",      label: "전세 보증금" },
   ]},
   { href: "interior", label: "인테리어" },
-  { href: "compound", label: "복리" },
-  { href: "goal",     label: "자산목표" },
-  { href: "salary",   label: "월급배분" },
-  { href: "savings",  label: "적금·배당" },
   { href: "guide",    label: "재테크자료" },
 ];
 
@@ -105,6 +107,21 @@ function mount(active) {
   initDropdowns();
   initReveal();
   initAmountHints();
+  scrollActiveTabIntoView();
+}
+
+/* 모바일에서 탭 줄이 가로 스크롤되면 현재 탭이 화면 밖에 있을 수 있다 */
+function scrollActiveTabIntoView() {
+  const nav = document.querySelector(".nav-pills");
+  if (!nav || nav.scrollWidth <= nav.clientWidth) return;
+  const tab = nav.querySelector(".active")?.closest(".nav-dd, a");
+  if (!tab) return;
+  // offsetLeft는 헤더 기준이라 쓸 수 없다. 화면 좌표 차이로 스크롤 영역 내 위치를 구한다
+  const navBox = nav.getBoundingClientRect();
+  const tabBox = tab.getBoundingClientRect();
+  const posInNav = nav.scrollLeft + (tabBox.left - navBox.left);
+  const centered = posInNav - (nav.clientWidth - tabBox.width) / 2;
+  nav.scrollLeft = Math.max(0, Math.min(centered, nav.scrollWidth - nav.clientWidth));
 }
 
 /* ---------- 금액 입력 하단에 억/만원 환산 표기 ----------
