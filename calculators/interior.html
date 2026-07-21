@@ -35,6 +35,9 @@
       <h2 style="font-size:clamp(22px,4vw,30px);color:var(--navy)">시공사례</h2>
       <p class="sub" style="margin:8px 0 20px">디자인포가 완성한 실제 현장입니다. 마음에 드시면 아래에서 상담을 신청하세요.</p>
       <div class="portfolio-grid" id="portfolio"></div>
+      <div style="text-align:center;margin-top:20px">
+        <button type="button" class="btn btn-ghost" id="more-btn"></button>
+      </div>
       <p class="note" id="portfolio-note" style="margin-top:12px"></p>
     </section>
 
@@ -266,7 +269,9 @@
        썸네일용으로 c_fill/w_800/h_600 변환 적용. 사진 추가·교체는 아래 배열만 수정. */
     const CDN = "https://res.cloudinary.com/dirocerek/image/upload/c_fill,g_auto,w_800,h_600,q_auto,f_auto";
     const PF = (v, id) => `${CDN}/${v}/designfor_portfolio/${id}.jpg`;
-    /* 현장명은 designfor.kr 포트폴리오의 이미지와 Cloudinary ID를 대조해 확인한 실제 현장입니다. */
+    /* 현장명은 designfor.kr 포트폴리오의 이미지와 Cloudinary ID를 대조해 확인한 실제 현장입니다.
+       앞 6개는 기본 노출, 나머지는 '더 보기'로 펼칩니다. */
+    const SHOWN_AT_FIRST = 6;
     const PORTFOLIO = [
       { t: "판교 TH212", m: "디자인포 시공", img: PF("v1776697880", "qkcbqivcmnyqow8b3v1x") },
       { t: "광교 자연앤힐스테이트", m: "디자인포 시공", img: PF("v1779095570", "gkps1cntlq4mjdahxmzx") },
@@ -274,6 +279,12 @@
       { t: "오산대역 꿈에그린", m: "디자인포 시공", img: PF("v1776696964", "bjmseaf5m8xchfkdhdap") },
       { t: "수지 신정6단지 상록", m: "디자인포 시공", img: PF("v1777518699", "dopjbjs4i7re9k6kt5ap") },
       { t: "수지 상현마을 현대성우 3차", m: "디자인포 시공", img: PF("v1779087031", "n0zmhgums1mbgsshlw4u") },
+      { t: "수지 신정마을 8단지 현대성우", m: "디자인포 시공", img: PF("v1779095281", "qyfqik7zlztddzaoembl") },
+      { t: "수원역 센트럴 어반시티", m: "디자인포 시공", img: PF("v1779084042", "o5nlmzxcfugb3puxygze") },
+      { t: "동천 디이스트", m: "디자인포 시공", img: PF("v1779094824", "eyyu6wnsnrh1m6lqbw0t") },
+      { t: "광명역 써밋플레이스", m: "디자인포 시공", img: PF("v1779079783", "nttxlq2ulokrt5ymz4yz") },
+      { t: "힐스테이트 영통", m: "디자인포 시공", img: PF("v1779095808", "euawuxivtwwtgtxr96xz") },
+      { t: "동탄 솔빛마을 쌍용예가", m: "디자인포 시공", img: PF("v1779094508", "ip9y1i1dvrewuucnuwp0") },
     ];
 
     HP.mount("interior");
@@ -287,6 +298,22 @@
         </div>
         <div class="cap"><div class="t">${p.t || "디자인포"}</div><div class="m">${p.m || ""}</div></div>
       </a>`).join("");
+
+    /* 처음엔 6개만 보여주고, '더 보기'로 나머지를 펼친다 */
+    const cards = [...grid.children];
+    const moreBtn = document.getElementById("more-btn");
+    const hidden = cards.length - SHOWN_AT_FIRST;
+    if (hidden > 0) {
+      cards.slice(SHOWN_AT_FIRST).forEach((c) => c.style.display = "none");
+      moreBtn.textContent = `시공사례 ${hidden}개 더 보기 ↓`;
+      moreBtn.onclick = () => {
+        cards.forEach((c) => c.style.display = "");
+        moreBtn.remove();
+      };
+    } else {
+      moreBtn.remove();
+    }
+
     document.getElementById("portfolio-note").innerHTML =
       '더 많은 시공사례는 <a href="https://designfor.kr" target="_blank" rel="noopener" style="color:var(--accent);font-weight:700">디자인포 포트폴리오 →</a> 에서 확인하세요.';
 
