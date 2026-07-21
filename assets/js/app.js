@@ -5,8 +5,8 @@
 
 const NAV = [
   { label: "내집마련", children: [
-    { href: "home-afford", label: "내집찾기 · 종잣돈 → 집값" },
-    { href: "home-goal",   label: "내집자금 · 집값 → 필요돈" },
+    { href: "home-afford", label: "부동산 적정 매매가" },
+    { href: "home-goal",   label: "부동산 필요 자금" },
   ]},
   { href: "interior", label: "인테리어" },
   { href: "compound", label: "복리" },
