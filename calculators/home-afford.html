@@ -129,8 +129,16 @@
         <div class="card" style="margin-bottom:12px">
           <h3 style="font-size:16px;color:var(--navy);margin-bottom:4px">현금을 더 모으면?</h3>
           <p class="small muted" style="margin:0 0 14px;line-height:1.5">투입할 수 있는 <b>현금이 늘어나면</b> 살 수 있는 집값이 어떻게 달라지는지 한눈에 비교해 보세요. 막대에 마우스를 올리면 자세히 보여드려요.</p>
+          <div class="save-row">
+            <span class="save-label">매달 모을 수 있는 금액</span>
+            <div class="input-suffix">
+              <input class="input" type="number" id="save" value="100" min="0" step="10" inputmode="numeric" autocomplete="off">
+              <span class="suffix">만원</span>
+            </div>
+          </div>
           <div id="cash-chart"></div>
           <p class="small" id="cash-note" style="margin:12px 0 0;line-height:1.6;color:var(--text-2)"></p>
+          <p class="save-note" id="save-note"></p>
         </div>
 
         <div class="insight" style="margin-bottom:12px">
@@ -163,6 +171,6 @@
   <script src="../assets/js/app.js?v=3"></script>
   <script src="../assets/js/policy.js"></script>
   <script src="../assets/js/calc-home-core.js"></script>
-  <script src="../assets/js/calc-home-afford.js?v=5"></script>
+  <script src="../assets/js/calc-home-afford.js?v=7"></script>
 </body>
 </html>

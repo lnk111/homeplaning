@@ -16,6 +16,23 @@ const ICO_WARN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 
 const NAVY = "#2b3245";
 const CASH_STEPS = [-3000, 0, 3000, 6000, 10000, 15000]; // 현재 보유 현금 대비 증감(만원)
+let monthlySave = 100; // 매달 모을 수 있는 금액(만원)
+
+/* 저축 개월 수를 "N년 M개월"로 표기 */
+function durationText(months) {
+  if (!isFinite(months) || months <= 0) return "지금 가능";
+  const y = Math.floor(months / 12), m = months % 12;
+  if (y === 0) return `${m}개월`;
+  if (m === 0) return `${y}년`;
+  return `${y}년 ${m}개월`;
+}
+
+/* 목표 금액까지 모으는 데 걸리는 개월 수 (단순 적립 기준) */
+function monthsToSave(amount) {
+  if (amount <= 0) return 0;
+  if (monthlySave <= 0) return Infinity;
+  return Math.ceil(amount / monthlySave);
+}
 
 /* 축·라벨용 짧은 금액 표기: 15000 → "1.5억", 3000 → "3,000만" */
 function compactMan(v) {
@@ -115,6 +132,7 @@ function renderCashChart(basePrice) {
         tip: [
           { k: "살 수 있는 집", v: HP.fmtMan(s.price) + "원" },
           { k: "지금 대비", v: diff === 0 ? "기준" : (diff > 0 ? "+" : "−") + HP.fmtMan(Math.abs(diff)) },
+          { k: "모으는 기간", v: s.delta > 0 ? durationText(monthsToSave(s.delta)) : "지금 가능" },
         ],
       };
     }),
@@ -131,6 +149,30 @@ function renderCashChart(basePrice) {
     capIdx >= 0
       ? `📌 현금 <b>${HP.fmtMan(scen[capIdx].cash)}</b>부터는 <b>대출 한도</b>에 걸려서, 모은 금액만큼만 집값이 올라갑니다. 그 전까지는 현금 1을 모으면 집값은 여러 배로 올라요.`
       : `현금을 모을수록 대출 한도도 같이 올라가서, <b>모은 돈보다 더 큰 폭</b>으로 살 수 있는 집값이 올라갑니다.`;
+
+  renderSaveNote(scen, basePrice);
+}
+
+/* 월 저축액 기준 도달 시점 안내 + 자산목표 계산기 연결 */
+function renderSaveNote(scen, basePrice) {
+  const note = document.getElementById("save-note");
+  if (monthlySave <= 0) {
+    note.innerHTML = `매달 모을 수 있는 금액을 입력하면, 목표 현금까지 <b>얼마나 걸리는지</b> 알려드려요.`;
+    return;
+  }
+  // 대표 목표 2개(가장 가까운 증액 구간, 그다음 구간)를 골라 안내
+  const ups = scen.filter((s) => s.delta > 0);
+  if (!ups.length) {
+    note.innerHTML = `🎯 매달 <b>${HP.fmtMan(monthlySave)}</b>씩 모으는 계획을 <a href="goal.html">자산목표 계산기</a>에서 세워보세요.`;
+    return;
+  }
+  const pick = [ups[1] || ups[0], ups[ups.length - 1]].filter((v, i, a) => a.indexOf(v) === i);
+  const parts = pick.map(
+    (s) => `<b>${durationText(monthsToSave(s.delta))}</b> 뒤 <b>${HP.fmtMan(s.price)}</b>짜리 집`
+  );
+  note.innerHTML =
+    `🎯 매달 <b>${HP.fmtMan(monthlySave)}원</b>씩 모으면 ${parts.join(", ")}을 살 수 있어요. ` +
+    `투자수익까지 감안하면 더 빨라질 수 있어요 — <a href="goal.html">자산목표 계산기</a>에서 계획을 세워보세요.`;
 }
 
 function bindChips(id, key) {
@@ -144,6 +186,7 @@ function bindInputs() {
   ["income", "existing", "cash", "rate", "years", "age"].forEach((id) => {
     document.getElementById(id).oninput = (e) => { state[id] = +e.target.value || 0; render(); };
   });
+  document.getElementById("save").oninput = (e) => { monthlySave = Math.max(0, +e.target.value || 0); render(); };
   document.getElementById("first").onchange = (e) => { state.first = e.target.checked; render(); };
   document.getElementById("newborn").onchange = (e) => { state.newborn = e.target.checked; render(); };
   document.getElementById("small-area").onchange = (e) => { state.smallArea = e.target.checked; render(); };

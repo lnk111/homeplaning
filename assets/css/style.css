@@ -335,6 +335,13 @@ table.compare tr.best td:first-child { font-weight: 800; color: var(--accent); }
 .metric-row.cols-4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 @media (max-width: 560px) { .metric-row, .metric-row.cols-4 { grid-template-columns: 1fr; } }
 
+/* 섹션3 월 저축액 입력 */
+.save-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.save-row .save-label { font-size: 13px; color: var(--text-2); font-weight: 600; }
+.save-row .input-suffix { width: 150px; flex: none; }
+.save-note { margin: 12px 0 0; line-height: 1.6; font-size: 13px; color: var(--text-2); }
+.save-note a { color: var(--accent); font-weight: 700; }
+
 .insight { display: flex; gap: 12px; align-items: flex-start; background: rgba(232, 73, 47, .07); border-radius: var(--radius-sm); padding: 15px 17px; }
 .insight .ico { font-size: 18px; line-height: 1.2; flex: none; }
 .insight .it { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 3px; }

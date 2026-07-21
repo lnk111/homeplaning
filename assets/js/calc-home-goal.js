@@ -13,6 +13,7 @@ let P = null;
 
 const ICO_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
 const ICO_WARN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>';
+const NAVY = "#2b3245";
 
 function render() {
   const { max, bindKey, limits, term } = HPHome.loanLimits(P, state, state.price);
@@ -38,19 +39,24 @@ function render() {
   badge.className = "hero-badge " + (shortfall ? "warn" : "ok");
   badge.innerHTML = shortfall ? `${ICO_WARN} 자금 부족` : `${ICO_OK} 자금 충분`;
 
-  // 지표 카드 3칸
+  // 섹션1 — 지표 카드 4칸
   document.getElementById("r-loan").textContent = HP.fmtMan(max);
-  document.getElementById("r-loan-sub").textContent = `월 ${HP.fmtMan(monthly)}원 상환`;
+  document.getElementById("r-loan-sub").textContent = `집값의 ${loanPct}%`;
   document.getElementById("r-cash").textContent = HP.fmtMan(state.cash);
-  document.getElementById("r-cash-sub").textContent = `부대비용 ${HP.fmtMan(feeTotal)} 포함`;
+  document.getElementById("r-cash-sub").textContent = `총 필요 ${HP.fmtMan(totalNeed)} (부대비용 ${HP.fmtMan(feeTotal)} 포함)`;
+  document.getElementById("r-monthly").textContent = HP.fmtMan(monthly) + "원";
+  const burden = state.income > 0 ? Math.round(((monthly * 12 + state.existing) / state.income) * 100) : 0;
+  const msub = document.getElementById("r-monthly-sub");
+  msub.className = "ms " + (burden >= 38 ? "warn" : "ok");
+  msub.textContent = `소득의 ${burden}%`;
   document.getElementById("r-interest").textContent = HP.fmtMan(interest);
-  document.getElementById("r-interest-sub").textContent = `총 필요 ${HP.fmtMan(totalNeed)} · ${term}년`;
+  document.getElementById("r-interest-sub").textContent = `${term}년 상환 기준`;
 
-  // 자금 구성 도넛 (중앙 대출 비중 + 금액 범례)
+  // 섹션2 — 자금 구성 도넛 (중앙 대출 비중 + 금액 범례)
   HP.donutPanel(document.getElementById("donut"), [
-    { value: actualLoan, color: "#2b3245", label: `대출 (${loanPct}%)`, display: HP.fmtMan(actualLoan) },
+    { value: actualLoan, color: NAVY, label: `대출 (${loanPct}%)`, display: HP.fmtMan(actualLoan) },
     { value: ownEquity, color: "var(--accent)", label: `자기자본 (${ownPct}%)`, display: HP.fmtMan(ownEquity) },
-  ], { centerLabel: `${loanPct}%`, centerSub: "대출 비중" });
+  ], { centerLabel: `${loanPct}%`, centerSub: "대출 비중", centerColor: NAVY });
 
   // 정책대출
   const loanNeeded = Math.max(0, state.price - state.cash);
