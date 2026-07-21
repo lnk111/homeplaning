@@ -86,8 +86,9 @@
   <script src="../assets/js/app.js?v=5"></script>
   <script>
     // 상태: 각 항목은 '퍼센트'가 기준값(정확한 실수). 금액 = 실수령액 × %/100.
-    const S = { net: 280, rule: "503020", fixed: 50, life: 30, save: 20 };
-    const PRESETS = { "503020": [50, 30, 20], save80: [15, 5, 80] };
+    // 50·30·20 — 저축·투자 50 / 고정지출 30 / 생활·여가 20 (저축 우선 배분)
+    const S = { net: 280, rule: "503020", fixed: 30, life: 20, save: 50 };
+    const PRESETS = { "503020": [30, 20, 50], save80: [15, 5, 80] };
     const KEYS = ["fixed", "life", "save"];
     const LIFE_COLOR = "#9e9e9e";
 
