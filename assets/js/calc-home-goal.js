@@ -11,6 +11,9 @@ const state = {
 };
 let P = null;
 
+const ICO_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+const ICO_WARN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>';
+
 function render() {
   const { max, bindKey, limits, term } = HPHome.loanLimits(P, state, state.price);
   const feeTotal = HPHome.fees(P, state, state.price);
@@ -19,27 +22,35 @@ function render() {
   const months = term * 12;
   const monthly = HPHome.monthlyPayment(actualLoan, state.rate, months);
   const interest = monthly * months - actualLoan;
+  const totalNeed = state.price + feeTotal;
+  const ownEquity = Math.max(0, state.price - actualLoan);
+  const loanPct = state.price > 0 ? Math.round((actualLoan / state.price) * 100) : 0;
+  const ownPct = 100 - loanPct;
 
+  // 히어로 + 상태 배지
   document.getElementById("r-need").innerHTML =
     (need > 0 ? HP.fmtMan(need) : "충분") + (need > 0 ? '<span class="unit"> 원</span>' : "");
-  document.getElementById("r-loan").textContent = HP.fmtMan(max);
-  document.getElementById("r-loan-sub").textContent =
-    `한도 결정: ${bindKey} (LTV ${HP.fmtMan(limits.LTV)} · DSR ${HP.fmtMan(limits.DSR)} · 절대캡 ${
+  document.getElementById("r-term").textContent =
+    `한도 ${bindKey} 기준 (LTV ${HP.fmtMan(limits.LTV)} · DSR ${HP.fmtMan(limits.DSR)} · 절대캡 ${
       limits.절대캡 === Infinity ? "없음" : HP.fmtMan(limits.절대캡)})`;
-  document.getElementById("r-fees").textContent = HP.fmtMan(feeTotal);
+  const shortfall = need > 0;
+  const badge = document.getElementById("r-badge");
+  badge.className = "hero-badge " + (shortfall ? "warn" : "ok");
+  badge.innerHTML = shortfall ? `${ICO_WARN} 자금 부족` : `${ICO_OK} 자금 충분`;
+
+  // 지표 카드 3칸
+  document.getElementById("r-loan").textContent = HP.fmtMan(max);
+  document.getElementById("r-loan-sub").textContent = `월 ${HP.fmtMan(monthly)}원 상환`;
   document.getElementById("r-cash").textContent = HP.fmtMan(state.cash);
-  document.getElementById("r-monthly").textContent = HP.fmtManWon(monthly);
+  document.getElementById("r-cash-sub").textContent = `부대비용 ${HP.fmtMan(feeTotal)} 포함`;
   document.getElementById("r-interest").textContent = HP.fmtMan(interest);
-  document.getElementById("r-term").textContent = `상환 ${term}년 (만 ${state.age}세 기준)`;
+  document.getElementById("r-interest-sub").textContent = `총 필요 ${HP.fmtMan(totalNeed)} · ${term}년`;
 
-  // 총 필요 자금 = 매매가 + 부대비용
-  document.getElementById("r-total-need").textContent = HP.fmtMan(state.price + feeTotal);
-
-  // 도넛
-  HP.donut(document.getElementById("donut"), [
-    { value: actualLoan, color: "var(--navy)", label: "대출" },
-    { value: Math.max(0, state.price - actualLoan), color: "var(--accent)", label: "자기자본" },
-  ]);
+  // 자금 구성 도넛 (중앙 대출 비중 + 금액 범례)
+  HP.donutPanel(document.getElementById("donut"), [
+    { value: actualLoan, color: "#2b3245", label: `대출 (${loanPct}%)`, display: HP.fmtMan(actualLoan) },
+    { value: ownEquity, color: "var(--accent)", label: `자기자본 (${ownPct}%)`, display: HP.fmtMan(ownEquity) },
+  ], { centerLabel: `${loanPct}%`, centerSub: "대출 비중" });
 
   // 정책대출
   const loanNeeded = Math.max(0, state.price - state.cash);

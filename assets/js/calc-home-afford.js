@@ -11,6 +11,9 @@ const state = {
 };
 let P = null;
 
+const ICO_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+const ICO_WARN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>';
+
 function render() {
   const price = Math.floor(HPHome.affordablePrice(P, state) / 100) * 100; // 100만 단위 내림(예산 초과 방지)
   const { max, bindKey, limits, term } = HPHome.loanLimits(P, state, price);
@@ -21,31 +24,54 @@ function render() {
   const months = term * 12;
   const monthly = HPHome.monthlyPayment(loan, state.rate, months);
   const ownEquity = Math.max(0, price - loan);
+  const loanPct = price > 0 ? Math.round((loan / price) * 100) : 0;
+  const ownPct = 100 - loanPct;
 
   document.getElementById("r-price").innerHTML = HP.fmtMan(price) + '<span class="unit"> 원</span>';
   document.getElementById("r-price-sub").textContent =
     `대출 한도는 ${bindKey} 기준 (LTV ${HP.fmtMan(limits.LTV)} · DSR ${HP.fmtMan(limits.DSR)} · 절대캡 ${
       limits.절대캡 === Infinity ? "없음" : HP.fmtMan(limits.절대캡)})`;
 
+  // 상태 배지: DSR이 한도를 묶으면 소득 대비 상환 여력을 최대로 당겨 쓴 것
+  const heavyDSR = bindKey === "DSR";
+  const badge = document.getElementById("r-badge");
+  badge.className = "hero-badge " + (heavyDSR ? "warn" : "ok");
+  badge.innerHTML = heavyDSR ? `${ICO_WARN} 상환 부담 최대치` : `${ICO_OK} 상환 여력 여유`;
+
+  // 지표 카드 3칸
   document.getElementById("r-loan").textContent = HP.fmtMan(loan);
+  document.getElementById("r-loan-sub").textContent = `월 ${HP.fmtMan(monthly)}원 상환`;
   document.getElementById("r-cashused").textContent = HP.fmtMan(cashUsed);
-  document.getElementById("r-fees").textContent = HP.fmtMan(feeTotal);
+  document.getElementById("r-cash-sub").textContent = `부대비용 ${HP.fmtMan(feeTotal)} 포함`;
   document.getElementById("r-remain").textContent = HP.fmtMan(remain);
-  document.getElementById("r-monthly").textContent = HP.fmtManWon(monthly);
+  const remainLow = remain < 500; // 500만원 미만이면 예비비 부족 경고
+  const rsub = document.getElementById("r-remain-sub");
+  rsub.className = "ms " + (remainLow ? "warn" : "ok");
+  rsub.textContent = remainLow ? "예비비 거의 소진" : "예비비 확보";
 
-  HP.donut(document.getElementById("donut"), [
-    { value: loan, color: "var(--navy)", label: "대출" },
-    { value: ownEquity, color: "var(--accent)", label: "자기자본" },
-  ]);
+  // 자금 구성 도넛 (중앙 대출 비중 + 금액 범례)
+  HP.donutPanel(document.getElementById("donut"), [
+    { value: loan, color: "#2b3245", label: `대출 (${loanPct}%)`, display: HP.fmtMan(loan) },
+    { value: ownEquity, color: "var(--accent)", label: `자기자본 (${ownPct}%)`, display: HP.fmtMan(ownEquity) },
+  ], { centerLabel: `${loanPct}%`, centerSub: "대출 비중" });
 
-  // 정책대출 활용 안내
+  // 정책대출 인사이트 카드
   const rows = HPHome.policyRows(P, state, loan, price);
   const eligible = rows.filter((r) => r.eligible && r.name !== "일반 주담대");
   let best = null;
   for (const r of eligible) if (!best || r.rate < best.rate) best = r;
-  document.getElementById("policy-hint").innerHTML = best
-    ? `💡 <strong>${best.name}</strong>(금리 ${best.rate.toFixed(2)}%) 자격이 됩니다. 정책대출을 쓰면 이자 부담이 줄어 더 좋은 조건이 될 수 있어요. <a href="home-goal.html" style="color:var(--accent);font-weight:700">내집자금 계산기</a>에서 비교해 보세요.`
-    : `일반 주담대 기준으로 산출했습니다. 조건에 맞는 정책대출이 있으면 한도·이자가 달라질 수 있어요.`;
+  const ico = document.getElementById("r-insight-ico");
+  const ititle = document.getElementById("r-insight-title");
+  const idesc = document.getElementById("r-insight-desc");
+  if (best) {
+    ico.textContent = "💡";
+    ititle.textContent = `${best.name} 자격이 됩니다 · 금리 ${best.rate.toFixed(2)}%`;
+    idesc.innerHTML = `정책대출을 쓰면 이자 부담이 줄어 월 상환액이 낮아져요. <a href="home-goal.html">내집자금 계산기</a>에서 비교해 보세요.`;
+  } else {
+    ico.textContent = "ℹ️";
+    ititle.textContent = "일반 주담대 기준으로 산출했습니다";
+    idesc.textContent = "조건에 맞는 정책대출이 있으면 한도·이자가 달라질 수 있어요.";
+  }
 }
 
 function bindChips(id, key) {
