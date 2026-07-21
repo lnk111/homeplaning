@@ -142,7 +142,19 @@
           <p class="small" id="d-tax-note" style="margin:12px 0 0;line-height:1.6;color:var(--text-2)"></p>
         </div>
 
-        <p class="note">※ 배당·주가는 변동하며 미래를 보장하지 않습니다. 세금은 15.4% 원천징수 기준이며, 실제 세액은 다른 금융소득·종합과세 여부에 따라 달라집니다. 참고용 추정치입니다.</p>
+        <div class="card" style="margin-bottom:12px">
+          <h3 style="font-size:16px;color:var(--navy);margin-bottom:4px">투자 방식별 비교</h3>
+          <p class="small muted" style="margin:0 0 12px;line-height:1.5">같은 조건(원금·월 납입·수익률·기간)에서 <b>세금만 다를 때</b> 실제로 손에 쥐는 금액입니다.</p>
+          <div style="overflow-x:auto">
+            <table class="compare" id="d-compare">
+              <thead><tr><th>방식</th><th>세율</th><th><span id="d-cmp-year">10</span>년차 세후</th><th>누적 세후 배당</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="small" id="d-cmp-note" style="margin:12px 0 0;line-height:1.6;color:var(--text-2)"></p>
+        </div>
+
+        <p class="note">※ 배당·주가는 변동하며 미래를 보장하지 않습니다. 세금은 선택한 투자 방식의 기본 세율 기준이며, 실제 세액은 다른 금융소득·종합과세 여부, 건강보험료 영향에 따라 달라집니다. 매매차익에 붙는 양도소득세는 계산에 포함하지 않았습니다. 참고용 추정치입니다.</p>
       </div>
     </div>
 
@@ -230,6 +242,38 @@
            국내 주식은 <b>매매차익에 세금이 없어</b>(대주주 제외) 미국 주식의 양도세 22%와 크게 다릅니다.`;
     }
 
+    /* 세 방식을 같은 조건으로 계산해 나란히 비교 */
+    const TYPE_NAME = { isa: "ISA·국내ETF", us: "미국 주식", kr: "국내 주식" };
+    const TYPE_RATE = { isa: "0 → 9.9%", us: "15%", kr: "15.4%" };
+    function renderCompare(viewYear) {
+      const list = ["isa", "us", "kr"].map((t) => {
+        const { rows } = dividendYears(t);
+        return {
+          type: t,
+          cur: rows[Math.min(viewYear, rows.length) - 1],
+          netTotal: rows.reduce((s, r) => s + r.net, 0),
+        };
+      });
+      const best = list.reduce((a, b) => (b.netTotal > a.netTotal ? b : a));
+      document.getElementById("d-cmp-year").textContent = viewYear;
+      document.querySelector("#d-compare tbody").innerHTML = list.map((x) => {
+        const isBest = x.type === best.type;
+        const name = TYPE_NAME[x.type] + (x.type === "isa" ? (DS.isaType === "general" ? " 일반형" : " 서민형") : "");
+        return `<tr class="${isBest ? "best" : ""}">
+          <td>${name}${x.type === DS.type ? ' <span class="badge na">현재</span>' : ""}</td>
+          <td>${TYPE_RATE[x.type]}</td>
+          <td>${HP.fmtMan(x.cur.net)}</td>
+          <td>${HP.fmtMan(x.netTotal)}${isBest ? ' <span class="badge best">유리</span>' : ""}</td></tr>`;
+      }).join("");
+
+      const gap = best.netTotal - list.reduce((a, b) => (b.netTotal < a.netTotal ? b : a)).netTotal;
+      document.getElementById("d-cmp-note").innerHTML =
+        `세금만 놓고 보면 <b>${TYPE_NAME[best.type]}</b>이(가) 기간 전체로 <b>${HP.fmtMan(gap)}원</b> 더 남습니다.
+         다만 ISA는 <b>연 4,000만·총 2억 납입한도</b>와 <b>3년 의무가입</b>이 있고,
+         국내 주식은 배당세가 가장 높은 대신 <b>매매차익이 비과세</b>라 팔 때 유리합니다.
+         배당만이 아니라 <b>언제 팔지</b>까지 함께 보고 고르세요.`;
+    }
+
     /* 투자 방식에 따라 설명·ISA 유형 노출을 전환 */
     const TYPE_DESC = {
       isa: "ISA 계좌에 담은 <b>국내상장 해외 배당 ETF</b> 기준. 순이익이 비과세 한도까지는 세금이 없고, 넘는 만큼만 9.9%를 냅니다.",
@@ -299,7 +343,8 @@
     }
 
     // 연도별 배당 흐름 계산 (세금은 원천징수 15.4% 기준)
-    function dividendYears() {
+    function dividendYears(type) {
+      const t = type || DS.type; // 비교표에서 다른 방식도 계산할 수 있게 인자로 받는다
       const yrs = Math.max(1, DS.years);
       const yearlyAdd = DS.monthlyAdd * 12;
       let base = DS.principal;   // 배당을 받는 투자 자산
@@ -317,12 +362,12 @@
         paid += yearlyAdd;
         // ISA는 '누적 순이익' 기준 비과세라 한도를 해마다 깎아 나가며 배분한다
         let tax;
-        if (DS.type === "isa") {
+        if (t === "isa") {
           const exempt = Math.min(div, exemptLeft);
           exemptLeft -= exempt;
           tax = (div - exempt) * ISA_RATE;
         } else {
-          tax = div * (DS.type === "kr" ? KR_RATE : US_RATE);
+          tax = div * (t === "kr" ? KR_RATE : US_RATE);
         }
         rows.push({ year: y, div, tax, net: div - tax, cumDiv, paid });
         pts.push({ year: y, base: paid, total: paid + cumDiv });
@@ -344,6 +389,7 @@
       document.getElementById("d-monthly").textContent =
         `세후 약 ${HP.fmtMan(cur.net)}원 · 월 평균 ${HP.fmtManWon(cur.net / 12)}`;
       renderDividendTable(rows, viewYear);
+      renderCompare(viewYear);
       document.getElementById("d-total-asset").textContent = HP.fmtMan(finalAsset) + "원";
       document.getElementById("d-principal-out").textContent = HP.fmtMan(principal) + "원";
       document.getElementById("d-roi").textContent = roi.toFixed(2) + "%";
