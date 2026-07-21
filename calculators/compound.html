@@ -41,13 +41,24 @@
           <div class="label"><span id="yr-label">20</span>년 후 예상 자산</div>
           <div class="big"><span id="r-final">–</span></div>
         </div>
-        <div class="stat-row" style="margin-bottom:12px">
-          <div class="stat"><div class="k">총 납입 원금</div><div class="v" id="r-principal">–</div></div>
-          <div class="stat"><div class="k">투자 수익</div><div class="v accent" id="r-profit">–</div></div>
-        </div>
-        <div class="card" style="margin-bottom:12px">
-          <h3 style="font-size:16px;color:var(--navy);margin-bottom:10px">연도별 자산 성장</h3>
-          <div id="chart" class="chart-box"></div>
+        <div class="card card-pad" style="margin-bottom:12px">
+          <h3 style="font-size:18px;color:var(--text)">투자 결과</h3>
+          <p class="muted small" style="margin:6px 0 18px">복리의 힘으로 시간이 지날수록 자산이 어떻게 쌓여 가는지 한눈에 확인해 보세요.</p>
+
+          <div class="res-grid">
+            <div class="res-stat"><div class="k">총 투자 결과</div><div class="v accent" id="r-final-2">–</div></div>
+            <div class="res-stat"><div class="k">총 투자금액</div><div class="v" id="r-principal">–</div></div>
+          </div>
+          <hr class="res-div">
+          <div class="res-grid">
+            <div class="res-stat"><div class="k">총 수익률</div><div class="v accent" id="r-roi">–</div></div>
+            <div class="res-stat"><div class="k">총 투자수익</div><div class="v" id="r-profit">–</div></div>
+          </div>
+
+          <div class="prop-head"><span class="pl" id="r-plabel">납입금 –</span><span class="pr" id="r-ylabel">수익금 –</span></div>
+          <div class="prop-bar"><span class="pb-seg pb-base" id="r-pbar"></span><span class="pb-seg pb-top" id="r-ybar"></span></div>
+
+          <div id="chart" style="margin-top:20px"></div>
         </div>
         <div class="card">
           <h3 style="font-size:16px;color:var(--navy);margin-bottom:6px">단리 vs 복리</h3>
@@ -77,37 +88,41 @@
       }
       return { final: bal, yearly };
     }
+    // 연도별 지점: 납입원금(base) + 총자산(total)
+    function pointsFor() {
+      const r = S.rate / 100 / 12, n = S.years * 12;
+      const arr = [{ year: 0, base: S.initial, total: S.initial }];
+      let bal = S.initial;
+      for (let m = 1; m <= n; m++) {
+        bal = bal * (1 + r) + S.monthly;
+        if (m % 12 === 0) arr.push({ year: m / 12, base: S.initial + S.monthly * m, total: bal });
+      }
+      if (n % 12 !== 0) arr.push({ year: n / 12, base: S.initial + S.monthly * n, total: bal });
+      return arr;
+    }
     function render() {
-      const { final, yearly } = grow(S.monthly, S.rate, S.years, S.initial);
+      const { final } = grow(S.monthly, S.rate, S.years, S.initial);
       const principal = S.initial + S.monthly * S.years * 12;
-      const profit = final - principal;
+      const profit = Math.max(0, final - principal);
+      const roi = principal > 0 ? (profit / principal) * 100 : 0;
       document.getElementById("r-final").innerHTML = HP.fmtMan(final) + '<span class="unit"> 원</span>';
-      document.getElementById("r-principal").textContent = HP.fmtMan(principal);
-      document.getElementById("r-profit").textContent = HP.fmtMan(profit);
       document.getElementById("yr-label").textContent = S.years;
-      // chart: pick ~8 checkpoints, 원금(아래)+투자수익(위) 누적 막대
-      const step = Math.max(1, Math.round(yearly.length / 8));
-      const series = [];
-      const addPoint = (i) => {
-        const y = i + 1;
-        const principal = S.initial + S.monthly * 12 * y; // 그해까지 납입 원금
-        const total = yearly[i];
-        const profit = Math.max(0, total - principal);
-        series.push({
-          label: y + "년",
-          parts: [
-            { value: Math.min(principal, total), color: "var(--navy)" },
-            { value: profit, color: "var(--accent)" },
-          ],
-        });
-      };
-      for (let i = step - 1; i < yearly.length; i += step) addPoint(i);
-      if (series[series.length - 1].label !== yearly.length + "년") addPoint(yearly.length - 1);
-      HP.stackedBars(document.getElementById("chart"), series, {
-        legend: [
-          { label: "원금", color: "var(--navy)" },
-          { label: "투자수익", color: "var(--accent)" },
-        ],
+
+      // 투자 결과 카드
+      document.getElementById("r-final-2").textContent = HP.fmtMan(final) + "원";
+      document.getElementById("r-principal").textContent = HP.fmtMan(principal) + "원";
+      document.getElementById("r-roi").textContent = roi.toFixed(2) + "%";
+      document.getElementById("r-profit").textContent = HP.fmtMan(profit) + "원";
+      const pPct = final > 0 ? Math.round((principal / final) * 100) : 0, yPct = 100 - pPct;
+      document.getElementById("r-plabel").textContent = `납입금 ${pPct}%`;
+      document.getElementById("r-ylabel").textContent = `수익금 ${yPct}%`;
+      document.getElementById("r-pbar").style.width = pPct + "%";
+      document.getElementById("r-ybar").style.width = yPct + "%";
+
+      // 연도별 자산 성장 (호버: N년 후 납입원금·총자산)
+      HP.lineChart(document.getElementById("chart"), {
+        points: pointsFor(), baseColor: "rgba(0,0,0,.38)", totalColor: "var(--accent)",
+        fmt: (v) => HP.fmtMan(v) + "원", axisFmt: (v) => (v ? HP.fmtMan(v) : "0"),
       });
       // 단리 비교
       const simple = S.initial * (1 + (S.rate / 100) * S.years) + S.monthly * 12 * S.years; // 대략 단리(원금 이자 미포함 근사)
