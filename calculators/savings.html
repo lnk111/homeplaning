@@ -62,6 +62,7 @@
           <div class="chips" id="d-type">
             <button class="chip on" data-v="isa">ISA·국내ETF</button>
             <button class="chip" data-v="us">미국 주식</button>
+            <button class="chip" data-v="kr">국내 주식</button>
           </div>
           <p class="small muted" id="d-type-desc" style="margin:8px 0 0;line-height:1.5"></p>
         </div>
@@ -165,6 +166,9 @@
     const ISA_EXEMPT = { general: 500, low: 1000 }; // 2026~ ISA 비과세 한도(순이익 누적 기준)
     const ISA_RATE = 0.099;      // 비과세 한도 초과분 분리과세 9%+지방세
     const US_RATE = 0.15;        // 미국 현지 원천징수(한미조세조약). 국내 추가 과세 없음
+    const KR_RATE = 0.154;       // 국내 배당소득세 14% + 지방소득세 1.4%
+    const HEALTH_INCLUDE = 1000; // 건보 피부양자 판정 시 금융소득 전액 합산이 시작되는 선
+    const HEALTH_LOSE = 2000;    // 연 소득 초과 시 피부양자 탈락
     const ISA_PAY_YEAR = 4000;   // ISA 연간 납입한도
     const ISA_PAY_TOTAL = 20000; // ISA 총 납입한도
 
@@ -198,7 +202,8 @@
         shown = rows.filter((r) => keep.has(r.year));
       }
       const isISA = DS.type === "isa";
-      document.getElementById("d-th-tax").textContent = isISA ? "세금 9.9%" : "세금 15%";
+      document.getElementById("d-th-tax").textContent =
+        isISA ? "세금 9.9%" : DS.type === "kr" ? "세금 15.4%" : "세금 15%";
       document.querySelector("#d-table tbody").innerHTML = shown.map((r) => {
         // ISA는 분리과세라 종합과세 배지를 붙이지 않는다
         const over = !isISA && r.div > FIN_THRESHOLD;
@@ -210,19 +215,52 @@
           <td>${HP.fmtMan(r.net)}</td>
           <td>${HP.fmtManWon(r.net / 12)}</td></tr>`;
       }).join("");
-      document.getElementById("d-tax-note").innerHTML = isISA ? isaNote(rows) : usNote(rows);
+      const note = isISA ? isaNote(rows) : DS.type === "kr" ? krNote(rows) : usNote(rows);
+      const health = isISA ? "" : healthNote(rows);
+      document.getElementById("d-tax-note").innerHTML = note + (health ? `<br><br>${health}` : "");
+    }
+
+    /* 국내 주식 — 15.4% + 종합과세 경계. 매매차익이 비과세인 점이 미국과의 큰 차이 */
+    function krNote(rows) {
+      const first = rows.find((r) => r.div > FIN_THRESHOLD);
+      return first
+        ? `⚠️ <b>${first.year}년차</b>부터 연 배당금이 <b>2,000만원</b>을 넘습니다. 초과분은 근로소득 등과 합쳐 과세하는
+           <b>금융소득종합과세</b> 대상이라 실제 세금이 위 표(15.4%)보다 <b>더 커질 수 있습니다</b>(6.6~49.5%).`
+        : `연 금융소득(이자+배당)이 <b>2,000만원 이하</b>면 15.4% 원천징수로 납세가 끝납니다.
+           국내 주식은 <b>매매차익에 세금이 없어</b>(대주주 제외) 미국 주식의 양도세 22%와 크게 다릅니다.`;
     }
 
     /* 투자 방식에 따라 설명·ISA 유형 노출을 전환 */
+    const TYPE_DESC = {
+      isa: "ISA 계좌에 담은 <b>국내상장 해외 배당 ETF</b> 기준. 순이익이 비과세 한도까지는 세금이 없고, 넘는 만큼만 9.9%를 냅니다.",
+      us: "<b>미국 주식·ETF를 직접</b> 보유하는 경우. 배당을 받을 때 미국에서 15%를 떼갑니다. 팔 때 생기는 차익은 별도로 양도세 22%(연 250만원 공제) 대상입니다.",
+      kr: "<b>국내 상장 주식·ETF</b>를 일반 계좌로 보유하는 경우. 배당은 15.4%지만 <b>매매차익은 비과세</b>입니다(대주주 제외).",
+    };
+    const TAX_INTRO = {
+      isa: "비과세 한도까지는 세금이 <b>0원</b>이고, 초과분에만 <b>9.9%</b> 분리과세가 붙은 실수령액입니다.",
+      us: "미국에서 <b>15%</b>를 원천징수한 실수령액입니다. 국내에서 추가로 내는 세금은 없습니다.",
+      kr: "배당소득세 <b>15.4%</b>(소득세 14% + 지방소득세 1.4%)를 뗀 실수령액입니다.",
+    };
     function applyTypeUI() {
       const isISA = DS.type === "isa";
       document.getElementById("d-isa-field").style.display = isISA ? "" : "none";
-      document.getElementById("d-type-desc").innerHTML = isISA
-        ? "ISA 계좌에 담은 <b>국내상장 해외 배당 ETF</b> 기준. 순이익이 비과세 한도까지는 세금이 없고, 넘는 만큼만 9.9%를 냅니다."
-        : "<b>미국 주식·ETF를 직접</b> 보유하는 경우. 배당을 받을 때 미국에서 15%를 떼갑니다.";
-      document.getElementById("d-tax-intro").innerHTML = isISA
-        ? "비과세 한도까지는 세금이 <b>0원</b>이고, 초과분에만 <b>9.9%</b> 분리과세가 붙은 실수령액입니다."
-        : "미국에서 <b>15%</b>를 원천징수한 실수령액입니다. 국내에서 추가로 내는 세금은 없습니다.";
+      document.getElementById("d-type-desc").innerHTML = TYPE_DESC[DS.type];
+      document.getElementById("d-tax-intro").innerHTML = TAX_INTRO[DS.type];
+    }
+
+    /* 건강보험 피부양자 — 세금보다 체감이 큰 부분이라 별도로 안내 */
+    function healthNote(rows) {
+      const lose = rows.find((r) => r.div > HEALTH_LOSE);
+      const include = rows.find((r) => r.div > HEALTH_INCLUDE);
+      if (lose) {
+        return `🏥 <b>${lose.year}년차</b>부터는 연 배당이 <b>2,000만원</b>을 넘어 <b>건강보험 피부양자에서 탈락</b>할 수 있습니다.
+                지역가입자로 바뀌면 재산·소득에 따라 월 건보료가 새로 부과됩니다. 직장가입자라면 해당 없습니다.`;
+      }
+      if (include) {
+        return `🏥 <b>${include.year}년차</b>부터 연 배당이 <b>1,000만원</b>을 넘습니다. 이때부터는 금융소득 <b>전액</b>이
+                건강보험 피부양자 판정 소득에 합산됩니다(1,000만원 이하면 아예 제외). 다른 소득과 합쳐 2,000만원을 넘으면 탈락합니다.`;
+      }
+      return "";
     }
 
     /* ISA — 비과세 소진 시점 + 납입한도·의무가입 주의사항 */
@@ -244,7 +282,8 @@
       if (totalPay > ISA_PAY_TOTAL) warn.push(`총 납입 ${HP.fmtMan(totalPay)}원이 <b>총 한도 2억원</b> 초과`);
       if (DS.years < 3) warn.push(`ISA는 <b>의무가입 3년</b>이라 중도해지 시 혜택이 사라짐`);
       if (warn.length) parts.push(`⚠️ ${warn.join(" · ")}.`);
-      parts.push(`<span class="muted">※ 국내상장 해외ETF는 펀드 안에서 현지 원천징수(미국 15% 등)가 이미 빠진 분배금이 들어옵니다. 위 표는 그 이후의 국내 세금입니다.</span>`);
+      parts.push(`<span class="muted">※ 국내상장 해외ETF는 펀드 안에서 현지 원천징수(미국 15% 등)가 이미 빠진 분배금이 들어옵니다. 위 표는 그 이후의 국내 세금입니다.
+        ※ ISA 분리과세분은 건강보험료 산정에서 빠지는 것으로 알려져 있으나, 피부양자 자격 판정 기준은 별도이므로 가입 전 확인하세요.</span>`);
       return parts.join(" ");
     }
 
@@ -283,7 +322,7 @@
           exemptLeft -= exempt;
           tax = (div - exempt) * ISA_RATE;
         } else {
-          tax = div * US_RATE;
+          tax = div * (DS.type === "kr" ? KR_RATE : US_RATE);
         }
         rows.push({ year: y, div, tax, net: div - tax, cumDiv, paid });
         pts.push({ year: y, base: paid, total: paid + cumDiv });
