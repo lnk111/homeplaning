@@ -37,9 +37,15 @@
             <div class="input-suffix"><input class="input" type="number" id="age" value="34" min="20" max="65" step="1"><span class="suffix">세</span></div>
           </div>
         </div>
-        <div class="field">
-          <label>보유 현금 <span class="hint">자기자본</span></label>
-          <div class="input-suffix"><input class="input" type="number" id="cash" value="15000" min="0" step="500"><span class="suffix">만원</span></div>
+        <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <label>보유 현금 <span class="hint">자기자본</span></label>
+            <div class="input-suffix"><input class="input" type="number" id="cash" value="15000" min="0" step="500"><span class="suffix">만원</span></div>
+          </div>
+          <div>
+            <label>순자산 <span class="hint">선택</span></label>
+            <div class="input-suffix"><input class="input" type="number" id="net-worth" value="" min="0" step="1000" placeholder="현금 기준" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
+          </div>
         </div>
         <div class="field">
           <label>기존 대출 연 상환액 <span class="hint">없으면 0</span></label>
@@ -64,6 +70,7 @@
         </div>
         <div class="field" style="display:flex;gap:24px;flex-wrap:wrap">
           <label class="switch"><input type="checkbox" id="no-house" checked /><span class="track"></span>무주택 세대주</label>
+          <label class="switch"><input type="checkbox" id="dual-income" /><span class="track"></span>맞벌이</label>
           <label class="switch"><input type="checkbox" id="first" /><span class="track"></span>생애최초</label>
           <label class="switch"><input type="checkbox" id="newborn" /><span class="track"></span>신생아 특례</label>
           <label class="switch"><input type="checkbox" id="small-area" checked /><span class="track"></span>전용 85㎡ 이하</label>
@@ -171,7 +178,7 @@
 
   <script src="../assets/js/app.js?v=5"></script>
   <script src="../assets/js/policy.js"></script>
-  <script src="../assets/js/calc-home-core.js?v=3"></script>
-  <script src="../assets/js/calc-home-afford.js?v=8"></script>
+  <script src="../assets/js/calc-home-core.js?v=4"></script>
+  <script src="../assets/js/calc-home-afford.js?v=9"></script>
 </body>
 </html>

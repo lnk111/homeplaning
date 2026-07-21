@@ -60,8 +60,10 @@ ${JSON.stringify(current, null, 2)}
   **공식적으로 확정된 변경**을 확인한 경우에만 수정하고, 그렇지 않으면 기존 값을 그대로 둡니다.
 - policy_loans 의 자격 판정 필드는 계산기가 직접 읽어 '대출 가능/불가'를 판정합니다.
   **절대 삭제하지 말고**, 공식 변경을 확인한 경우에만 값을 수정하세요:
-  income_cap_man(일반 소득상한), income_cap_first_man(생애최초), income_cap_newlywed_man(신혼),
-  income_cap_multichild_man(2자녀 이상), net_worth_cap_man(순자산 상한),
+  income_cap_man(일반 소득상한), income_cap_dual_man(맞벌이), income_cap_first_man(생애최초),
+  income_cap_newlywed_man(신혼), income_cap_1child_man(1자녀), income_cap_multichild_man(2자녀 이상),
+  limit_general_man / limit_first_man / limit_newlywed_man / limit_1child_man / limit_multichild_man(세대별 한도),
+  net_worth_cap_man(순자산 상한),
   requires_small_area(전용면적 85㎡ 요건), requires_no_house(무주택 요건),
   requires_newborn(출산 요건), age_max, ltv_max, dti_max.
   예) 디딤돌은 소득 6,000/생애최초·2자녀 7,000/신혼 8,500만원 이하, 순자산 5.11억 이하, 무주택 세대주.

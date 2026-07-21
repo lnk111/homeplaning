@@ -7,6 +7,7 @@ const state = {
   income: 6000, existing: 0, cash: 15000, age: 34,
   region: "수도권_비규제", household: "일반",
   first: false, newborn: false, smallArea: true, hasHouse: false,
+  dualIncome: false, netWorth: 0,
   rate: 4.0, years: 30, bank: "은행",
 };
 let P = null;
@@ -187,6 +188,8 @@ function bindInputs() {
     document.getElementById(id).oninput = (e) => { state[id] = +e.target.value || 0; render(); };
   });
   document.getElementById("save").oninput = (e) => { monthlySave = Math.max(0, +e.target.value || 0); render(); };
+  document.getElementById("net-worth").oninput = (e) => { state.netWorth = +e.target.value || 0; render(); };
+  document.getElementById("dual-income").onchange = (e) => { state.dualIncome = e.target.checked; render(); };
   document.getElementById("no-house").onchange = (e) => { state.hasHouse = !e.target.checked; render(); };
   document.getElementById("first").onchange = (e) => { state.first = e.target.checked; render(); };
   document.getElementById("newborn").onchange = (e) => { state.newborn = e.target.checked; render(); };
