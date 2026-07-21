@@ -32,7 +32,6 @@ function render() {
   document.getElementById("r-fees").textContent = HP.fmtMan(feeTotal);
   document.getElementById("r-remain").textContent = HP.fmtMan(remain);
   document.getElementById("r-monthly").textContent = HP.fmtManWon(monthly);
-  document.getElementById("r-term").textContent = `상환 ${term}년 (만 ${state.age}세) · 월 상환 ${HP.fmtManWon(monthly)}`;
 
   HP.donut(document.getElementById("donut"), [
     { value: loan, color: "var(--navy)", label: "대출" },
