@@ -8,5 +8,5 @@ window.HP_CONFIG = {
   // 미설정(xxxx 포함) 시 자동으로 메일 앱(mailto)으로 대체됩니다.
   FORM_ENDPOINT: "https://formspree.io/f/xaqrnvbe",
   EMAIL: "729497@gmail.com",
-  BRAND: "Design For",
+  BRAND: "디자인포",
 };

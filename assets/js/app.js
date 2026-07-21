@@ -87,7 +87,7 @@ function renderFooter() {
       <div class="disc">
         홈플래닝의 모든 계산 결과는 <strong>참고용 추정치</strong>이며, 실제 대출 한도·금리·세금은 개인 신용,
         금융기관 심사, 시장 상황에 따라 달라질 수 있습니다. 투자·대출 결정 전 반드시 전문가와 상담하세요.
-        <br>운영: Design For · 문의 <a style="display:inline;color:rgba(255,255,255,.5);text-decoration:underline" href="${b}contact.html">여기</a>
+        <br>운영: 디자인포 · 문의 <a style="display:inline;color:rgba(255,255,255,.5);text-decoration:underline" href="${b}contact.html">여기</a>
         · © 2026 홈플래닝(homeplaning.kr)
       </div>
     </div>

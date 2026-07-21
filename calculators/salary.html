@@ -32,6 +32,13 @@
         </div>
         <div id="alloc">
           <div class="field">
+            <label><span class="cat-dot" style="background:var(--accent)"></span>저축·투자 <span class="hint">적금·펀드·비상금</span></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div class="input-suffix"><input class="input" type="number" id="save-amt" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">만원</span></div>
+              <div class="input-suffix"><input class="input" type="number" id="save-pct" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">%</span></div>
+            </div>
+          </div>
+          <div class="field">
             <label><span class="cat-dot" style="background:var(--navy)"></span>고정지출 <span class="hint">월세·통신·보험</span></label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
               <div class="input-suffix"><input class="input" type="number" id="fixed-amt" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">만원</span></div>
@@ -43,13 +50,6 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
               <div class="input-suffix"><input class="input" type="number" id="life-amt" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">만원</span></div>
               <div class="input-suffix"><input class="input" type="number" id="life-pct" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">%</span></div>
-            </div>
-          </div>
-          <div class="field">
-            <label><span class="cat-dot" style="background:var(--accent)"></span>저축·투자 <span class="hint">적금·펀드·비상금</span></label>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-              <div class="input-suffix"><input class="input" type="number" id="save-amt" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">만원</span></div>
-              <div class="input-suffix"><input class="input" type="number" id="save-pct" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">%</span></div>
             </div>
           </div>
           <div class="sum-box" id="sum-box"><span id="sum-msg"></span><span class="total" id="sum-total"></span></div>
@@ -83,7 +83,7 @@
   </main>
   <div id="app-footer"></div>
 
-  <script src="../assets/js/app.js?v=6"></script>
+  <script src="../assets/js/app.js?v=7"></script>
   <script>
     // 상태: 각 항목은 '퍼센트'가 기준값(정확한 실수). 금액 = 실수령액 × %/100.
     // 50·30·20 — 저축·투자 50 / 고정지출 30 / 생활·여가 20 (저축 우선 배분)

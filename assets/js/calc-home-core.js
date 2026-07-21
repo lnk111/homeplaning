@@ -146,9 +146,8 @@ function policyRows(P, state, loanNeeded, price) {
     if (pl.age_max && state.age > pl.age_max) reasons.push(`만 ${pl.age_max}세 이하`);
     const incCap = incomeCapFor(pl, state);
     if (incCap && state.income > incCap) reasons.push(`소득 ${HP.fmtMan(incCap)} 이하`);
-    // 순자산: 입력값 우선, 비워두면 보유 현금으로 하한만 검증
-    const netWorth = state.netWorth > 0 ? state.netWorth : state.cash;
-    if (pl.net_worth_cap_man && netWorth > pl.net_worth_cap_man) reasons.push(`순자산 ${HP.fmtMan(pl.net_worth_cap_man)} 이하`);
+    // 순자산은 별도 입력이 없어 보유 현금으로 하한만 검증(현금만으로 이미 초과면 확실히 불가)
+    if (pl.net_worth_cap_man && state.cash > pl.net_worth_cap_man) reasons.push(`순자산 ${HP.fmtMan(pl.net_worth_cap_man)} 이하`);
     const eligible = reasons.length === 0;
     const reason = reasons.slice(0, 2).join(" · ");
     const limit = limitFor(pl, state);

@@ -89,15 +89,9 @@
           <label>연 배당 성장률</label>
           <div class="input-suffix"><input class="input" type="number" id="d-growth" value="5" min="0" step="0.5" inputmode="decimal" autocomplete="off"><span class="suffix">%</span></div>
         </div>
-        <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div>
-            <label>보유 기간</label>
-            <div class="input-suffix"><input class="input" type="number" id="d-years" value="10" min="1" max="50" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">년</span></div>
-          </div>
-          <div>
-            <label>확인할 연차 <span class="hint">몇 년차</span></label>
-            <div class="input-suffix"><input class="input" type="number" id="d-view-year" value="10" min="1" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">년차</span></div>
-          </div>
+        <div class="field">
+          <label>보유 기간</label>
+          <div class="input-suffix"><input class="input" type="number" id="d-years" value="10" min="1" max="50" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">년</span></div>
         </div>
         <div class="field">
           <label class="switch"><input type="checkbox" id="d-reinvest" checked><span class="track"></span>배당 재투자 (복리)</label>
@@ -161,12 +155,12 @@
   </main>
   <div id="app-footer"></div>
 
-  <script src="../assets/js/app.js?v=6"></script>
+  <script src="../assets/js/app.js?v=7"></script>
   <script src="../assets/js/policy.js"></script>
   <script>
     let PROD = [];
     const YS = { idx: 0, monthly: 50, rate: 4.5 };
-    const DS = { principal: 3000, monthlyAdd: 30, yield: 4, growth: 5, years: 10, reinvest: true, viewYear: 10,
+    const DS = { principal: 3000, monthlyAdd: 30, yield: 4, growth: 5, years: 10, reinvest: true,
                  type: "isa", isaType: "general" };
     const FIN_THRESHOLD = 2000;  // 금융소득종합과세 기준 2,000만원(만원 단위)
     const MAX_ROWS = 15;         // 표가 길어지면 구간을 건너뛰어 표시
@@ -216,7 +210,7 @@
         const over = !isISA && r.div > FIN_THRESHOLD;
         const free = isISA && r.tax === 0;
         return `<tr class="${r.year === viewYear ? "best" : ""}">
-          <td>${r.year}년차${r.year === viewYear ? ' <span class="badge best">선택</span>' : ""}</td>
+          <td>${r.year}년차${r.year === viewYear ? ' <span class="badge best">최종</span>' : ""}</td>
           <td>${HP.fmtMan(r.div)}${over ? ' <span class="badge na">종합과세</span>' : ""}</td>
           <td>${free ? '<span class="badge best">비과세</span>' : HP.fmtMan(r.tax)}</td>
           <td class="net">${HP.fmtMan(r.net)}</td>
@@ -373,7 +367,7 @@
     function renderDividend() {
       const { rows, pts, paid, cumDiv } = dividendYears();
       // 확인할 연차는 보유 기간을 넘지 않도록 보정
-      const viewYear = Math.min(Math.max(1, DS.viewYear), rows.length);
+      const viewYear = rows.length; // 입력을 없애고 항상 마지막 연차 기준으로 표시
       const cur = rows[viewYear - 1];
       const principal = paid;
       const finalAsset = principal + cumDiv;
@@ -429,14 +423,7 @@
     bindNum("d-yield", DS, "yield", renderDividend, 0);
     bindNum("d-growth", DS, "growth", renderDividend, 0);
     // 보유 기간을 줄이면 확인 연차도 따라 줄인다(입력칸 값까지 동기화)
-    document.getElementById("d-years").oninput = (e) => {
-      DS.years = +e.target.value || 1;
-      const vy = document.getElementById("d-view-year");
-      vy.max = DS.years;
-      if (DS.viewYear > DS.years) { DS.viewYear = DS.years; vy.value = DS.years; }
-      renderDividend();
-    };
-    bindNum("d-view-year", DS, "viewYear", renderDividend, 1);
+    bindNum("d-years", DS, "years", renderDividend, 1);
     // 투자 방식 / ISA 유형 선택
     function bindDivChips(boxId, key) {
       const box = document.getElementById(boxId);
