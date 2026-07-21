@@ -79,18 +79,31 @@
       </div>
       <div>
         <div class="result-hero">
-          <div class="label">첫 해 예상 배당금</div>
-          <div class="big"><span id="d-first">–</span></div>
+          <div class="label">최종 연 배당금</div>
+          <div class="big"><span id="d-last">–</span></div>
           <div class="small" id="d-monthly" style="color:#aeb7cc;margin-top:6px"></div>
         </div>
-        <div class="stat-row" style="margin-bottom:12px">
-          <div class="stat"><div class="k" id="d-lastyr-k">최종 연 배당금</div><div class="v accent" id="d-last">–</div></div>
-          <div class="stat"><div class="k">누적 배당 총액</div><div class="v" id="d-total">–</div></div>
+
+        <div class="card card-pad" style="margin-bottom:12px">
+          <h3 style="font-size:18px;color:var(--navy)">투자 결과</h3>
+          <p class="muted small" style="margin:6px 0 18px">배당을 재투자하며 시간이 지날수록 자산이 어떻게 쌓여 가는지 한눈에 확인해 보세요.</p>
+
+          <div class="res-grid">
+            <div class="res-stat"><div class="k">총 자산</div><div class="v accent" id="d-total-asset">–</div></div>
+            <div class="res-stat"><div class="k">투자 원금</div><div class="v" id="d-principal-out">–</div></div>
+          </div>
+          <hr class="res-div">
+          <div class="res-grid">
+            <div class="res-stat"><div class="k">누적 수익률</div><div class="v accent" id="d-roi">–</div></div>
+            <div class="res-stat"><div class="k">누적 배당 총액</div><div class="v" id="d-total">–</div></div>
+          </div>
+
+          <div class="prop-head"><span class="pl" id="d-plabel">원금 –</span><span class="pr" id="d-ylabel">배당수익 –</span></div>
+          <div class="prop-bar"><span class="pb-seg pb-base" id="d-pbar"></span><span class="pb-seg pb-top" id="d-ybar"></span></div>
+
+          <div id="d-chart" style="margin-top:20px"></div>
         </div>
-        <div class="card">
-          <h3 style="font-size:16px;color:var(--navy);margin-bottom:10px">연도별 배당금</h3>
-          <div id="d-chart" class="chart-box"></div>
-        </div>
+
         <p class="note">※ 배당·주가는 변동하며 미래를 보장하지 않습니다. 세금(배당소득세 15.4%)은 미반영. 참고용 추정치입니다.</p>
       </div>
     </div>
@@ -131,25 +144,35 @@
       document.getElementById("y-desc").textContent = p.note || "";
     }
     function renderDividend() {
-      const yrs = DS.years;
-      let totalDiv = 0, firstDiv = 0, lastDiv = 0, base = DS.principal;
-      const series = [];
+      const yrs = Math.max(1, DS.years);
+      const principal = DS.principal;
+      let base = principal, cumDiv = 0, lastDiv = 0;
+      const pts = [{ year: 0, base: principal, total: principal }]; // 납입원금(고정) + 총자산
       for (let y = 1; y <= yrs; y++) {
-        const yieldOnBase = DS.yield / 100 * Math.pow(1 + DS.growth / 100, y - 1);
+        const yieldOnBase = (DS.yield / 100) * Math.pow(1 + DS.growth / 100, y - 1);
         const div = base * yieldOnBase;
-        if (y === 1) firstDiv = div;
         lastDiv = div;
-        totalDiv += div;
+        cumDiv += div;
         if (DS.reinvest) base += div;
-        series.push({ label: y + "년", value: div });
+        pts.push({ year: y, base: principal, total: principal + cumDiv });
       }
-      document.getElementById("d-first").innerHTML = HP.fmtMan(firstDiv) + '<span class="unit"> 원</span>';
-      document.getElementById("d-monthly").textContent = `월 평균 약 ${HP.fmtManWon(firstDiv / 12)}`;
-      document.getElementById("d-last").textContent = HP.fmtMan(lastDiv);
-      document.getElementById("d-total").textContent = HP.fmtMan(totalDiv);
-      const step = Math.max(1, Math.round(series.length / 8));
-      const shown = series.filter((_, i) => i % step === 0 || i === series.length - 1);
-      HP.growthBars(document.getElementById("d-chart"), shown);
+      const finalAsset = principal + cumDiv;
+      const roi = principal > 0 ? (cumDiv / principal) * 100 : 0;
+      document.getElementById("d-last").innerHTML = HP.fmtMan(lastDiv) + '<span class="unit"> 원</span>';
+      document.getElementById("d-monthly").textContent = `월 평균 약 ${HP.fmtManWon(lastDiv / 12)}`;
+      document.getElementById("d-total-asset").textContent = HP.fmtMan(finalAsset) + "원";
+      document.getElementById("d-principal-out").textContent = HP.fmtMan(principal) + "원";
+      document.getElementById("d-roi").textContent = roi.toFixed(2) + "%";
+      document.getElementById("d-total").textContent = HP.fmtMan(cumDiv) + "원";
+      const pPct = finalAsset > 0 ? Math.round((principal / finalAsset) * 100) : 0, yPct = 100 - pPct;
+      document.getElementById("d-plabel").textContent = `원금 ${pPct}%`;
+      document.getElementById("d-ylabel").textContent = `배당수익 ${yPct}%`;
+      document.getElementById("d-pbar").style.width = pPct + "%";
+      document.getElementById("d-ybar").style.width = yPct + "%";
+      HP.lineChart(document.getElementById("d-chart"), {
+        points: pts, baseColor: "#8a94ac", totalColor: "var(--accent)",
+        fmt: (v) => HP.fmtMan(v) + "원", axisFmt: (v) => (v ? HP.fmtMan(v) : "0"),
+      });
     }
 
     function bindNum(id, obj, key, cb, min) {
