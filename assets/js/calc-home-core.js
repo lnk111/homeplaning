@@ -100,6 +100,17 @@ function affordablePrice(P, state) {
 }
 
 /* 정책대출 비교 rows */
+/* 세대 유형별 소득 상한 (해당되는 것 중 가장 유리한 값 적용)
+   예) 디딤돌 — 일반 6천 / 생애최초·2자녀 7천 / 신혼 8,500만 */
+function incomeCapFor(pl, state) {
+  const caps = [];
+  if (pl.income_cap_man) caps.push(pl.income_cap_man);
+  if (state.first && pl.income_cap_first_man) caps.push(pl.income_cap_first_man);
+  if (state.household === "신혼" && pl.income_cap_newlywed_man) caps.push(pl.income_cap_newlywed_man);
+  if (state.household === "2자녀" && pl.income_cap_multichild_man) caps.push(pl.income_cap_multichild_man);
+  return caps.length ? Math.max(...caps) : null;
+}
+
 function policyRows(P, state, loanNeeded, price) {
   const months = effectiveTermYears(state) * 12;
   const rows = [];
@@ -110,14 +121,20 @@ function policyRows(P, state, loanNeeded, price) {
     rate: state.rate, monthly: monthlyPayment(genLoan, state.rate, months), loan: genLoan,
   });
   for (const pl of P.policy_loans || []) {
-    let eligible = true, reason = "";
+    const reasons = [];
     const houseCap = state.household === "신혼" || state.household === "2자녀"
       ? pl.house_cap_special_man : pl.house_cap_man;
-    if (price > houseCap) { eligible = false; reason = `주택 ${HP.fmtMan(houseCap)} 이하`; }
-    if (pl.requires_newborn && !state.newborn) { eligible = false; reason = "최근 2년 내 출산"; }
-    if (pl.id === "newborn" && !state.smallArea) { eligible = false; reason = "전용 85㎡ 이하"; }
-    if (pl.age_max && state.age > pl.age_max) { eligible = false; reason = `만 ${pl.age_max}세 이하`; }
-    if (pl.income_cap_man && state.income > pl.income_cap_man) { eligible = false; reason = `소득 ${HP.fmtMan(pl.income_cap_man)} 이하`; }
+    if (price > houseCap) reasons.push(`주택 ${HP.fmtMan(houseCap)} 이하`);
+    if (pl.requires_newborn && !state.newborn) reasons.push("최근 2년 내 출산");
+    if (pl.requires_small_area && !state.smallArea) reasons.push("전용 85㎡ 이하");
+    if (pl.requires_no_house && state.hasHouse) reasons.push("무주택 세대주");
+    if (pl.age_max && state.age > pl.age_max) reasons.push(`만 ${pl.age_max}세 이하`);
+    const incCap = incomeCapFor(pl, state);
+    if (incCap && state.income > incCap) reasons.push(`소득 ${HP.fmtMan(incCap)} 이하`);
+    // 순자산은 별도 입력이 없어 보유 현금으로 하한만 검증(현금만으로 이미 초과면 확실히 불가)
+    if (pl.net_worth_cap_man && state.cash > pl.net_worth_cap_man) reasons.push(`순자산 ${HP.fmtMan(pl.net_worth_cap_man)} 이하`);
+    const eligible = reasons.length === 0;
+    const reason = reasons.slice(0, 2).join(" · ");
     let limit = pl.limit_general_man;
     if (state.household === "신혼" || state.household === "2자녀") limit = pl.limit_special_man;
     else if (state.first) limit = pl.limit_first_man;

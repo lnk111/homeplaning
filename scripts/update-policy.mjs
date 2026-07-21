@@ -58,6 +58,13 @@ ${JSON.stringify(current, null, 2)}
 - highlights: 최신 이슈 3개. 각 {title, summary, tag, date, url}. url은 실제 기사/발표 링크(없으면 빈 문자열).
 - 숫자 필드(ltv, dsr, stress_rate, loan_abs_cap, acquisition_tax, policy_loans, savings_products)는
   **공식적으로 확정된 변경**을 확인한 경우에만 수정하고, 그렇지 않으면 기존 값을 그대로 둡니다.
+- policy_loans 의 자격 판정 필드는 계산기가 직접 읽어 '대출 가능/불가'를 판정합니다.
+  **절대 삭제하지 말고**, 공식 변경을 확인한 경우에만 값을 수정하세요:
+  income_cap_man(일반 소득상한), income_cap_first_man(생애최초), income_cap_newlywed_man(신혼),
+  income_cap_multichild_man(2자녀 이상), net_worth_cap_man(순자산 상한),
+  requires_small_area(전용면적 85㎡ 요건), requires_no_house(무주택 요건),
+  requires_newborn(출산 요건), age_max, ltv_max, dti_max.
+  예) 디딤돌은 소득 6,000/생애최초·2자녀 7,000/신혼 8,500만원 이하, 순자산 5.11억 이하, 무주택 세대주.
 - meta.updated_at 을 "${TODAY}" 로, meta.updated_by 를 "ai" 로 설정합니다.
 
 응답은 반드시 아래 형식으로, 코드펜스 안에 **완전한 JSON만** 담아 반환하세요:
