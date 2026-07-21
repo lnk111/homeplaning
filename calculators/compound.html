@@ -24,15 +24,15 @@
         </div>
         <div class="field">
           <label>매월 적립액</label>
-          <div class="range-row"><input type="range" id="monthly" min="0" max="300" step="5" value="50"><span class="range-val" id="monthly-val"></span></div>
+          <div class="input-suffix"><input class="input" type="number" id="monthly" value="50" min="0" step="5" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
         </div>
         <div class="field">
           <label>연 수익률 <span class="hint">기대 수익률</span></label>
-          <div class="range-row"><input type="range" id="rate" min="0" max="20" step="0.5" value="7"><span class="range-val" id="rate-val"></span></div>
+          <div class="input-suffix"><input class="input" type="number" id="rate" value="7" min="0" max="30" step="0.5" inputmode="decimal" autocomplete="off"><span class="suffix">%</span></div>
         </div>
         <div class="field">
           <label>투자 기간</label>
-          <div class="range-row"><input type="range" id="years" min="1" max="40" step="1" value="20"><span class="range-val" id="years-val"></span></div>
+          <div class="input-suffix"><input class="input" type="number" id="years" value="20" min="1" max="60" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">년</span></div>
         </div>
       </div>
 
@@ -115,16 +115,10 @@
       document.getElementById("compare-txt").innerHTML =
         `같은 조건을 단리로 계산하면 약 <strong>${HP.fmtMan(simple)}</strong>. 복리는 <strong style="color:var(--accent)">${HP.fmtMan(diff)}</strong> 더 많습니다. 시간이 길수록 격차는 커집니다.`;
     }
-    function bindRange(id, key, fmt) {
-      const el = document.getElementById(id), lab = document.getElementById(id + "-val");
-      const upd = () => { S[key] = +el.value; lab.textContent = fmt(S[key]); render(); };
-      el.oninput = upd; upd();
-    }
-    document.getElementById("initial").oninput = (e) => { S.initial = +e.target.value || 0; render(); };
+    ["initial", "monthly", "rate"].forEach((id) =>
+      document.getElementById(id).oninput = (e) => { S[id] = +e.target.value || 0; render(); });
+    document.getElementById("years").oninput = (e) => { S.years = +e.target.value || 1; render(); };
     HP.mount("compound");
-    bindRange("monthly", "monthly", (v) => HP.fmtMan(v));
-    bindRange("rate", "rate", (v) => v + "%");
-    bindRange("years", "years", (v) => v + "년");
     render();
   </script>
 </body>

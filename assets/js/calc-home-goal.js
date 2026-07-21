@@ -61,9 +61,6 @@ function render() {
     : "조건 충족 정책대출이 없어 일반 주담대 기준입니다.";
 }
 
-function syncPriceLabel() {
-  document.getElementById("price-val").textContent = HP.fmtMan(state.price);
-}
 function bindChips(id, key) {
   const box = document.getElementById(id);
   box.querySelectorAll(".chip").forEach((c) => c.onclick = () => {
@@ -73,7 +70,7 @@ function bindChips(id, key) {
 }
 function bindInputs() {
   const price = document.getElementById("price");
-  price.oninput = () => { state.price = +price.value; syncPriceLabel(); render(); };
+  price.oninput = () => { state.price = +price.value || 0; render(); };
   ["income", "existing", "cash", "rate", "years", "age"].forEach((id) => {
     document.getElementById(id).oninput = (e) => { state[id] = +e.target.value || 0; render(); };
   });
@@ -89,7 +86,6 @@ HP.mount("home-goal");
 HPPolicy.loadPolicy().then((data) => {
   P = data;
   document.getElementById("policy-date").textContent = data.meta.updated_at;
-  syncPriceLabel();
   bindInputs();
   render();
 });

@@ -29,10 +29,7 @@
       <div class="card card-pad">
         <div class="field">
           <label>가고 싶은 집 매매가 <span class="hint">목표 집값</span></label>
-          <div class="range-row">
-            <input type="range" id="price" min="10000" max="200000" step="1000" value="50000" />
-            <span class="range-val" id="price-val"></span>
-          </div>
+          <div class="input-suffix"><input class="input" type="number" id="price" value="50000" min="1000" step="1000" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
         </div>
         <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div>
