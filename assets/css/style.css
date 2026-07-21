@@ -159,7 +159,8 @@ h1, h2, h3, h4 { line-height: 1.25; letter-spacing: -0.02em; margin: 0; }
 .calc-card .go { color: var(--accent); font-weight: 700; font-size: 14px; margin-top: 6px; }
 
 /* ---------- Forms / Calculator UI ---------- */
-.calc-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+/* 입력 폼은 좁게 고정, 결과 영역이 남은 공간을 모두 사용 */
+.calc-layout { display: grid; grid-template-columns: minmax(280px, 360px) 1fr; gap: 24px; align-items: start; }
 .field { margin-bottom: 18px; }
 .field label { display: block; font-weight: 600; font-size: 14px; color: var(--navy); margin-bottom: 8px; }
 .field .hint { font-weight: 400; color: var(--text-3); font-size: 12px; margin-left: 4px; }
@@ -175,6 +176,10 @@ h1, h2, h3, h4 { line-height: 1.25; letter-spacing: -0.02em; margin: 0; }
   color: var(--text-3); font-size: 14px; pointer-events: none;
 }
 .input-suffix .input { padding-right: 46px; }
+
+/* 금액 입력 하단 억/만원 환산 표기 (initAmountHints가 자동 생성) */
+.amt-field { min-width: 0; }
+.amt-hint { font-size: 12px; font-weight: 700; color: var(--text-3); margin-top: 5px; min-height: 15px; line-height: 15px; }
 
 /* Range slider */
 .range-row { display: flex; align-items: center; gap: 12px; }

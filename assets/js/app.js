@@ -102,6 +102,45 @@ function mount(active) {
   if (f) f.outerHTML = renderFooter();
   initDropdowns();
   initReveal();
+  initAmountHints();
+}
+
+/* ---------- 금액 입력 하단에 억/만원 환산 표기 ----------
+   '만원' 접미사를 가진 숫자 입력을 찾아 아래에 읽기 쉬운 금액을 보여준다.
+   예) 10000 → "1억원", 15000 → "1억 5,000만원"                       */
+const amountHintUpdaters = [];
+function initAmountHints(root) {
+  (root || document).querySelectorAll(".input-suffix").forEach((wrap) => {
+    const suffix = wrap.querySelector(".suffix");
+    const input = wrap.querySelector('input[type="number"]');
+    if (!suffix || !input) return;
+    const sfx = suffix.textContent.trim();
+    if (sfx.indexOf("만원") !== 0) return; // '만원', '만원/년'만 대상
+    if (wrap.parentNode && wrap.parentNode.classList.contains("amt-field")) return; // 중복 방지
+
+    // 그리드/플렉스 부모의 칸을 유지하도록 입력+힌트를 래퍼로 감싼다
+    const holder = document.createElement("div");
+    holder.className = "amt-field";
+    wrap.parentNode.insertBefore(holder, wrap);
+    holder.appendChild(wrap);
+
+    const tail = sfx.slice(2); // '/년' 같은 꼬리표 유지
+    const hint = document.createElement("div");
+    hint.className = "amt-hint";
+    holder.appendChild(hint);
+
+    const update = () => {
+      const v = +input.value;
+      hint.textContent = v > 0 ? fmtMan(v) + "원" + tail : "";
+    };
+    input.addEventListener("input", update);
+    amountHintUpdaters.push(update);
+    update();
+  });
+}
+/* 값을 JS로 바꾼 뒤(예: 월급배분 자동 배분) 호출 */
+function refreshAmountHints() {
+  amountHintUpdaters.forEach((f) => f());
 }
 
 /* 내집마련 드롭다운 (position:fixed 로 스크롤 컨테이너 클리핑 회피) */
@@ -488,4 +527,5 @@ function initReveal() {
 window.HP = {
   mount, fmtMan, fmtWon, fmtManWon, fmtPct, clamp,
   donut, donutPanel, growthBars, stackedBars, lineChart, scenarioBars, linkFor, basePrefix,
+  initAmountHints, refreshAmountHints,
 };

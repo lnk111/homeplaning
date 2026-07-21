@@ -83,7 +83,7 @@
   </main>
   <div id="app-footer"></div>
 
-  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/app.js?v=5"></script>
   <script>
     // 상태: 각 항목은 '퍼센트'가 기준값(정확한 실수). 금액 = 실수령액 × %/100.
     const S = { net: 280, rule: "503020", fixed: 50, life: 30, save: 20 };
@@ -97,6 +97,7 @@
         document.getElementById(k + "-amt").value = Math.round((S.net * S[k]) / 100);
         document.getElementById(k + "-pct").value = Math.round(S[k]);
       });
+      HP.refreshAmountHints();
     }
     function markCustom() {
       document.querySelectorAll("#rule .chip").forEach((x) => x.classList.remove("on"));
@@ -141,12 +142,14 @@
         const a = +e.target.value || 0;
         S[k] = S.net > 0 ? (a / S.net) * 100 : 0;
         document.getElementById(k + "-pct").value = Math.round(S[k]); // 반대편만 갱신
+        HP.refreshAmountHints();
         markCustom(); render();
       };
       document.getElementById(k + "-pct").oninput = (e) => {
         const p = +e.target.value || 0;
         S[k] = p;
         document.getElementById(k + "-amt").value = Math.round((S.net * p) / 100); // 반대편만 갱신
+        HP.refreshAmountHints();
         markCustom(); render();
       };
     });
