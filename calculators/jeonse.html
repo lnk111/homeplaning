@@ -73,6 +73,25 @@
           <label>일반 전세대출 금리 <span class="hint">정책대출 불가 시</span></label>
           <div class="input-suffix"><input class="input" type="number" id="rate" value="3.5" step="0.1" min="0"><span class="suffix">%</span></div>
         </div>
+
+        <div class="field" style="border-top:1px solid var(--line);padding-top:18px">
+          <label style="font-size:15px">월세로 돌린다면</label>
+          <p class="small muted" style="margin:4px 0 0;line-height:1.5">보증금을 낮추고 월세로 전환할 때 월 얼마인지 비교합니다.</p>
+        </div>
+        <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <label>월세 보증금</label>
+            <div class="input-suffix"><input class="input" type="number" id="monthlyDeposit" value="5000" min="0" step="500" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
+          </div>
+          <div>
+            <label>전환율 <span class="hint">법정 상한</span></label>
+            <div class="input-suffix"><input class="input" type="number" id="convRate" value="4.5" min="0" step="0.1" inputmode="decimal" autocomplete="off"><span class="suffix">%</span></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>여유자금 기대수익률 <span class="hint">월세 선택 시 남는 돈</span></label>
+          <div class="input-suffix"><input class="input" type="number" id="yieldRate" value="4" min="0" step="0.5" inputmode="decimal" autocomplete="off"><span class="suffix">%</span></div>
+        </div>
       </div>
 
       <!-- OUTPUT -->
@@ -125,6 +144,21 @@
           <p class="small" id="ratio-note" style="margin:12px 0 0;line-height:1.6;color:var(--text-2)"></p>
         </div>
 
+        <div class="card" style="margin-bottom:12px">
+          <h3 style="font-size:16px;color:var(--navy);margin-bottom:4px">전세 vs 월세 — 어느 쪽이 이득?</h3>
+          <p class="small muted" style="margin:0 0 14px;line-height:1.5">
+            월 지출만 보면 답이 틀립니다. <b>묶이는 목돈의 기회비용</b>까지 같이 비교해요.
+          </p>
+          <div class="rent-formula" id="rent-formula">–</div>
+          <div style="overflow-x:auto">
+            <table class="compare" id="rent-table">
+              <thead><tr><th>구분</th><th>전세</th><th>월세 전환</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="small" id="rent-note" style="margin:12px 0 0;line-height:1.6;color:var(--text-2)"></p>
+        </div>
+
         <div class="card">
           <h3 style="font-size:16px;color:var(--navy);margin-bottom:10px">전세대출 비교</h3>
           <div style="overflow-x:auto">
@@ -152,6 +186,6 @@
 
   <script src="../assets/js/app.js?v=8"></script>
   <script src="../assets/js/policy.js"></script>
-  <script src="../assets/js/calc-jeonse.js?v=2"></script>
+  <script src="../assets/js/calc-jeonse.js?v=3"></script>
 </body>
 </html>

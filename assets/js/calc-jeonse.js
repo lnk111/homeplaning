@@ -9,6 +9,7 @@ const state = {
   region: "수도권", household: "일반",
   smallArea: true, hasHouse: false,
   rate: 3.5, marketPrice: 0, // 매매 시세(선택) — 전세가율 계산용
+  monthlyDeposit: 5000, convRate: 4.5, yieldRate: 4, // 월세 전환 비교용
 };
 let P = null;
 
@@ -115,7 +116,70 @@ function render() {
   ], { centerLabel: `${loanPct}%`, centerSub: "대출 비중", centerColor: NAVY });
 
   renderRatio();
+  renderRent(monthlyInterest, cashUsed);
   renderTable(rows, best);
+}
+
+/* 전세 → 월세 전환. 전월세전환율은 (전세금 − 월세보증금)에만 적용된다. */
+const won = (man) => HP.fmtMan(man) + "원"; // 월 단위 금액은 상단 지표와 같은 '만원' 표기로
+
+function renderRent(monthlyInterest, cashUsed) {
+  const formula = document.getElementById("rent-formula");
+  const note = document.getElementById("rent-note");
+  const body = document.querySelector("#rent-table tbody");
+
+  const convBase = Math.max(0, state.deposit - state.monthlyDeposit);
+  const rent = convBase * (state.convRate / 100) / 12;
+  // 월세를 택하면 전세 보증금에 묶였을 내 현금 중 일부가 손에 남는다
+  const freeCash = Math.max(0, cashUsed - state.monthlyDeposit);
+  const oppGain = freeCash * (state.yieldRate / 100) / 12;
+  const extra = rent - monthlyInterest;   // 월세가 매달 더 나가는 돈
+  const net = extra - oppGain;            // 양수면 전세가 유리
+
+  formula.innerHTML = convBase > 0
+    ? `월세 = (${HP.fmtMan(state.deposit)} − ${HP.fmtMan(state.monthlyDeposit)}) × ${state.convRate}% ÷ 12
+       = <b>월 ${won(rent)}</b>`
+    : `월세 보증금이 전세 보증금 이상이라 <b>전환할 금액이 없습니다</b>.`;
+
+  const ok = convBase > 0; // 전환할 금액이 없으면 월세 쪽 수치는 의미가 없다
+  body.innerHTML = [
+    ["보증금", HP.fmtMan(state.deposit), ok ? HP.fmtMan(state.monthlyDeposit) : "–", false],
+    ["월 지출", `대출이자 ${won(monthlyInterest)}`, ok ? won(rent) : "–", true],
+    ["묶이는 내 돈", HP.fmtMan(cashUsed), ok ? HP.fmtMan(state.monthlyDeposit) : "–", false],
+    ["손에 남는 돈", "–", ok && freeCash > 0 ? HP.fmtMan(freeCash) : "–", false],
+  ].map(([k, a, b, hi]) =>
+    `<tr><td>${k}</td><td${hi ? ' class="net"' : ""}>${a}</td><td${hi ? ' class="net"' : ""}>${b}</td></tr>`
+  ).join("");
+
+  if (convBase <= 0) {
+    note.innerHTML = `월세 보증금을 전세 보증금보다 <b>낮게</b> 넣어야 전환 금액이 계산됩니다.`;
+    return;
+  }
+
+  const parts = [];
+  if (extra > 0) {
+    parts.push(`월세가 매달 <b>${won(extra)}</b> 더 나가는 대신, 손에 쥐는 ${HP.fmtMan(freeCash)}을
+      연 ${state.yieldRate}%로 굴리면 월 ${won(oppGain)}입니다.`);
+  } else {
+    parts.push(`월세가 전세 대출이자보다 오히려 <b>${won(-extra)}</b> 적게 나갑니다.`);
+  }
+  const gap = Math.abs(net);
+  parts.push(Math.round(gap) === 0
+    ? `이 조건에선 <b>전세와 월세가 사실상 비슷</b>합니다. 목돈을 굴릴 곳이 확실한지로 정하세요.`
+    : net > 0
+      ? `이 조건에선 <b>전세가 월 ${won(gap)} 유리</b>합니다.`
+      : `이 조건에선 <b>월세가 월 ${won(gap)} 유리</b>합니다.`);
+
+  // 보증금 반환 위험이 큰 집이라면 금액 비교와 별개로 월세가 안전할 수 있다
+  const ratio = state.marketPrice ? (state.deposit / state.marketPrice) * 100 : 0;
+  if (ratio >= RATIO_WARN) {
+    parts.push(`다만 전세가율이 <b>${ratio.toFixed(1)}%</b>로 높습니다.
+      숫자가 조금 불리해도, 떼일 보증금이 적은 <b>월세가 안전한 선택</b>일 수 있어요.`);
+  }
+  parts.push(`전환율 법정 상한은 <b>기준금리+2%와 연 10% 중 낮은 값</b>이며,
+    계약 기간 중·갱신요구권 행사 때만 적용됩니다(신규 계약엔 미적용).
+    <a href="../guide/index.html#jeonse" style="color:var(--accent);font-weight:700">자세히 보기 →</a>`);
+  note.innerHTML = parts.join(" ");
 }
 
 /* 전세가율 — 보증금이 매매 시세에 얼마나 근접한지 (반환 위험 신호) */
@@ -155,7 +219,7 @@ function renderTable(rows, best) {
       <td>${r.eligible ? "✅" : `<span class="badge na">불가</span><div class="small muted">${r.reason}</div>`}</td>
       <td>${HP.fmtMan(r.limit)}</td>
       <td>${r.rate.toFixed(2)}%${r.rateMax && r.rateMax !== r.rate ? `~${r.rateMax.toFixed(2)}` : ""}</td>
-      <td class="net">${r.eligible ? HP.fmtManWon(r.monthly) : "–"}</td></tr>`;
+      <td class="net">${r.eligible ? won(r.monthly) : "–"}</td></tr>`;
   }).join("");
   document.getElementById("loan-note").innerHTML = best
     ? `'<b>${best.name}</b>'이(가) 금리 ${best.rate.toFixed(2)}%로 가장 유리합니다.
@@ -172,7 +236,8 @@ function bindChips(id, key) {
   });
 }
 function bindInputs() {
-  ["deposit", "income", "cash", "age", "rate", "marketPrice"].forEach((id) => {
+  ["deposit", "income", "cash", "age", "rate", "marketPrice",
+   "monthlyDeposit", "convRate", "yieldRate"].forEach((id) => {
     const el = document.getElementById(id);
     el.oninput = (e) => { state[id] = +e.target.value || 0; render(); };
   });

@@ -398,6 +398,11 @@ table.compare td.net { color: var(--accent-dark); font-weight: 800; }
 .insight .id { font-size: 13px; color: var(--text-2); line-height: 1.55; }
 .insight .id a { color: var(--accent); font-weight: 700; }
 
+/* ---------- 월세 전환 공식 ---------- */
+.rent-formula { background: var(--surface-2); border-radius: var(--radius-sm); padding: 13px 16px; margin-bottom: 14px;
+  font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.6; }
+.rent-formula b { color: var(--primary-dark); }
+
 /* ---------- 투자 결과 (자산목표) ---------- */
 .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
 .res-stat .k { font-size: 13px; color: var(--text-2); font-weight: 600; }
