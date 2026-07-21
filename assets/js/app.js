@@ -7,6 +7,7 @@ const NAV = [
   { label: "내집마련", children: [
     { href: "home-afford", label: "부동산 적정 매매가" },
     { href: "home-goal",   label: "부동산 필요 자금" },
+    { href: "jeonse",      label: "전세 보증금" },
   ]},
   { href: "interior", label: "인테리어" },
   { href: "compound", label: "복리" },
@@ -69,6 +70,7 @@ function renderFooter() {
           <h4>계산기</h4>
           <a href="${b}calculators/home-afford.html">내집찾기 계산기</a>
           <a href="${b}calculators/home-goal.html">내집자금 계산기</a>
+          <a href="${b}calculators/jeonse.html">전세 계산기</a>
           <a href="${b}calculators/interior.html">인테리어 견적</a>
           <a href="${b}calculators/compound.html">복리 계산기</a>
           <a href="${b}calculators/goal.html">자산목표 계산기</a>
