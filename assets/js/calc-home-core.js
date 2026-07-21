@@ -107,8 +107,22 @@ function incomeCapFor(pl, state) {
   if (pl.income_cap_man) caps.push(pl.income_cap_man);
   if (state.first && pl.income_cap_first_man) caps.push(pl.income_cap_first_man);
   if (state.household === "신혼" && pl.income_cap_newlywed_man) caps.push(pl.income_cap_newlywed_man);
+  if (state.household === "1자녀" && pl.income_cap_1child_man) caps.push(pl.income_cap_1child_man);
   if (state.household === "2자녀" && pl.income_cap_multichild_man) caps.push(pl.income_cap_multichild_man);
   return caps.length ? Math.max(...caps) : null;
+}
+
+/* 세대 유형별 대출 한도 (해당되는 것 중 가장 큰 값)
+   상품마다 우대 대상이 달라 데이터에 있는 항목만 반영한다.
+   예) 디딤돌은 신혼·2자녀 모두 3.2억이지만, 보금자리론은 다자녀만 4억(신혼 우대 없음) */
+function limitFor(pl, state) {
+  const cands = [pl.limit_general_man || 0];
+  if (state.first && pl.limit_first_man) cands.push(pl.limit_first_man);
+  const legacySpecial = pl.limit_special_man || 0; // 구 스키마 호환
+  if (state.household === "신혼") cands.push(pl.limit_newlywed_man || legacySpecial);
+  if (state.household === "1자녀") cands.push(pl.limit_1child_man || 0);
+  if (state.household === "2자녀") cands.push(pl.limit_multichild_man || legacySpecial);
+  return Math.max(...cands);
 }
 
 function policyRows(P, state, loanNeeded, price) {
@@ -135,9 +149,7 @@ function policyRows(P, state, loanNeeded, price) {
     if (pl.net_worth_cap_man && state.cash > pl.net_worth_cap_man) reasons.push(`순자산 ${HP.fmtMan(pl.net_worth_cap_man)} 이하`);
     const eligible = reasons.length === 0;
     const reason = reasons.slice(0, 2).join(" · ");
-    let limit = pl.limit_general_man;
-    if (state.household === "신혼" || state.household === "2자녀") limit = pl.limit_special_man;
-    else if (state.first) limit = pl.limit_first_man;
+    const limit = limitFor(pl, state);
     const loan = eligible ? Math.min(limit, loanNeeded) : 0;
     rows.push({
       name: pl.name, eligible, reason, limit,

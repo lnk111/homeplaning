@@ -82,7 +82,8 @@
       "rate_max": 3.55,
       "limit_general_man": 20000,
       "limit_first_man": 24000,
-      "limit_special_man": 32000,
+      "limit_newlywed_man": 32000,
+      "limit_multichild_man": 32000,
       "house_cap_man": 50000,
       "house_cap_special_man": 60000,
       "income_cap_man": 6000,
@@ -119,10 +120,16 @@
       "rate_max": 4.2,
       "limit_general_man": 36000,
       "limit_first_man": 42000,
-      "limit_special_man": 42000,
+      "limit_multichild_man": 40000,
       "house_cap_man": 60000,
       "house_cap_special_man": 60000,
-      "note": "일반 3.6억 / 생애최초 4.2억, 주택 6억 이하. 금일 공식 추가 변경 미확인으로 기존 값 유지(참고용)"
+      "income_cap_man": 7000,
+      "income_cap_newlywed_man": 8500,
+      "income_cap_1child_man": 9000,
+      "income_cap_multichild_man": 10000,
+      "ltv_max": 0.7,
+      "dti_max": 0.6,
+      "note": "한도 일반 3.6억 / 생애최초 4.2억 / 다자녀 4억(신혼은 별도 한도 우대 없음). 주택가격 6억 이하, 전용면적·순자산 제한 없음. 부부합산 연소득 7천(신혼 8,500만, 1자녀 9천, 2자녀 이상 1억) 이하. 무주택 또는 1주택(3년 내 처분조건부)이라 유주택도 가능해 무주택 요건은 걸지 않음. LTV 70%(아파트 기준)·DTI 60%. 출처: 한국주택금융공사"
     },
     {
       "id": "newborn",
@@ -131,13 +138,15 @@
       "rate_max": 4.5,
       "limit_general_man": 40000,
       "limit_first_man": 40000,
-      "limit_special_man": 40000,
       "house_cap_man": 90000,
       "house_cap_special_man": 90000,
       "requires_newborn": true,
       "requires_small_area": true,
       "income_cap_man": 20000,
-      "note": "한도 4억, 소득 2억·주택 9억·전용 85㎡, 최근 2년 내 출산. 금리 1.8~4.5%(직전 확인 2026.06.22 국토부 고시, 지방 소재 주택 0.2%p 인하). 금일 재확인 불가로 기존 값 유지(참고용)"
+      "net_worth_cap_man": 51100,
+      "ltv_max": 0.7,
+      "dti_max": 0.6,
+      "note": "한도 최대 4억(2025-06-27 이전 계약분은 5억). 주택가격 9억 이하, 전용 85㎡ 이하, 순자산 5.11억 이하, 대출신청일 기준 2년 내 출산(2023-01-01 이후 출생아). 소득은 외벌이 1.3억 / 맞벌이 2억(부부 각 1인 1.3억 이하) 이하인데, 계산기 입력이 부부합산 하나뿐이라 상한을 2억으로 둠 — 외벌이 1.3억 초과 시 실제로는 불가할 수 있음. 무주택 세대주 또는 1주택(대환)이라 무주택 요건은 걸지 않음. LTV 70%(생애최초 80%)·DTI 60%. 금리 1.8~4.5%(직전 확인 2026.06.22 국토부 고시, 지방 소재 주택 0.2%p 인하). 출처: 주택도시기금"
     }
   ],
   "savings_products": [
