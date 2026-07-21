@@ -75,7 +75,7 @@
   </main>
   <div id="app-footer"></div>
 
-  <script src="../assets/js/app.js?v=5"></script>
+  <script src="../assets/js/app.js?v=6"></script>
   <script>
     const S = { initial: 1000, monthly: 50, rate: 7, years: 20 };
     function grow(monthlyContribute, annualRate, years, initial) {
@@ -122,7 +122,7 @@
       // 연도별 자산 성장 (호버: N년 후 납입원금·총자산)
       HP.lineChart(document.getElementById("chart"), {
         points: pointsFor(), baseColor: "rgba(0,0,0,.38)", totalColor: "var(--accent)",
-        fmt: (v) => HP.fmtMan(v) + "원", axisFmt: (v) => (v ? HP.fmtMan(v) : "0"),
+        fmt: (v) => HP.fmtMan(v) + "원", axisFmt: (v) => (v ? HP.fmtManShort(v) : "0"),
       });
       // 단리 비교
       const simple = S.initial * (1 + (S.rate / 100) * S.years) + S.monthly * 12 * S.years; // 대략 단리(원금 이자 미포함 근사)

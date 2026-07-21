@@ -83,7 +83,7 @@
   </main>
   <div id="app-footer"></div>
 
-  <script src="../assets/js/app.js?v=5"></script>
+  <script src="../assets/js/app.js?v=6"></script>
   <script>
     const S = { mode: "monthly", target: 10000, current: 2000, rate: 4, years: 10, monthly: 80 };
 
@@ -131,7 +131,7 @@
       document.getElementById("g-ybar").style.width = yPct + "%";
       HP.lineChart(document.getElementById("chart"), {
         points: pts, baseColor: "rgba(0,0,0,.38)", totalColor: "var(--accent)",
-        fmt: (v) => HP.fmtMan(v) + "원", axisFmt: (v) => (v ? HP.fmtMan(v) : "0"),
+        fmt: (v) => HP.fmtMan(v) + "원", axisFmt: (v) => (v ? HP.fmtManShort(v) : "0"),
       });
     }
     function clearResult(msg) {

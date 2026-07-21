@@ -182,6 +182,16 @@ function fmtMan(man) {
   }
   return `${man.toLocaleString()}만`;
 }
+/* 차트 축처럼 폭이 좁은 자리용 짧은 표기: 15000 → "1.5억", 3000 → "3,000만"
+   fmtMan은 "1억 5,000만"이라 축 라벨로 쓰면 그래프 밖으로 잘린다 */
+function fmtManShort(man) {
+  man = Math.round(man);
+  if (Math.abs(man) >= 10000) {
+    const eok = man / 10000;
+    return (Math.abs(man) % 10000 === 0 ? eok : eok.toFixed(1)) + "억";
+  }
+  return man.toLocaleString() + "만";
+}
 function fmtWon(won) {
   return Math.round(won).toLocaleString() + "원";
 }
@@ -525,7 +535,7 @@ function initReveal() {
 }
 
 window.HP = {
-  mount, fmtMan, fmtWon, fmtManWon, fmtPct, clamp,
+  mount, fmtMan, fmtManShort, fmtWon, fmtManWon, fmtPct, clamp,
   donut, donutPanel, growthBars, stackedBars, lineChart, scenarioBars, linkFor, basePrefix,
   initAmountHints, refreshAmountHints,
 };

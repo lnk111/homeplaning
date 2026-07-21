@@ -58,8 +58,12 @@
     <div id="panel-dividend" class="calc-layout" style="display:none">
       <div class="card card-pad">
         <div class="field">
-          <label>투자 원금</label>
+          <label>투자 원금 <span class="hint">처음 넣는 목돈</span></label>
           <div class="input-suffix"><input class="input" type="number" id="d-principal" value="3000" min="0" step="100"><span class="suffix">만원</span></div>
+        </div>
+        <div class="field">
+          <label>월 납입액 <span class="hint">매달 추가 매수</span></label>
+          <div class="input-suffix"><input class="input" type="number" id="d-monthly-add" value="30" min="0" step="10" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
         </div>
         <div class="field">
           <label>배당 수익률 <span class="hint">연</span></label>
@@ -90,7 +94,7 @@
 
           <div class="res-grid">
             <div class="res-stat"><div class="k">총 자산</div><div class="v accent" id="d-total-asset">–</div></div>
-            <div class="res-stat"><div class="k">투자 원금</div><div class="v" id="d-principal-out">–</div></div>
+            <div class="res-stat"><div class="k">총 납입 원금</div><div class="v" id="d-principal-out">–</div></div>
           </div>
           <hr class="res-div">
           <div class="res-grid">
@@ -116,12 +120,12 @@
   </main>
   <div id="app-footer"></div>
 
-  <script src="../assets/js/app.js?v=5"></script>
+  <script src="../assets/js/app.js?v=6"></script>
   <script src="../assets/js/policy.js"></script>
   <script>
     let PROD = [];
     const YS = { idx: 0, monthly: 50, rate: 4.5 };
-    const DS = { principal: 3000, yield: 4, growth: 5, years: 10, reinvest: true };
+    const DS = { principal: 3000, monthlyAdd: 30, yield: 4, growth: 5, years: 10, reinvest: true };
 
     function renderYouth() {
       const p = PROD[YS.idx];
@@ -145,17 +149,22 @@
     }
     function renderDividend() {
       const yrs = Math.max(1, DS.years);
-      const principal = DS.principal;
-      let base = principal, cumDiv = 0, lastDiv = 0;
-      const pts = [{ year: 0, base: principal, total: principal }]; // 납입원금(고정) + 총자산
+      const yearlyAdd = DS.monthlyAdd * 12;
+      let base = DS.principal;   // 배당을 받는 투자 자산
+      let paid = DS.principal;   // 누적 납입 원금(초기 목돈 + 매달 매수분)
+      let cumDiv = 0, lastDiv = 0;
+      const pts = [{ year: 0, base: paid, total: paid }]; // 납입원금 + 총자산
       for (let y = 1; y <= yrs; y++) {
         const yieldOnBase = (DS.yield / 100) * Math.pow(1 + DS.growth / 100, y - 1);
-        const div = base * yieldOnBase;
+        // 그 해 매수분은 연중 나눠 들어가므로 평균 절반만 배당 대상으로 계산
+        const div = (base + yearlyAdd / 2) * yieldOnBase;
         lastDiv = div;
         cumDiv += div;
-        if (DS.reinvest) base += div;
-        pts.push({ year: y, base: principal, total: principal + cumDiv });
+        base += yearlyAdd + (DS.reinvest ? div : 0);
+        paid += yearlyAdd;
+        pts.push({ year: y, base: paid, total: paid + cumDiv });
       }
+      const principal = paid;
       const finalAsset = principal + cumDiv;
       const roi = principal > 0 ? (cumDiv / principal) * 100 : 0;
       document.getElementById("d-last").innerHTML = HP.fmtMan(lastDiv) + '<span class="unit"> 원</span>';
@@ -170,8 +179,9 @@
       document.getElementById("d-pbar").style.width = pPct + "%";
       document.getElementById("d-ybar").style.width = yPct + "%";
       HP.lineChart(document.getElementById("d-chart"), {
-        points: pts, baseColor: "rgba(0,0,0,.38)", totalColor: "var(--accent)", baseDashed: true,
-        fmt: (v) => HP.fmtMan(v) + "원", axisFmt: (v) => (v ? HP.fmtMan(v) : "0"),
+        // 월 납입이 없으면 원금선이 수평이라 점선 기준선으로, 있으면 실선으로 표시
+        points: pts, baseColor: "rgba(0,0,0,.38)", totalColor: "var(--accent)", baseDashed: DS.monthlyAdd <= 0,
+        fmt: (v) => HP.fmtMan(v) + "원", axisFmt: (v) => (v ? HP.fmtManShort(v) : "0"),
       });
     }
 
@@ -198,6 +208,7 @@
     });
     // dividend
     document.getElementById("d-principal").oninput = (e) => { DS.principal = +e.target.value || 0; renderDividend(); };
+    bindNum("d-monthly-add", DS, "monthlyAdd", renderDividend, 0);
     document.getElementById("d-reinvest").onchange = (e) => { DS.reinvest = e.target.checked; renderDividend(); };
     bindNum("d-yield", DS, "yield", renderDividend, 0);
     bindNum("d-growth", DS, "growth", renderDividend, 0);
