@@ -328,8 +328,8 @@ function lineChart(el, opts) {
       <svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">
         ${grid}${xlabels}
         <path d="${area("total")}" fill="${cTotal}" opacity="0.09"/>
-        <path d="${area("base")}" fill="${cBase}" opacity="0.10"/>
-        <path d="${line("base")}" fill="none" stroke="${cBase}" stroke-width="2.5"/>
+        ${opts.baseDashed ? "" : `<path d="${area("base")}" fill="${cBase}" opacity="0.10"/>`}
+        <path d="${line("base")}" fill="none" stroke="${cBase}" stroke-width="2.5"${opts.baseDashed ? ' stroke-dasharray="6 5"' : ""}/>
         <path d="${line("total")}" fill="none" stroke="${cTotal}" stroke-width="2.5"/>
         <g class="lc-hover" style="display:none">
           <line class="lc-vline" y1="${padT}" y2="${yBottom}" stroke="var(--text-3)" stroke-dasharray="3 3"/>

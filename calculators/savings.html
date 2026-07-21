@@ -170,7 +170,7 @@
       document.getElementById("d-pbar").style.width = pPct + "%";
       document.getElementById("d-ybar").style.width = yPct + "%";
       HP.lineChart(document.getElementById("d-chart"), {
-        points: pts, baseColor: "#8a94ac", totalColor: "var(--accent)",
+        points: pts, baseColor: "#8a94ac", totalColor: "var(--accent)", baseDashed: true,
         fmt: (v) => HP.fmtMan(v) + "원", axisFmt: (v) => (v ? HP.fmtMan(v) : "0"),
       });
     }
