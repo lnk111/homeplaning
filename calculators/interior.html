@@ -131,7 +131,7 @@
     const grid = document.getElementById("portfolio");
     grid.innerHTML = PORTFOLIO.map((p, i) => `
       <a class="portfolio-card" href="#quote">
-        <div class="thumb" style="background:${p.img ? "#000" : (p.grad || "linear-gradient(135deg,#2a3550,#1b2130)")}">
+        <div class="thumb" style="background:${p.img ? "#000" : (p.grad || "linear-gradient(135deg,#1565c0,#1976d2)")}">
           ${p.img ? `<img src="${p.img}" alt="${p.t} ${p.m}" loading="lazy">` : `<span class="ph-label">Design For<br><span style="font-size:13px;opacity:.8">${p.m || "시공사례 " + String(i + 1).padStart(2, "0")}</span></span>`}
         </div>
         <div class="cap"><div class="t">${p.t || "Design For"}</div><div class="m">${p.m || ""}</div></div>

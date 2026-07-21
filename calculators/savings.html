@@ -44,7 +44,7 @@
         <div class="result-hero">
           <div class="label">만기 예상 수령액</div>
           <div class="big"><span id="y-final">–</span></div>
-          <div class="small" id="y-term" style="color:#aeb7cc;margin-top:6px"></div>
+          <div class="small" id="y-term" style="color:rgba(255,255,255,.7);margin-top:6px"></div>
         </div>
         <div class="stat-row">
           <div class="stat"><div class="k">총 납입 원금</div><div class="v" id="y-principal">–</div></div>
@@ -81,7 +81,7 @@
         <div class="result-hero">
           <div class="label">최종 연 배당금</div>
           <div class="big"><span id="d-last">–</span></div>
-          <div class="small" id="d-monthly" style="color:#aeb7cc;margin-top:6px"></div>
+          <div class="small" id="d-monthly" style="color:rgba(255,255,255,.7);margin-top:6px"></div>
         </div>
 
         <div class="card card-pad" style="margin-bottom:12px">
@@ -170,7 +170,7 @@
       document.getElementById("d-pbar").style.width = pPct + "%";
       document.getElementById("d-ybar").style.width = yPct + "%";
       HP.lineChart(document.getElementById("d-chart"), {
-        points: pts, baseColor: "#8a94ac", totalColor: "var(--accent)", baseDashed: true,
+        points: pts, baseColor: "rgba(0,0,0,.38)", totalColor: "var(--accent)", baseDashed: true,
         fmt: (v) => HP.fmtMan(v) + "원", axisFmt: (v) => (v ? HP.fmtMan(v) : "0"),
       });
     }

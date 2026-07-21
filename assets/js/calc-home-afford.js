@@ -15,7 +15,7 @@ let P = null;
 const ICO_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
 const ICO_WARN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>';
 
-const NAVY = "#2b3245";
+const NAVY = "#1976d2";
 const CASH_STEPS = [-3000, 0, 3000, 6000, 10000, 15000]; // 현재 보유 현금 대비 증감(만원)
 let monthlySave = 100; // 매달 모을 수 있는 금액(만원)
 

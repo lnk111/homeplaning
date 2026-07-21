@@ -39,7 +39,7 @@
             </div>
           </div>
           <div class="field">
-            <label><span class="cat-dot" style="background:#a9b2c3"></span>생활·여가 <span class="hint">식비·쇼핑·취미</span></label>
+            <label><span class="cat-dot" style="background:#9e9e9e"></span>생활·여가 <span class="hint">식비·쇼핑·취미</span></label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
               <div class="input-suffix"><input class="input" type="number" id="life-amt" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">만원</span></div>
               <div class="input-suffix"><input class="input" type="number" id="life-pct" min="0" step="1" inputmode="numeric" autocomplete="off" style="text-align:right"><span class="suffix">%</span></div>
@@ -89,7 +89,7 @@
     const S = { net: 280, rule: "503020", fixed: 50, life: 30, save: 20 };
     const PRESETS = { "503020": [50, 30, 20], save80: [15, 5, 80] };
     const KEYS = ["fixed", "life", "save"];
-    const LIFE_COLOR = "#a9b2c3";
+    const LIFE_COLOR = "#9e9e9e";
 
     // 상태 → 입력칸(금액·%) 동기화
     function syncInputs() {

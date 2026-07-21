@@ -13,7 +13,7 @@
   <div id="app-header"></div>
   <main class="wrap" style="padding-top:32px">
     <div class="eyebrow">자산목표 계산기</div>
-    <h1 style="font-size:clamp(26px,4.5vw,36px);color:var(--navy)">목표까지, 매달 얼마씩 · 몇 년?</h1>
+    <h1 style="font-size:clamp(26px,4.5vw,36px);color:var(--text)">목표까지, 매달 얼마씩 · 몇 년?</h1>
     <p class="muted" style="margin:10px 0 24px;max-width:640px">모으고 싶은 금액을 정하면 필요한 월 저축액과 도달 기간을 역산합니다.</p>
 
     <div class="calc-layout">
@@ -51,10 +51,10 @@
         <div class="result-hero">
           <div class="label" id="out-label">필요 월 저축액</div>
           <div class="big"><span id="r-main">–</span></div>
-          <div class="small" id="r-sub" style="color:#aeb7cc;margin-top:6px"></div>
+          <div class="small" id="r-sub" style="color:rgba(255,255,255,.7);margin-top:6px"></div>
         </div>
         <div class="card card-pad" style="margin-bottom:12px">
-          <h3 style="font-size:18px;color:var(--navy)">투자 결과</h3>
+          <h3 style="font-size:18px;color:var(--text)">투자 결과</h3>
           <p class="muted small" style="margin:6px 0 18px">복리의 힘으로 시간이 지날수록 자산이 어떻게 쌓여 가는지 한눈에 확인해 보세요.</p>
 
           <div class="res-grid">
@@ -130,7 +130,7 @@
       document.getElementById("g-pbar").style.width = pPct + "%";
       document.getElementById("g-ybar").style.width = yPct + "%";
       HP.lineChart(document.getElementById("chart"), {
-        points: pts, baseColor: "#8a94ac", totalColor: "var(--accent)",
+        points: pts, baseColor: "rgba(0,0,0,.38)", totalColor: "var(--accent)",
         fmt: (v) => HP.fmtMan(v) + "원", axisFmt: (v) => (v ? HP.fmtMan(v) : "0"),
       });
     }

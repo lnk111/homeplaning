@@ -61,7 +61,7 @@ function renderFooter() {
       <div class="cols">
         <div>
           <div class="brand">홈플래닝</div>
-          <p style="font-size:14px;color:#aeb7cc;margin:0;max-width:280px">
+          <p style="font-size:14px;color:rgba(255,255,255,.5);margin:0;max-width:280px">
             2030 사회초년생의 첫 돈 관리·자산형성·내집마련을 돕는 무료 계산기 플랫폼.
           </p>
         </div>
@@ -87,7 +87,7 @@ function renderFooter() {
       <div class="disc">
         홈플래닝의 모든 계산 결과는 <strong>참고용 추정치</strong>이며, 실제 대출 한도·금리·세금은 개인 신용,
         금융기관 심사, 시장 상황에 따라 달라질 수 있습니다. 투자·대출 결정 전 반드시 전문가와 상담하세요.
-        <br>운영: Design For · 문의 <a style="display:inline;color:#aeb7cc;text-decoration:underline" href="${b}contact.html">여기</a>
+        <br>운영: Design For · 문의 <a style="display:inline;color:rgba(255,255,255,.5);text-decoration:underline" href="${b}contact.html">여기</a>
         · © 2026 홈플래닝(homeplaning.kr)
       </div>
     </div>
@@ -338,7 +338,7 @@ function lineChart(el, opts) {
   const N = pts[pts.length - 1].year || 1;
   const fmt = opts.fmt || ((v) => Math.round(v));
   const axisFmt = opts.axisFmt || fmt;
-  const cBase = opts.baseColor || "#8a94ac";
+  const cBase = opts.baseColor || "rgba(0,0,0,.38)";
   const cTotal = opts.totalColor || "var(--accent)";
   const W = 560, H = 280, padL = 54, padR = 14, padT = 14, padB = 28;
   const plotW = W - padL - padR, plotH = H - padT - padB;
@@ -421,7 +421,7 @@ function scenarioBars(el, opts) {
   if (!items.length) { el.innerHTML = ""; return; }
   const axisFmt = opts.axisFmt || ((v) => Math.round(v));
   const cOn = opts.activeColor || "var(--accent)";
-  const cOff = opts.barColor || "#d9dfea";
+  const cOff = opts.barColor || "rgba(0,0,0,.12)";
   // 좁은 화면에서는 뷰박스를 줄여 글자가 상대적으로 커지도록 함
   const narrow = (el.clientWidth || 560) < 430;
   const W = narrow ? 400 : 560, H = narrow ? 240 : 250;
