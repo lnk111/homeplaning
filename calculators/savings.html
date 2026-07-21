@@ -158,11 +158,6 @@
       </div>
     </div>
 
-    <div class="lead-cta" style="max-width:900px">
-      <h3>모은 돈으로 내 집까지</h3>
-      <p>적금·배당으로 만든 종잣돈으로 살 수 있는 집을 확인하세요.</p>
-      <a class="btn btn-ghost" href="home-afford.html">내 집 찾기 →</a>
-    </div>
   </main>
   <div id="app-footer"></div>
 
@@ -224,7 +219,7 @@
           <td>${r.year}년차${r.year === viewYear ? ' <span class="badge best">선택</span>' : ""}</td>
           <td>${HP.fmtMan(r.div)}${over ? ' <span class="badge na">종합과세</span>' : ""}</td>
           <td>${free ? '<span class="badge best">비과세</span>' : HP.fmtMan(r.tax)}</td>
-          <td>${HP.fmtMan(r.net)}</td>
+          <td class="net">${HP.fmtMan(r.net)}</td>
           <td>${HP.fmtManWon(r.net / 12)}</td></tr>`;
       }).join("");
       const note = isISA ? isaNote(rows) : DS.type === "kr" ? krNote(rows) : usNote(rows);

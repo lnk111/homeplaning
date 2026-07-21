@@ -280,6 +280,8 @@ table.compare th:first-child, table.compare td:first-child { text-align: left; }
 table.compare thead th { color: var(--text-2); font-weight: 700; font-size: 13px; }
 table.compare tr.best { background: rgba(232, 73, 47, .06); }
 table.compare tr.best td:first-child { font-weight: 800; color: var(--accent); }
+/* '실제로 손에 쥐는 금액' 강조. accent(#e8492f)는 흰 배경에서 3.9:1이라 accent-dark(5.1:1) 사용 */
+table.compare td.net { color: var(--accent-dark); font-weight: 800; }
 .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
 .badge.best { background: var(--accent); color: #fff; }
 .badge.na { background: var(--line); color: var(--text-3); }
