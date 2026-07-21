@@ -97,7 +97,7 @@
           <div class="small" id="r-price-sub" style="color:#aeb7cc;margin-top:6px"></div>
         </div>
 
-        <div class="metric-row" style="margin-bottom:12px">
+        <div class="metric-row cols-4" style="margin-bottom:12px">
           <div class="metric">
             <div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 10h16M5 10 12 4l7 6M6 10v8M10 10v8M14 10v8M18 10v8"/></svg> 받는 대출</div>
             <div class="mv accent" id="r-loan">–</div>
@@ -109,9 +109,14 @@
             <div class="ms" id="r-cash-sub">–</div>
           </div>
           <div class="metric">
-            <div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg> 남는 현금</div>
-            <div class="mv" id="r-remain">–</div>
-            <div class="ms" id="r-remain-sub">–</div>
+            <div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v12H4zM4 10h16M8 15h3"/></svg> 초기 부대비용</div>
+            <div class="mv" id="r-fees">–</div>
+            <div class="ms">취득세·중개비 등</div>
+          </div>
+          <div class="metric">
+            <div class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> 월 상환액</div>
+            <div class="mv" id="r-monthly">–</div>
+            <div class="ms" id="r-monthly-sub">–</div>
           </div>
         </div>
 
@@ -119,6 +124,13 @@
           <h3 style="font-size:16px;color:var(--navy);margin-bottom:4px">자금 구성</h3>
           <p class="small muted" style="margin:0 0 14px;line-height:1.5">집값을 <b>대출(빌리는 돈)</b>과 <b>자기자본(내 현금)</b>으로 얼마씩 채우는지 보여줘요.</p>
           <div id="donut"></div>
+        </div>
+
+        <div class="card" style="margin-bottom:12px">
+          <h3 style="font-size:16px;color:var(--navy);margin-bottom:4px">현금을 더 모으면?</h3>
+          <p class="small muted" style="margin:0 0 14px;line-height:1.5">투입할 수 있는 <b>현금이 늘어나면</b> 살 수 있는 집값이 어떻게 달라지는지 한눈에 비교해 보세요. 막대에 마우스를 올리면 자세히 보여드려요.</p>
+          <div id="cash-chart"></div>
+          <p class="small" id="cash-note" style="margin:12px 0 0;line-height:1.6;color:var(--text-2)"></p>
         </div>
 
         <div class="insight" style="margin-bottom:12px">
@@ -148,9 +160,9 @@
 
   <div id="app-footer"></div>
 
-  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/app.js?v=3"></script>
   <script src="../assets/js/policy.js"></script>
   <script src="../assets/js/calc-home-core.js"></script>
-  <script src="../assets/js/calc-home-afford.js?v=3"></script>
+  <script src="../assets/js/calc-home-afford.js?v=5"></script>
 </body>
 </html>

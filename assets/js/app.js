@@ -202,7 +202,7 @@ function donutPanel(el, parts, opts = {}) {
     .join("");
   const center = opts.centerLabel
     ? `<div class="dp-center">
-        <div class="dp-center-v">${opts.centerLabel}</div>
+        <div class="dp-center-v"${opts.centerColor ? ` style="color:${opts.centerColor}"` : ""}>${opts.centerLabel}</div>
         <div class="dp-center-s">${opts.centerSub || ""}</div>
       </div>`
     : "";
@@ -375,6 +375,95 @@ function lineChart(el, opts) {
   cont.addEventListener("touchmove", (e) => e.touches[0] && showAt(e.touches[0].clientX), { passive: true });
 }
 
+/* ---------- 시나리오 막대 차트 (현재 위치 강조 + 호버 툴팁) ---------- */
+function scenarioBars(el, opts) {
+  // items: [{label, value, current, tipTitle, tip:[{k,v}]}] — value 만원
+  const items = opts.items || [];
+  if (!items.length) { el.innerHTML = ""; return; }
+  const axisFmt = opts.axisFmt || ((v) => Math.round(v));
+  const cOn = opts.activeColor || "var(--accent)";
+  const cOff = opts.barColor || "#d9dfea";
+  // 좁은 화면에서는 뷰박스를 줄여 글자가 상대적으로 커지도록 함
+  const narrow = (el.clientWidth || 560) < 430;
+  const W = narrow ? 400 : 560, H = narrow ? 240 : 250;
+  const padL = narrow ? 40 : 56, padR = 10, padT = 18, padB = narrow ? 30 : 46;
+  const showSub = !narrow;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const x0 = padL, yBottom = padT + plotH;
+  const yMax = niceCeil(Math.max(...items.map((i) => i.value), 1) * 1.1);
+  const slot = plotW / items.length;
+  const bw = Math.min(44, slot * 0.52);
+  const cx = (i) => x0 + slot * (i + 0.5);
+  const Y = (v) => yBottom - (v / yMax) * plotH;
+
+  const grid = (narrow ? [0, 0.5, 1] : [0, 0.25, 0.5, 0.75, 1])
+    .map((f) => {
+      const t = f * yMax, y = Y(t);
+      return `<line x1="${x0}" y1="${y}" x2="${x0 + plotW}" y2="${y}" stroke="var(--line)"/>
+        <text x="${x0 - 6}" y="${y + 4}" text-anchor="end" font-size="12" fill="var(--text-3)">${axisFmt(t)}</text>`;
+    })
+    .join("");
+
+  const bars = items
+    .map((it, i) => {
+      const h = Math.max(3, yBottom - Y(it.value));
+      return `<rect class="sb-bar" data-i="${i}" x="${(cx(i) - bw / 2).toFixed(1)}" y="${Y(it.value).toFixed(1)}"
+        width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="6" fill="${it.current ? cOn : cOff}"/>`;
+    })
+    .join("");
+
+  const xlabels = items
+    .map(
+      (it, i) =>
+        `<text x="${cx(i).toFixed(1)}" y="${yBottom + 19}" text-anchor="middle" font-size="12"
+          fill="${it.current ? "var(--accent)" : "var(--text-3)"}" font-weight="${it.current ? 800 : 500}">${it.label}</text>` +
+        (it.sub && showSub
+          ? `<text x="${cx(i).toFixed(1)}" y="${yBottom + 35}" text-anchor="middle" font-size="11" fill="${
+              it.current ? "var(--accent)" : "var(--text-3)"
+            }" font-weight="${it.current ? 700 : 400}">${it.sub}</text>`
+          : "")
+    )
+    .join("");
+
+  el.innerHTML = `
+    <div class="lc-container" style="position:relative">
+      <svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">${grid}${bars}${xlabels}</svg>
+      <div class="lc-tip" style="display:none"></div>
+    </div>`;
+
+  const cont = el.querySelector(".lc-container");
+  const svg = el.querySelector("svg");
+  const tip = el.querySelector(".lc-tip");
+  const rects = Array.from(el.querySelectorAll(".sb-bar"));
+
+  function showAt(clientX) {
+    const rect = svg.getBoundingClientRect();
+    const vbX = ((clientX - rect.left) / rect.width) * W;
+    let bi = 0, bd = Infinity;
+    items.forEach((it, i) => { const d = Math.abs(cx(i) - vbX); if (d < bd) { bd = d; bi = i; } });
+    const it = items[bi];
+    rects.forEach((r, i) => r.setAttribute("opacity", i === bi ? "1" : "0.45"));
+    tip.innerHTML =
+      `<div class="lc-tip-yr">${it.tipTitle || it.label}</div>` +
+      (it.tip || []).map((t) => `<div class="lc-tip-row"><span>${t.k}</span><b>${t.v}</b></div>`).join("");
+    tip.style.display = "block";
+    const scale = rect.width / W;
+    const tw = tip.offsetWidth || 170;
+    let L = cx(bi) * scale - tw / 2;
+    L = Math.max(2, Math.min(L, cont.clientWidth - tw - 2));
+    tip.style.left = L + "px";
+    tip.style.top = Math.max(2, Y(it.value) * (rect.height / H) - tip.offsetHeight - 10) + "px";
+  }
+  function hide() {
+    tip.style.display = "none";
+    rects.forEach((r) => r.setAttribute("opacity", "1"));
+  }
+  cont.addEventListener("mousemove", (e) => showAt(e.clientX));
+  cont.addEventListener("mouseleave", hide);
+  cont.addEventListener("touchstart", (e) => e.touches[0] && showAt(e.touches[0].clientX), { passive: true });
+  cont.addEventListener("touchmove", (e) => e.touches[0] && showAt(e.touches[0].clientX), { passive: true });
+}
+
 /* ---------- 스크롤 리빌 ---------- */
 function initReveal() {
   const els = document.querySelectorAll(".reveal");
@@ -398,5 +487,5 @@ function initReveal() {
 
 window.HP = {
   mount, fmtMan, fmtWon, fmtManWon, fmtPct, clamp,
-  donut, donutPanel, growthBars, stackedBars, lineChart, linkFor, basePrefix,
+  donut, donutPanel, growthBars, stackedBars, lineChart, scenarioBars, linkFor, basePrefix,
 };

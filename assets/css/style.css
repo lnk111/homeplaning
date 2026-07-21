@@ -331,7 +331,9 @@ table.compare tr.best td:first-child { font-weight: 800; color: var(--accent); }
 .metric .ms { font-size: 11px; color: var(--text-3); margin-top: 4px; line-height: 1.4; }
 .metric .ms.warn { color: var(--accent); font-weight: 600; }
 .metric .ms.ok { color: var(--good); font-weight: 600; }
-@media (max-width: 560px) { .metric-row { grid-template-columns: 1fr; } }
+/* 4칸: 넓으면 4열, 보통은 2×2, 모바일은 1열 */
+.metric-row.cols-4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+@media (max-width: 560px) { .metric-row, .metric-row.cols-4 { grid-template-columns: 1fr; } }
 
 .insight { display: flex; gap: 12px; align-items: flex-start; background: rgba(232, 73, 47, .07); border-radius: var(--radius-sm); padding: 15px 17px; }
 .insight .ico { font-size: 18px; line-height: 1.2; flex: none; }
