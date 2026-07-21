@@ -53,13 +53,24 @@
           <div class="big"><span id="r-main">–</span></div>
           <div class="small" id="r-sub" style="color:#aeb7cc;margin-top:6px"></div>
         </div>
-        <div class="stat-row" style="margin-bottom:12px">
-          <div class="stat"><div class="k">목표 금액</div><div class="v" id="r-target">–</div></div>
-          <div class="stat"><div class="k">투자 수익 기여</div><div class="v accent" id="r-yield">–</div></div>
-        </div>
-        <div class="card">
-          <h3 style="font-size:16px;color:var(--navy);margin-bottom:10px">자산 성장 경로</h3>
-          <div id="chart" class="chart-box"></div>
+        <div class="card card-pad" style="margin-bottom:12px">
+          <h3 style="font-size:18px;color:var(--navy)">투자 결과</h3>
+          <p class="muted small" style="margin:6px 0 18px">복리의 힘으로 시간이 지날수록 자산이 어떻게 쌓여 가는지 한눈에 확인해 보세요.</p>
+
+          <div class="res-grid">
+            <div class="res-stat"><div class="k">총 투자 결과</div><div class="v accent" id="g-total">–</div></div>
+            <div class="res-stat"><div class="k">총 투자금액</div><div class="v" id="g-principal">–</div></div>
+          </div>
+          <hr class="res-div">
+          <div class="res-grid">
+            <div class="res-stat"><div class="k">총 수익률</div><div class="v accent" id="g-rate">–</div></div>
+            <div class="res-stat"><div class="k">총 이자수익</div><div class="v" id="g-interest">–</div></div>
+          </div>
+
+          <div class="prop-head"><span class="pl" id="g-plabel">납입금 –</span><span class="pr" id="g-ylabel">수익금 –</span></div>
+          <div class="prop-bar"><span class="pb-seg pb-base" id="g-pbar"></span><span class="pb-seg pb-top" id="g-ybar"></span></div>
+
+          <div id="chart" style="margin-top:20px"></div>
         </div>
         <div class="lead-cta">
           <h3>목표 달성 후엔 내 집?</h3>
@@ -92,59 +103,64 @@
       while (bal < S.target && m < 12 * 80) { bal = bal * (1 + r) + S.monthly; m++; }
       return m >= 12 * 80 ? null : m;
     }
-    const CHART_LEGEND = { legend: [
-      { label: "원금", color: "var(--navy)" },
-      { label: "투자수익", color: "var(--accent)" },
-    ]};
-    function pathSeries(monthly, months) {
+    // 연도별 지점: 납입원금(base) + 총자산(total)
+    function pointsFor(monthly, months) {
       const r = S.rate / 100 / 12;
-      let bal = S.current; const yearly = [];
-      for (let m = 1; m <= months; m++) { bal = bal * (1 + r) + monthly; if (m % 12 === 0 || m === months) yearly.push({ m, bal }); }
-      const step = Math.max(1, Math.round(yearly.length / 8));
-      const pts = [];
-      for (let i = 0; i < yearly.length; i += step) pts.push(yearly[i]);
-      const last = yearly[yearly.length - 1];
-      if (pts[pts.length - 1] !== last) pts.push(last);
-      // 원금(현재자산+누적납입) 아래 + 투자수익 위로 누적
-      return pts.map((p) => {
-        const principal = S.current + monthly * p.m;
-        const profit = Math.max(0, p.bal - principal);
-        return {
-          label: Math.round(p.m / 12) + "년",
-          parts: [
-            { value: Math.min(principal, p.bal), color: "var(--navy)" },
-            { value: profit, color: "var(--accent)" },
-          ],
-        };
+      const arr = [{ year: 0, base: S.current, total: S.current }];
+      let bal = S.current;
+      for (let m = 1; m <= months; m++) {
+        bal = bal * (1 + r) + monthly;
+        if (m % 12 === 0) arr.push({ year: m / 12, base: S.current + monthly * m, total: bal });
+      }
+      if (months % 12 !== 0) arr.push({ year: months / 12, base: S.current + monthly * months, total: bal });
+      return arr;
+    }
+    function fillResult(monthly, months) {
+      const pts = pointsFor(monthly, months);
+      const last = pts[pts.length - 1];
+      const principal = last.base, final = last.total, interest = Math.max(0, final - principal);
+      const roi = principal > 0 ? (interest / principal) * 100 : 0;
+      document.getElementById("g-total").textContent = HP.fmtMan(final) + "원";
+      document.getElementById("g-principal").textContent = HP.fmtMan(principal) + "원";
+      document.getElementById("g-rate").textContent = roi.toFixed(2) + "%";
+      document.getElementById("g-interest").textContent = HP.fmtMan(interest) + "원";
+      const pPct = final > 0 ? Math.round((principal / final) * 100) : 0, yPct = 100 - pPct;
+      document.getElementById("g-plabel").textContent = `납입금 ${pPct}%`;
+      document.getElementById("g-ylabel").textContent = `수익금 ${yPct}%`;
+      document.getElementById("g-pbar").style.width = pPct + "%";
+      document.getElementById("g-ybar").style.width = yPct + "%";
+      HP.lineChart(document.getElementById("chart"), {
+        points: pts, baseColor: "#8a94ac", totalColor: "var(--accent)",
+        fmt: (v) => HP.fmtMan(v) + "원", axisFmt: (v) => (v ? HP.fmtMan(v) : "0"),
       });
     }
+    function clearResult(msg) {
+      ["g-total", "g-principal", "g-rate", "g-interest"].forEach((id) => document.getElementById(id).textContent = "–");
+      document.getElementById("g-plabel").textContent = "납입금 –";
+      document.getElementById("g-ylabel").textContent = "수익금 –";
+      document.getElementById("g-pbar").style.width = "0%";
+      document.getElementById("g-ybar").style.width = "0%";
+      document.getElementById("chart").innerHTML = `<p class="note" style="text-align:center;padding:24px 0">${msg || ""}</p>`;
+    }
     function render() {
-      document.getElementById("r-target").textContent = HP.fmtMan(S.target);
       if (S.mode === "monthly") {
         const pmt = requiredMonthly();
-        const months = S.years * 12;
-        const principal = S.current + pmt * months;
-        const yieldPart = S.target - principal;
         document.getElementById("out-label").textContent = "필요 월 저축액";
         document.getElementById("r-main").innerHTML = HP.fmtManWon(pmt).replace("원", "") + '<span class="unit"> 원/월</span>';
         document.getElementById("r-sub").textContent = `${S.years}년간 매달 저축하면 목표 ${HP.fmtMan(S.target)} 달성`;
-        document.getElementById("r-yield").textContent = HP.fmtMan(Math.max(0, yieldPart));
-        HP.stackedBars(document.getElementById("chart"), pathSeries(pmt, months), CHART_LEGEND);
+        fillResult(pmt, S.years * 12);
       } else {
         const months = monthsToReach();
+        document.getElementById("out-label").textContent = "목표 도달 기간";
         if (months === null) {
           document.getElementById("r-main").innerHTML = "80년+";
           document.getElementById("r-sub").textContent = "월 저축액을 늘려야 현실적인 기간에 도달합니다.";
-          document.getElementById("r-yield").textContent = "–";
-          document.getElementById("chart").innerHTML = "";
+          clearResult("월 저축액을 늘리면 결과가 표시됩니다.");
         } else {
           const y = Math.floor(months / 12), mo = months % 12;
-          document.getElementById("out-label").textContent = "목표 도달 기간";
           document.getElementById("r-main").innerHTML = y + '<span class="unit">년</span> ' + mo + '<span class="unit">개월</span>';
-          const principal = S.current + S.monthly * months;
           document.getElementById("r-sub").textContent = `매달 ${HP.fmtMan(S.monthly)}씩 저축 시`;
-          document.getElementById("r-yield").textContent = HP.fmtMan(Math.max(0, S.target - principal));
-          HP.stackedBars(document.getElementById("chart"), pathSeries(S.monthly, months), CHART_LEGEND);
+          fillResult(S.monthly, months);
         }
       }
     }

@@ -286,6 +286,95 @@ function stackedBars(el, series, opts = {}) {
     ${legend ? `<div class="legend" style="justify-content:center;margin-top:8px">${legend}</div>` : ""}`;
 }
 
+/* ---------- 라인 차트 (호버 툴팁: N년 후 납입원금·총자산) ---------- */
+function niceCeil(v) {
+  if (v <= 0) return 1;
+  const p = Math.pow(10, Math.floor(Math.log10(v)));
+  const n = v / p;
+  const steps = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+  return (steps.find((s) => n <= s) || 10) * p;
+}
+function lineChart(el, opts) {
+  const pts = opts.points; // [{year, base, total}]
+  const N = pts[pts.length - 1].year || 1;
+  const fmt = opts.fmt || ((v) => Math.round(v));
+  const axisFmt = opts.axisFmt || fmt;
+  const cBase = opts.baseColor || "#8a94ac";
+  const cTotal = opts.totalColor || "var(--accent)";
+  const W = 560, H = 280, padL = 54, padR = 14, padT = 14, padB = 28;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const x0 = padL, yBottom = padT + plotH;
+  const yMax = niceCeil(Math.max(...pts.map((p) => p.total), 1) * 1.08);
+  const X = (yr) => x0 + (yr / N) * plotW;
+  const Y = (v) => yBottom - (v / yMax) * plotH;
+
+  const grid = [0, 0.25, 0.5, 0.75, 1]
+    .map((f) => {
+      const t = f * yMax, y = Y(t);
+      return `<line x1="${x0}" y1="${y}" x2="${x0 + plotW}" y2="${y}" stroke="var(--line)"/>
+        <text x="${x0 - 8}" y="${y + 4}" text-anchor="end" font-size="12" fill="var(--text-3)">${axisFmt(t)}</text>`;
+    })
+    .join("");
+  const xstep = N <= 12 ? 1 : Math.ceil(N / 10);
+  let xlabels = "";
+  for (let yr = 0; yr <= N + 0.001; yr += xstep)
+    xlabels += `<text x="${X(Math.min(yr, N))}" y="${yBottom + 18}" text-anchor="middle" font-size="12" fill="var(--text-3)">${Math.round(yr)}년</text>`;
+
+  const line = (k) => pts.map((p, i) => `${i ? "L" : "M"}${X(p.year).toFixed(1)},${Y(p[k]).toFixed(1)}`).join(" ");
+  const area = (k) => `M${X(0)},${yBottom} ` + pts.map((p) => `L${X(p.year).toFixed(1)},${Y(p[k]).toFixed(1)}`).join(" ") + ` L${X(N)},${yBottom} Z`;
+
+  el.innerHTML = `
+    <div class="lc-container" style="position:relative">
+      <svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">
+        ${grid}${xlabels}
+        <path d="${area("total")}" fill="${cTotal}" opacity="0.09"/>
+        <path d="${area("base")}" fill="${cBase}" opacity="0.10"/>
+        <path d="${line("base")}" fill="none" stroke="${cBase}" stroke-width="2.5"/>
+        <path d="${line("total")}" fill="none" stroke="${cTotal}" stroke-width="2.5"/>
+        <g class="lc-hover" style="display:none">
+          <line class="lc-vline" y1="${padT}" y2="${yBottom}" stroke="var(--text-3)" stroke-dasharray="3 3"/>
+          <circle class="lc-dot-b" r="5" fill="${cBase}" stroke="#fff" stroke-width="2"/>
+          <circle class="lc-dot-t" r="5" fill="${cTotal}" stroke="#fff" stroke-width="2"/>
+        </g>
+      </svg>
+      <div class="lc-legend"><span><span class="lc-dot" style="background:${cBase}"></span>납입 원금</span><span><span class="lc-dot" style="background:${cTotal}"></span>총 자산</span></div>
+      <div class="lc-tip" style="display:none"></div>
+    </div>`;
+
+  const cont = el.querySelector(".lc-container");
+  const svg = el.querySelector("svg");
+  const hov = el.querySelector(".lc-hover");
+  const vline = el.querySelector(".lc-vline");
+  const dotB = el.querySelector(".lc-dot-b");
+  const dotT = el.querySelector(".lc-dot-t");
+  const tip = el.querySelector(".lc-tip");
+
+  function showAt(clientX) {
+    const rect = svg.getBoundingClientRect();
+    const vbX = ((clientX - rect.left) / rect.width) * W;
+    let bi = 0, bd = Infinity;
+    pts.forEach((p, i) => { const d = Math.abs(X(p.year) - vbX); if (d < bd) { bd = d; bi = i; } });
+    const p = pts[bi], px = X(p.year);
+    vline.setAttribute("x1", px); vline.setAttribute("x2", px);
+    dotB.setAttribute("cx", px); dotB.setAttribute("cy", Y(p.base));
+    dotT.setAttribute("cx", px); dotT.setAttribute("cy", Y(p.total));
+    hov.style.display = "";
+    tip.innerHTML = `<div class="lc-tip-yr">${Math.round(p.year)}년 후</div>
+      <div class="lc-tip-row"><span><span class="lc-dot" style="background:${cBase}"></span>납입 원금</span><b>${fmt(p.base)}</b></div>
+      <div class="lc-tip-row"><span><span class="lc-dot" style="background:${cTotal}"></span>총 자산</span><b>${fmt(p.total)}</b></div>`;
+    tip.style.display = "block";
+    const leftPx = (px / W) * rect.width, tw = tip.offsetWidth || 160;
+    let L = leftPx + 14;
+    if (L + tw > cont.clientWidth) L = leftPx - tw - 14;
+    tip.style.left = Math.max(2, L) + "px";
+  }
+  function hide() { hov.style.display = "none"; tip.style.display = "none"; }
+  cont.addEventListener("mousemove", (e) => showAt(e.clientX));
+  cont.addEventListener("mouseleave", hide);
+  cont.addEventListener("touchstart", (e) => e.touches[0] && showAt(e.touches[0].clientX), { passive: true });
+  cont.addEventListener("touchmove", (e) => e.touches[0] && showAt(e.touches[0].clientX), { passive: true });
+}
+
 /* ---------- 스크롤 리빌 ---------- */
 function initReveal() {
   const els = document.querySelectorAll(".reveal");
@@ -309,5 +398,5 @@ function initReveal() {
 
 window.HP = {
   mount, fmtMan, fmtWon, fmtManWon, fmtPct, clamp,
-  donut, donutPanel, growthBars, stackedBars, linkFor, basePrefix,
+  donut, donutPanel, growthBars, stackedBars, lineChart, linkFor, basePrefix,
 };

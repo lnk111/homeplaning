@@ -314,6 +314,29 @@ table.compare tr.best td:first-child { font-weight: 800; color: var(--accent); }
   .dp-amt { margin-left: 6px; }
 }
 
+/* ---------- 투자 결과 (자산목표) ---------- */
+.res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
+.res-stat .k { font-size: 13px; color: var(--text-2); font-weight: 600; }
+.res-stat .v { font-size: 22px; font-weight: 800; color: var(--navy); margin-top: 3px; letter-spacing: -0.02em; }
+.res-stat .v.accent { color: var(--accent); }
+.res-div { border: none; border-top: 1px solid var(--line); margin: 16px 0; }
+
+.prop-head { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin: 20px 0 8px; }
+.prop-head .pl { color: var(--text-2); }
+.prop-head .pr { color: var(--accent); }
+.prop-bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: var(--line); }
+.prop-bar .pb-seg { height: 100%; }
+.prop-bar .pb-base { background: #8a94ac; }
+.prop-bar .pb-top { background: var(--accent); }
+
+/* 라인 차트 */
+.lc-legend { display: flex; gap: 18px; justify-content: center; margin-top: 8px; font-size: 13px; color: var(--text-2); }
+.lc-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.lc-tip { position: absolute; top: 6px; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-lg); padding: 10px 13px; font-size: 13px; pointer-events: none; z-index: 6; min-width: 160px; }
+.lc-tip-yr { font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+.lc-tip-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 2px 0; color: var(--text-2); }
+.lc-tip-row b { color: var(--navy); font-weight: 800; }
+
 /* ---------- Portfolio (시공사례) ---------- */
 .portfolio-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;
