@@ -124,6 +124,125 @@ function scrollActiveTabIntoView() {
   nav.scrollLeft = Math.max(0, Math.min(centered, nav.scrollWidth - nav.clientWidth));
 }
 
+/* =========================================================
+   계산기 간 값 전달 · 결과 공유
+   서버도 로그인도 없이 URL 쿼리로 값을 넘긴다.
+   같은 링크를 열면 누구든 같은 결과를 본다 = 공유 기능이 덤으로 따라온다.
+   ========================================================= */
+
+const CALC_LABEL = {
+  salary: "월급배분", goal: "자산목표", savings: "적금·배당", compound: "복리",
+  "home-afford": "내집찾기", "home-goal": "내집자금", jeonse: "전세",
+};
+
+/**
+ * URL 쿼리에서 값을 읽는다. 외부 입력이므로 타입과 범위를 반드시 검증한다.
+ * @param {Object} spec { key: {min,max} | {allow:[...]} }
+ * @returns {Object} 검증을 통과한 값만 담긴 객체
+ */
+function readParams(spec) {
+  const q = new URLSearchParams(location.search);
+  const out = {};
+  for (const [key, def] of Object.entries(spec)) {
+    if (!q.has(key)) continue;
+    const raw = (q.get(key) || "").trim();
+    if (def.allow) {
+      if (def.allow.includes(raw)) out[key] = raw;
+      continue;
+    }
+    const n = Number(raw);
+    if (raw === "" || !Number.isFinite(n)) continue; // 빈값·NaN·Infinity 차단
+    out[key] = Math.min(def.max ?? Infinity, Math.max(def.min ?? 0, n));
+  }
+  return out;
+}
+
+/** 상대 링크에 값을 붙인다. 빈 값은 넣지 않는다. */
+function withParams(href, params) {
+  const q = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (v === null || v === undefined || v === "" || (typeof v === "number" && !Number.isFinite(v))) continue;
+    q.set(k, typeof v === "number" ? String(Math.round(v * 100) / 100) : String(v));
+  }
+  const s = q.toString();
+  return s ? `${href}?${s}` : href;
+}
+
+/** 받침에 따라 '로/으로'를 고른다. 받침이 없거나 ㄹ이면 '로'.
+    (월급배분 → 으로, 자산목표 → 로) */
+function josaRo(word) {
+  const code = word.charCodeAt(word.length - 1);
+  if (code < 0xac00 || code > 0xd7a3) return "로"; // 한글이 아니면 기본형
+  const jong = (code - 0xac00) % 28;
+  return jong === 0 || jong === 8 ? "로" : "으로"; // 8 = ㄹ
+}
+
+/** 지금 보고 있는 계산기 키 (파일명 기준) */
+function currentCalcKey() {
+  return (location.pathname.split("/").pop() || "").replace(/\.html$/, "");
+}
+
+/** 어느 계산기에서 넘어왔는지 (from 파라미터).
+    공유 링크는 from이 자기 자신이므로, 그때는 이어받음이 아니다. */
+function handoffSource() {
+  const f = new URLSearchParams(location.search).get("from");
+  if (!CALC_LABEL[f] || f === currentCalcKey()) return null;
+  return { key: f, label: CALC_LABEL[f] };
+}
+
+/**
+ * 이어받은 값을 화면에 알린다.
+ * 값이 기본값과 다른 이유를 모르면 사용자는 계산기를 믿지 못한다.
+ * @param {Element} el 결과 영역 (맨 위에 삽입)
+ * @param {Array<{k:string,v:string}>} items 이어받은 항목
+ */
+function handoffNotice(el, items) {
+  const src = handoffSource();
+  if (!el || !src || !items || !items.length) return;
+  const list = items.map((i) => `${i.k} <b>${i.v}</b>`).join(" · ");
+  const back = document.createElement("div");
+  back.className = "handoff";
+  back.innerHTML = `<span class="ic">↩</span>
+    <div><b>${src.label} 계산기</b>에서 이어받았어요 — ${list}
+    <a href="${linkFor(src.key)}">${src.label}${josaRo(src.label)} 돌아가기</a></div>`;
+  el.prepend(back);
+}
+
+/** 현재 값이 담긴 공유용 절대 URL */
+function shareUrl(params) {
+  const rel = withParams(location.pathname.split("/").pop() || "", params);
+  const q = rel.includes("?") ? rel.slice(rel.indexOf("?")) : "";
+  return location.origin + location.pathname + q;
+}
+
+/**
+ * 공유 버튼을 붙인다. 누르면 현재 값이 담긴 링크가 복사된다.
+ * @param {Element} el 버튼을 넣을 컨테이너
+ * @param {Function} getParams 현재 상태를 파라미터 객체로 반환
+ */
+function initShare(el, getParams) {
+  if (!el) return;
+  el.innerHTML = `<button type="button" class="btn btn-ghost share-btn">🔗 결과 링크 복사</button>
+    <input class="share-url" type="text" readonly hidden aria-label="공유 링크">`;
+  const btn = el.querySelector(".share-btn");
+  const box = el.querySelector(".share-url");
+  btn.addEventListener("click", async () => {
+    const url = shareUrl(getParams());
+    try {
+      await navigator.clipboard.writeText(url);
+      btn.textContent = "✅ 복사됐어요";
+      btn.classList.add("ok");
+      setTimeout(() => { btn.textContent = "🔗 결과 링크 복사"; btn.classList.remove("ok"); }, 2000);
+    } catch {
+      // 클립보드 권한이 없으면 직접 복사할 수 있게 노출한다
+      box.value = url;
+      box.hidden = false;
+      box.select();
+      btn.textContent = "아래 주소를 복사하세요";
+    }
+  });
+}
+
 /* ---------- 금액 입력 하단에 억/만원 환산 표기 ----------
    '만원' 접미사를 가진 숫자 입력을 찾아 아래에 읽기 쉬운 금액을 보여준다.
    예) 10000 → "1억원", 15000 → "1억 5,000만원"                       */
@@ -557,4 +676,5 @@ window.HP = {
   mount, fmtMan, fmtManShort, fmtWon, fmtManWon, fmtPct, clamp,
   donut, donutPanel, growthBars, stackedBars, lineChart, scenarioBars, linkFor, basePrefix,
   initAmountHints, refreshAmountHints,
+  readParams, withParams, handoffNotice, handoffSource, shareUrl, initShare,
 };

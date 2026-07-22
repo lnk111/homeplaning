@@ -98,7 +98,12 @@
       "PowerShell(python -m pip install pyyaml --quiet 2>&1)",
       "PowerShell(python -c \"import yaml,io,json; d=yaml.safe_load\\(io.open\\('.github/workflows/update-policy.yml',encoding='utf-8'\\)\\); s=d['jobs']['update-policy']['steps']; print\\('YAML OK, steps=',len\\(s\\)\\); [print\\('  -',x.get\\('name','?'\\).encode\\('ascii','replace'\\).decode\\(\\),'| if:',x.get\\('if','-'\\)\\) for x in s]\")",
       "PowerShell(python -c \"import yaml,io; d=yaml.safe_load\\(io.open\\('.github/workflows/update-policy.yml',encoding='utf-8'\\)\\); print\\('permissions:', d['permissions']\\); print\\('notify step if:', d['jobs']['update-policy']['steps'][-1]['if']\\); print\\('uses:', d['jobs']['update-policy']['steps'][-1]['uses']\\)\")",
-      "Bash(git commit -q -m 'fix: 사이트가 사실과 다르게 말하던 3건 수정 *)"
+      "Bash(git commit -q -m 'fix: 사이트가 사실과 다르게 말하던 3건 수정 *)",
+      "Bash(grep -n 'result-hero\\\\|<div>$\\\\|lead-cta\\\\|class=\"note\"' calculators/home-afford.html)",
+      "Bash(node --check assets/js/app.js)",
+      "Bash(node --check assets/js/calc-home-afford.js)",
+      "Bash(node --check assets/js/calc-jeonse.js)",
+      "Bash(git commit -q -m 'feat: 계산기 간 값 이어받기 + 결과 링크 공유 *)"
     ]
   }
 }

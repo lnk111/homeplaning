@@ -71,19 +71,21 @@
           </div>
         </div>
 
-        <a href="goal.html" class="cta-orange">
+        <a href="goal.html" id="next-goal" class="cta-orange">
           <div>
-            <div class="t">1년동안 이 금액을 저축하면?</div>
+            <div class="t">이 금액으로 목표까지 몇 년?</div>
             <div class="s" id="cta-sub">연간 – 저축</div>
           </div>
           <span class="arrow">→</span>
         </a>
+
+        <div class="share-box" id="share"></div>
       </div>
     </div>
   </main>
   <div id="app-footer"></div>
 
-  <script src="../assets/js/app.js?v=11"></script>
+  <script src="../assets/js/app.js?v=13"></script>
   <script>
     // 상태: 각 항목은 '퍼센트'가 기준값(정확한 실수). 금액 = 실수령액 × %/100.
     // 50·30·20 — 저축·투자 50 / 고정지출 30 / 생활·여가 20 (저축 우선 배분)
@@ -113,6 +115,9 @@
       document.getElementById("r-year").textContent = HP.fmtMan(saveAmt * 12) + "원";
       document.getElementById("r-rate").textContent = Math.round(S.save) + "%";
       document.getElementById("cta-sub").textContent = "연간 " + HP.fmtMan(saveAmt * 12) + "원 저축";
+      // 저축액을 자산목표 계산기로 그대로 넘긴다 (도달 기간 모드로)
+      document.getElementById("next-goal").href =
+        HP.withParams("goal.html", { mode: "years", monthly: saveAmt, from: "salary" });
       HP.donutPanel(document.getElementById("donut"), [
         { value: fixedAmt, color: "var(--navy)", label: "고정지출", display: HP.fmtMan(fixedAmt) + "원" },
         { value: lifeAmt, color: LIFE_COLOR, label: "생활·여가", display: HP.fmtMan(lifeAmt) + "원" },
@@ -156,8 +161,22 @@
     });
 
     HP.mount("salary");
+
+    // 링크로 넘어온 값 반영 (외부 입력이라 범위 검증을 거친다)
+    const IN = HP.readParams({
+      net: { min: 0, max: 100000 },
+      save: { min: 0, max: 100 }, fixed: { min: 0, max: 100 }, life: { min: 0, max: 100 },
+    });
+    Object.assign(S, IN);
+    if (IN.net !== undefined) document.getElementById("net").value = Math.round(S.net);
+    if (IN.save !== undefined || IN.fixed !== undefined || IN.life !== undefined) markCustom();
+
     syncInputs();
     render();
+    HP.refreshAmountHints();
+    HP.initShare(document.getElementById("share"), () => ({
+      net: S.net, save: S.save, fixed: S.fixed, life: S.life, from: "salary",
+    }));
   </script>
 </body>
 </html>

@@ -47,7 +47,7 @@
         </div>
       </div>
 
-      <div>
+      <div id="result-col">
         <div class="result-hero">
           <div class="label" id="out-label">필요 월 저축액</div>
           <div class="big"><span id="r-main">–</span></div>
@@ -72,13 +72,23 @@
 
           <div id="chart" style="margin-top:20px"></div>
         </div>
+        <a href="home-afford.html" id="next-home" class="cta-orange">
+          <div>
+            <div class="t">이 종잣돈으로 살 수 있는 집은?</div>
+            <div class="s" id="next-home-sub">– 을 종잣돈으로 매매가 계산</div>
+          </div>
+          <span class="arrow">→</span>
+        </a>
+
+        <div class="share-box" id="share"></div>
+
         <p class="note">※ 결과는 참고용 추정치입니다. 실제 수익률은 변동합니다.</p>
       </div>
     </div>
   </main>
   <div id="app-footer"></div>
 
-  <script src="../assets/js/app.js?v=11"></script>
+  <script src="../assets/js/app.js?v=13"></script>
   <script>
     const S = { mode: "monthly", target: 10000, current: 2000, rate: 4, years: 10, monthly: 80 };
 
@@ -158,6 +168,14 @@
           fillResult(S.monthly, months);
         }
       }
+      updateNextLink();
+    }
+    // 목표 금액을 내집찾기의 '보유 종잣돈'으로 넘긴다
+    function updateNextLink() {
+      document.getElementById("next-home").href =
+        HP.withParams("home-afford.html", { cash: S.target, from: "goal" });
+      document.getElementById("next-home-sub").textContent =
+        `${HP.fmtMan(S.target)}을 종잣돈으로 매매가 계산`;
     }
     function setMode(v) {
       S.mode = v;
@@ -173,7 +191,38 @@
       document.getElementById(id).oninput = (e) => { S[id] = +e.target.value || 0; render(); });
     document.getElementById("years").oninput = (e) => { S.years = +e.target.value || 1; render(); };
     HP.mount("goal");
-    render();
+
+    // 링크로 넘어온 값 반영
+    const IN = HP.readParams({
+      mode: { allow: ["monthly", "years"] },
+      target: { min: 100, max: 1000000 },
+      current: { min: 0, max: 1000000 },
+      monthly: { min: 0, max: 100000 },
+      rate: { min: 0, max: 30 },
+      years: { min: 1, max: 60 },
+    });
+    Object.assign(S, IN);
+    ["target", "current", "monthly", "rate", "years"].forEach((id) => {
+      if (IN[id] !== undefined) document.getElementById(id).value = Math.round(S[id] * 100) / 100;
+    });
+    if (IN.mode) {
+      document.querySelectorAll("#mode .chip").forEach((x) =>
+        x.classList.toggle("on", x.dataset.v === IN.mode));
+    }
+    setMode(S.mode); // 모드에 맞춰 입력칸 표시 + render()
+    HP.refreshAmountHints();
+
+    // 어디서 무엇을 받아왔는지 알린다
+    const got = [];
+    if (IN.monthly !== undefined) got.push({ k: "월 저축액", v: HP.fmtMan(S.monthly) + "원" });
+    if (IN.current !== undefined) got.push({ k: "보유 자산", v: HP.fmtMan(S.current) + "원" });
+    if (IN.rate !== undefined) got.push({ k: "수익률", v: S.rate + "%" });
+    HP.handoffNotice(document.getElementById("result-col"), got);
+
+    HP.initShare(document.getElementById("share"), () => ({
+      mode: S.mode, target: S.target, current: S.current,
+      monthly: S.monthly, rate: S.rate, years: S.years, from: "goal",
+    }));
   </script>
 </body>
 </html>

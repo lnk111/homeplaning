@@ -36,7 +36,7 @@
         </div>
       </div>
 
-      <div>
+      <div id="result-col">
         <div class="result-hero">
           <div class="label"><span id="yr-label">20</span>년 후 예상 자산</div>
           <div class="big"><span id="r-final">–</span></div>
@@ -67,15 +67,18 @@
         <div class="lead-cta">
           <h3>목표까지 얼마 남았나요?</h3>
           <p>이 수익률로 1억·3억 모으는 데 걸리는 시간은 자산목표 계산기에서 확인하세요.</p>
-          <a class="btn btn-ghost" href="goal.html">자산목표 계산 →</a>
+          <a class="btn btn-ghost" href="goal.html" id="next-goal">자산목표 계산 →</a>
         </div>
+
+        <div class="share-box" id="share"></div>
+
         <p class="note">※ 수익률은 미래를 보장하지 않는 가정값입니다. 결과는 참고용 추정치입니다.</p>
       </div>
     </div>
   </main>
   <div id="app-footer"></div>
 
-  <script src="../assets/js/app.js?v=11"></script>
+  <script src="../assets/js/app.js?v=13"></script>
   <script>
     const S = { initial: 1000, monthly: 50, rate: 7, years: 20 };
     function grow(monthlyContribute, annualRate, years, initial) {
@@ -129,12 +132,34 @@
       const diff = final - simple;
       document.getElementById("compare-txt").innerHTML =
         `같은 조건을 단리로 계산하면 약 <strong>${HP.fmtMan(simple)}</strong>. 복리는 <strong style="color:var(--accent)">${HP.fmtMan(diff)}</strong> 더 많습니다. 시간이 길수록 격차는 커집니다.`;
+
+      // 지금 조건 그대로 자산목표 계산기로 (도달 기간 모드)
+      document.getElementById("next-goal").href = HP.withParams("goal.html", {
+        mode: "years", monthly: S.monthly, current: S.initial, rate: S.rate, from: "compound",
+      });
     }
     ["initial", "monthly", "rate"].forEach((id) =>
       document.getElementById(id).oninput = (e) => { S[id] = +e.target.value || 0; render(); });
     document.getElementById("years").oninput = (e) => { S.years = +e.target.value || 1; render(); };
     HP.mount("compound");
+
+    const IN = HP.readParams({
+      initial: { min: 0, max: 1000000 }, monthly: { min: 0, max: 100000 },
+      rate: { min: 0, max: 30 }, years: { min: 1, max: 60 },
+    });
+    Object.assign(S, IN);
+    Object.keys(IN).forEach((id) => { document.getElementById(id).value = S[id]; });
     render();
+    HP.refreshAmountHints();
+
+    const got = [];
+    if (IN.monthly !== undefined) got.push({ k: "월 납입액", v: HP.fmtMan(S.monthly) + "원" });
+    if (IN.initial !== undefined) got.push({ k: "초기 자금", v: HP.fmtMan(S.initial) + "원" });
+    HP.handoffNotice(document.getElementById("result-col"), got);
+
+    HP.initShare(document.getElementById("share"), () => ({
+      initial: S.initial, monthly: S.monthly, rate: S.rate, years: S.years, from: "compound",
+    }));
   </script>
 </body>
 </html>

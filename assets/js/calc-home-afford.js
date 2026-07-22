@@ -198,10 +198,44 @@ function bindInputs() {
   bindChips("bank", "bank");
 }
 
+/* 링크로 넘어온 값 반영 — 외부 입력이라 범위를 검증한다 */
+function applyIncoming() {
+  const IN = HP.readParams({
+    cash: { min: 0, max: 1000000 },
+    income: { min: 0, max: 1000000 },
+    existing: { min: 0, max: 100000 },
+    age: { min: 19, max: 70 },
+    rate: { min: 0, max: 20 },
+    years: { min: 1, max: 50 },
+    region: { allow: ["수도권_규제", "수도권_비규제", "지방"] },
+    household: { allow: ["일반", "신혼", "1자녀", "2자녀"] },
+  });
+  Object.assign(state, IN);
+  ["cash", "income", "existing", "age", "rate", "years"].forEach((id) => {
+    if (IN[id] !== undefined) document.getElementById(id).value = state[id];
+  });
+  ["region", "household"].forEach((k) => {
+    if (IN[k] === undefined) return;
+    document.querySelectorAll(`#${k} .chip`).forEach((c) => c.classList.toggle("on", c.dataset.v === IN[k]));
+  });
+  HP.refreshAmountHints();
+
+  const got = [];
+  if (IN.cash !== undefined) got.push({ k: "종잣돈", v: HP.fmtMan(state.cash) + "원" });
+  if (IN.income !== undefined) got.push({ k: "연 소득", v: HP.fmtMan(state.income) + "원" });
+  HP.handoffNotice(document.getElementById("result-col"), got);
+}
+
 HP.mount("home-afford");
 HPPolicy.loadPolicy().then((data) => {
   P = data;
   HPPolicy.renderPolicyDate(document.getElementById("policy-date"), data);
   bindInputs();
+  applyIncoming();
   render();
+  HP.initShare(document.getElementById("share"), () => ({
+    cash: state.cash, income: state.income, existing: state.existing, age: state.age,
+    rate: state.rate, years: state.years, region: state.region, household: state.household,
+    from: "home-afford",
+  }));
 });

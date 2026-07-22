@@ -247,10 +247,45 @@ function bindInputs() {
   bindChips("household", "household");
 }
 
+/* 링크로 넘어온 값 반영 — 외부 입력이라 범위를 검증한다 */
+function applyIncoming() {
+  const IN = HP.readParams({
+    deposit: { min: 0, max: 1000000 }, cash: { min: 0, max: 1000000 },
+    income: { min: 0, max: 1000000 }, age: { min: 19, max: 65 },
+    marketPrice: { min: 0, max: 1000000 }, rate: { min: 0, max: 20 },
+    monthlyDeposit: { min: 0, max: 1000000 }, convRate: { min: 0, max: 20 },
+    yieldRate: { min: 0, max: 30 },
+    region: { allow: ["수도권", "지방"] },
+    household: { allow: ["일반", "신혼"] },
+  });
+  Object.assign(state, IN);
+  ["deposit", "cash", "income", "age", "marketPrice", "rate",
+   "monthlyDeposit", "convRate", "yieldRate"].forEach((id) => {
+    if (IN[id] !== undefined) document.getElementById(id).value = state[id];
+  });
+  ["region", "household"].forEach((k) => {
+    if (IN[k] === undefined) return;
+    document.querySelectorAll(`#${k} .chip`).forEach((c) => c.classList.toggle("on", c.dataset.v === IN[k]));
+  });
+  HP.refreshAmountHints();
+
+  const got = [];
+  if (IN.cash !== undefined) got.push({ k: "보유 현금", v: HP.fmtMan(state.cash) + "원" });
+  if (IN.income !== undefined) got.push({ k: "연 소득", v: HP.fmtMan(state.income) + "원" });
+  HP.handoffNotice(document.getElementById("result-col"), got);
+}
+
 HP.mount("jeonse");
 HPPolicy.loadPolicy().then((data) => {
   P = data;
   HPPolicy.renderPolicyDate(document.getElementById("policy-date"), data);
   bindInputs();
+  applyIncoming();
   render();
+  HP.initShare(document.getElementById("share"), () => ({
+    deposit: state.deposit, cash: state.cash, income: state.income, age: state.age,
+    marketPrice: state.marketPrice || "", region: state.region, household: state.household,
+    monthlyDeposit: state.monthlyDeposit, convRate: state.convRate, yieldRate: state.yieldRate,
+    from: "jeonse",
+  }));
 });
