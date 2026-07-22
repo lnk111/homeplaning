@@ -68,6 +68,12 @@ ${JSON.stringify(current, null, 2)}
   requires_small_area(전용면적 85㎡ 요건), requires_no_house(무주택 요건),
   requires_newborn(출산 요건), age_max, ltv_max, dti_max.
   예) 디딤돌은 소득 6,000/생애최초·2자녀 7,000/신혼 8,500만원 이하, 순자산 5.11억 이하, 무주택 세대주.
+- savings_products 도 계산기가 자격 판정과 기본 상품 선택에 직접 사용합니다.
+  **절대 삭제하지 말고** 공식 변경 시에만 수정하세요:
+  age_min / age_max(가입 연령), monthly_max_man(월 납입 상한), gov_match_rate(정부기여율),
+  term_months(만기), open_for_signup(신규 가입을 지금 받는지 true/false).
+  신규 가입이 종료된 상품은 open_for_signup 을 false 로 두세요 — 계산기가 이 값을 보고
+  '지금 가입할 수 있는 상품'을 기본으로 보여줍니다. 상품이 새로 생기면 배열에 추가하세요.
 - meta.updated_at 을 "${TODAY}" 로, meta.updated_by 를 "ai" 로 설정합니다.
 
 응답은 반드시 아래 형식으로, 코드펜스 안에 **완전한 JSON만** 담아 반환하세요:

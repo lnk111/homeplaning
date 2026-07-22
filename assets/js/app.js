@@ -269,13 +269,27 @@ function withParams(href, params) {
   return s ? `${href}?${s}` : href;
 }
 
+/** 마지막 글자에 받침이 있는지. 한글이 아니면 null. */
+function hasBatchim(word) {
+  const code = (word || "").charCodeAt((word || "").length - 1);
+  if (!(code >= 0xac00 && code <= 0xd7a3)) return null;
+  return (code - 0xac00) % 28;
+}
+
 /** 받침에 따라 '로/으로'를 고른다. 받침이 없거나 ㄹ이면 '로'.
     (월급배분 → 으로, 자산목표 → 로) */
 function josaRo(word) {
-  const code = word.charCodeAt(word.length - 1);
-  if (code < 0xac00 || code > 0xd7a3) return "로"; // 한글이 아니면 기본형
-  const jong = (code - 0xac00) % 28;
+  const jong = hasBatchim(word);
+  if (jong === null) return "로";
   return jong === 0 || jong === 8 ? "로" : "으로"; // 8 = ㄹ
+}
+
+/** 은/는, 이/가, 을/를 등 받침 유무로 갈리는 조사.
+    josa("청년도약계좌", "은", "는") → "는" */
+function josa(word, withB, withoutB) {
+  const jong = hasBatchim(word);
+  if (jong === null) return withoutB;
+  return jong === 0 ? withoutB : withB;
 }
 
 /** 지금 보고 있는 계산기 키 (파일명 기준) */
@@ -778,5 +792,5 @@ window.HP = {
   donut, donutPanel, growthBars, stackedBars, lineChart, scenarioBars, linkFor, basePrefix,
   initAmountHints, refreshAmountHints,
   readParams, withParams, handoffNotice, handoffSource, shareUrl, initShare,
-  initAdvanced, refreshAdvanced,
+  initAdvanced, refreshAdvanced, josa, josaRo,
 };

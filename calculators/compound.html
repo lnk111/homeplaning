@@ -7,7 +7,7 @@
   <meta name="description" content="초기금액·매월 적립액·수익률·기간을 넣으면 복리로 자산이 얼마나 불어나는지 그래프로 계산. 단리 vs 복리 비교까지." />
   <meta name="keywords" content="복리 계산기, 적립식 투자, 복리의 힘, 자산 성장 계산기, 월 적립 계산" />
   <link rel="canonical" href="https://homeplaning.kr/calculators/compound.html" />
-  <link rel="stylesheet" href="../assets/css/style.css?v=9" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=11" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="alternate icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -49,13 +49,33 @@
           <label>투자 기간</label>
           <div class="input-suffix"><input class="input" type="number" id="years" value="20" min="1" max="60" step="1" inputmode="numeric" autocomplete="off"><span class="suffix">년</span></div>
         </div>
+
+        <div class="adv">
+          <button type="button" class="adv-toggle" aria-expanded="false">
+            <span>자세히 설정</span>
+            <span class="adv-hint">물가 상승률</span>
+            <span class="adv-mark" hidden>변경됨</span>
+            <span class="adv-caret">▾</span>
+          </button>
+          <div class="adv-body" hidden>
+            <div class="field">
+              <label>연 물가 상승률 <span class="hint">실질 가치 계산용</span></label>
+              <div class="input-suffix"><input class="input" type="number" id="inflation" value="2" min="0" max="10" step="0.1" inputmode="decimal" autocomplete="off"><span class="suffix">%</span></div>
+              <p class="small muted" style="margin:8px 0 0;line-height:1.5">
+                한국은행 물가안정목표가 연 2%입니다. 이 값으로 미래 금액이 <b>지금 돈으로 얼마인지</b> 환산합니다.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div id="result-col">
         <div class="result-hero">
           <div class="label"><span id="yr-label">20</span>년 후 예상 자산</div>
           <div class="big"><span id="r-final">–</span></div>
+          <div class="small" id="r-real" style="color:rgba(255,255,255,.85);margin-top:8px"></div>
         </div>
+
         <div class="card card-pad" style="margin-bottom:12px">
           <h3 style="font-size:18px;color:var(--text)">투자 결과</h3>
           <p class="muted small" style="margin:6px 0 18px">복리의 힘으로 시간이 지날수록 자산이 어떻게 쌓여 가는지 한눈에 확인해 보세요.</p>
@@ -74,6 +94,22 @@
           <div class="prop-bar"><span class="pb-seg pb-base" id="r-pbar"></span><span class="pb-seg pb-top" id="r-ybar"></span></div>
 
           <div id="chart" style="margin-top:20px"></div>
+        </div>
+        <div class="card card-pad" style="margin-bottom:12px">
+          <h3 style="font-size:16px;color:var(--navy);margin-bottom:4px">그때 그 돈, 지금 돈으로 얼마일까</h3>
+          <p class="small muted" style="margin:0 0 14px;line-height:1.5">
+            물가가 오르면 같은 금액으로 살 수 있는 게 줄어듭니다. <b>미래 금액을 지금 물가 기준으로</b> 바꿔 봤어요.
+          </p>
+          <div class="goal-cards">
+            <div class="gc"><div class="k">계산된 금액 (명목)</div><div class="v" id="rv-nominal">–</div></div>
+            <div class="gc hi"><div class="k">지금 돈의 가치로</div><div class="v" id="rv-real">–</div></div>
+          </div>
+          <p class="small" id="rv-note" style="margin:14px 0 0;line-height:1.6;color:var(--text-2)"></p>
+        </div>
+
+        <div class="card" style="margin-bottom:12px">
+          <h3 style="font-size:16px;color:var(--navy);margin-bottom:6px">한 가지만 짚고 갈게요</h3>
+          <p class="small" id="risk-note" style="margin:0;line-height:1.65;color:var(--text-2)"></p>
         </div>
         <div class="card">
           <h3 style="font-size:16px;color:var(--navy);margin-bottom:6px">단리 vs 복리</h3>
@@ -95,9 +131,47 @@
 
   <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/analytics.js?v=1"></script>
-  <script src="../assets/js/app.js?v=18"></script>
+  <script src="../assets/js/app.js?v=19"></script>
   <script>
-    const S = { initial: 500, monthly: 30, rate: 7, years: 20 };
+    const S = { initial: 500, monthly: 30, rate: 7, years: 20, inflation: 2 };
+
+    /* 물가를 반영한 실질 가치 — 20년 뒤 1.7억이 '그때도 1.7억의 값어치'는 아니다.
+       2030이 가장 크게 오해하는 지점이라 결과에 함께 붙인다. */
+    function realValue(nominal) {
+      return nominal / Math.pow(1 + S.inflation / 100, S.years);
+    }
+    function renderReal(final, principal) {
+      const real = realValue(final);
+      const lost = final - real;
+      document.getElementById("r-real").textContent =
+        S.inflation > 0 ? `지금 돈의 가치로는 약 ${HP.fmtMan(real)}원` : "";
+      document.getElementById("rv-nominal").textContent = HP.fmtMan(final) + "원";
+      document.getElementById("rv-real").textContent = HP.fmtMan(real) + "원";
+
+      const note = document.getElementById("rv-note");
+      if (S.inflation <= 0) {
+        note.innerHTML = "물가 상승률을 0으로 두면 두 금액이 같습니다. 실제로는 물가가 오르니 참고용으로만 보세요.";
+      } else {
+        const pct = final > 0 ? Math.round((lost / final) * 100) : 0;
+        note.innerHTML = `물가가 연 ${S.inflation}%씩 오르면 ${S.years}년 뒤 <b>${HP.fmtMan(final)}원</b>의 실제 구매력은
+          지금의 <b>${HP.fmtMan(real)}원</b> 수준입니다. 숫자의 <b>${pct}%</b>가 물가로 사라지는 셈이에요.
+          그래도 <b>${real > principal ? "원금보다는 앞섭니다" : "원금에 못 미칩니다"}</b>
+          (총 납입 ${HP.fmtMan(principal)}원).`;
+      }
+    }
+
+    /* 수익률은 가정일 뿐이라는 점을 결과 옆에 같이 둔다 */
+    function renderRisk() {
+      const r = S.rate;
+      const tone = r >= 12 ? "높은" : r >= 8 ? "다소 높은" : "일반적인";
+      document.getElementById("risk-note").innerHTML =
+        `연 <b>${r}%</b>는 ${tone} 가정입니다. 이 계산은 <b>매년 똑같이 ${r}%가 난다고 가정</b>하지만,
+         실제 시장은 오르내립니다. 장기 주식시장도 <b>한 해에 -30% 이상</b> 빠진 적이 여러 번 있었고,
+         그런 해에 팔면 손실이 확정됩니다.<br><br>
+         그래서 복리의 교훈은 "높은 수익률을 좇으라"가 아니라
+         <b>"적은 금액이라도 빨리 시작하고 오래 유지하라"</b>입니다.
+         <a href="../guide/compound.html" style="color:var(--accent);font-weight:700">복리 자세히 보기 →</a>`;
+    }
     function grow(monthlyContribute, annualRate, years, initial) {
       const r = annualRate / 100 / 12, n = years * 12;
       let bal = initial;
@@ -154,15 +228,20 @@
       document.getElementById("next-goal").href = HP.withParams("goal.html", {
         mode: "years", monthly: S.monthly, current: S.initial, rate: S.rate, from: "compound",
       });
+
+      renderReal(final, principal);
+      renderRisk();
     }
     ["initial", "monthly", "rate"].forEach((id) =>
       document.getElementById(id).oninput = (e) => { S[id] = +e.target.value || 0; render(); });
     document.getElementById("years").oninput = (e) => { S.years = +e.target.value || 1; render(); };
     HP.mount("compound");
 
+    document.getElementById("inflation").oninput = (e) => { S.inflation = Math.max(0, +e.target.value || 0); render(); };
+
     const IN = HP.readParams({
       initial: { min: 0, max: 1000000 }, monthly: { min: 0, max: 100000 },
-      rate: { min: 0, max: 30 }, years: { min: 1, max: 60 },
+      rate: { min: 0, max: 30 }, years: { min: 1, max: 60 }, inflation: { min: 0, max: 10 },
     });
     Object.assign(S, IN);
     Object.keys(IN).forEach((id) => { document.getElementById(id).value = S[id]; });
@@ -174,8 +253,10 @@
     if (IN.initial !== undefined) got.push({ k: "초기 자금", v: HP.fmtMan(S.initial) + "원" });
     HP.handoffNotice(document.getElementById("result-col"), got);
 
+    HP.refreshAdvanced(); // 링크 값이 접힌 영역에 있으면 펼친다
     HP.initShare(document.getElementById("share"), () => ({
-      initial: S.initial, monthly: S.monthly, rate: S.rate, years: S.years, from: "compound",
+      initial: S.initial, monthly: S.monthly, rate: S.rate, years: S.years,
+      inflation: S.inflation, from: "compound",
     }));
   </script>
 </body>

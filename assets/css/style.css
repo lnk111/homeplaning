@@ -423,6 +423,12 @@ table.compare td.net { color: var(--accent-dark); font-weight: 800; }
 .insight .id { font-size: 13px; color: var(--text-2); line-height: 1.55; }
 .insight .id a { color: var(--accent); font-weight: 700; }
 
+/* ---------- 가입 자격 안내 (적금) ---------- */
+.elig { border-radius: var(--radius-sm); padding: 11px 14px; margin: -6px 0 18px;
+  font-size: 13px; line-height: 1.6; word-break: keep-all; }
+.elig.ok { background: #e8f5e9; color: #1b5e20; }
+.elig.no { background: #fff3e0; color: #7a3b00; }
+
 /* ---------- 계약 체크리스트 (전세) ---------- */
 .ck-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
 .ck-count { flex: none; font-size: 13px; color: var(--text-3); font-weight: 700; white-space: nowrap; }
