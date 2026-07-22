@@ -88,7 +88,17 @@
       "Bash(git -c user.name=homeplaning -c user.email=729497@gmail.com commit -m 'docs: 재테크 자료에 '\\\\''전세 계약, 보증금 지키는 법'\\\\'' 추가 *)",
       "Bash(git -c user.name=homeplaning -c user.email=729497@gmail.com commit -m 'docs: 전세 문서에 월세 전환 계산·전세vs월세 비교 추가 *)",
       "Bash(git commit -q -m 'feat: 전세 계산기에 월세 전환 비교 추가 *)",
-      "Bash(git commit -q -m 'feat: 상단 탭을 사회초년생 이용 순서대로 재배치 *)"
+      "Bash(git commit -q -m 'feat: 상단 탭을 사회초년생 이용 순서대로 재배치 *)",
+      "Bash(gh run *)",
+      "PowerShell(gh run list --workflow=update-policy.yml --limit 8)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(node --check scripts/update-policy.mjs)",
+      "Bash(node -e ' *)",
+      "Bash(pip install *)",
+      "PowerShell(python -m pip install pyyaml --quiet 2>&1)",
+      "PowerShell(python -c \"import yaml,io,json; d=yaml.safe_load\\(io.open\\('.github/workflows/update-policy.yml',encoding='utf-8'\\)\\); s=d['jobs']['update-policy']['steps']; print\\('YAML OK, steps=',len\\(s\\)\\); [print\\('  -',x.get\\('name','?'\\).encode\\('ascii','replace'\\).decode\\(\\),'| if:',x.get\\('if','-'\\)\\) for x in s]\")",
+      "PowerShell(python -c \"import yaml,io; d=yaml.safe_load\\(io.open\\('.github/workflows/update-policy.yml',encoding='utf-8'\\)\\); print\\('permissions:', d['permissions']\\); print\\('notify step if:', d['jobs']['update-policy']['steps'][-1]['if']\\); print\\('uses:', d['jobs']['update-policy']['steps'][-1]['uses']\\)\")",
+      "Bash(git commit -q -m 'fix: 사이트가 사실과 다르게 말하던 3건 수정 *)"
     ]
   }
 }

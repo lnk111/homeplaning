@@ -33,6 +33,7 @@ if (!process.env.ANTHROPIC_API_KEY || !process.env.ANTHROPIC_API_KEY.trim()) {
 }
 
 const client = new Anthropic(); // ANTHROPIC_API_KEY 환경변수 사용
+const MODEL = "claude-opus-4-8";
 
 const SYSTEM = `당신은 대한민국 부동산·금융 정책 분석가입니다.
 사회초년생 대상 계산기 사이트 '홈플래닝'의 정책 데이터를 매일 갱신합니다.
@@ -76,7 +77,7 @@ ${JSON.stringify(current, null, 2)}
 
 async function run() {
   const params = {
-    model: "claude-opus-4-8",
+    model: MODEL,
     max_tokens: 8000,
     system: SYSTEM,
     thinking: { type: "adaptive" },
@@ -121,4 +122,18 @@ async function run() {
   console.log(`[update-policy] 갱신 완료 (${TODAY}) — headline: ${updated.headline}`);
 }
 
-run().catch((e) => fail(e.stack || String(e)));
+/* API 실패는 원인별로 대응이 달라서, 상태 코드를 그대로 드러낸다.
+   (로그를 열지 않고도 이슈 알림만 보고 판단할 수 있게) */
+function explain(e) {
+  const status = e?.status;
+  const detail = e?.error?.error?.message || e?.message || String(e);
+  if (status === 401) return `인증 실패(401) — ANTHROPIC_API_KEY 가 폐기됐거나 잘못됐습니다.\n  ${detail}`;
+  if (status === 400 && /credit|balance/i.test(detail))
+    return `크레딧 부족(400) — Anthropic Console에서 잔액을 충전하세요.\n  ${detail}`;
+  if (status === 429) return `요청 한도 초과(429) — 잠시 후 재시도됩니다.\n  ${detail}`;
+  if (status === 404) return `모델을 찾을 수 없음(404) — 모델명 '${MODEL}' 을 확인하세요.\n  ${detail}`;
+  if (status >= 500) return `Anthropic 서버 오류(${status}) — 일시적일 수 있습니다.\n  ${detail}`;
+  return e?.stack || detail;
+}
+
+run().catch((e) => fail(explain(e)));

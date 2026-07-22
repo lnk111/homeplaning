@@ -42,8 +42,43 @@ async function loadPolicy() {
   }
 }
 
+/* ---------- 신선도 ----------
+   자동 갱신이 멈춰도 화면은 최신인 척하면 안 된다.
+   기준일이 며칠 지났는지 계산해 상태를 정직하게 표시한다. */
+const STALE_AFTER_DAYS = 3;  // 이 이상 지나면 '지연'
+const OLD_AFTER_DAYS = 8;    // 이 이상 지나면 '확인 필요'
+
+function policyAgeDays(data) {
+  const raw = data?.meta?.updated_at;
+  const t = Date.parse(raw + "T00:00:00Z");
+  if (!raw || Number.isNaN(t)) return null;
+  return Math.floor((Date.now() - t) / 86400000);
+}
+
+/** @returns {{level:'fresh'|'stale'|'old'|'unknown', label:string, days:number|null}} */
+function policyFreshness(data) {
+  const days = policyAgeDays(data);
+  if (days === null) return { level: "unknown", label: "기준일 미상", days: null };
+  if (days <= STALE_AFTER_DAYS) return { level: "fresh", label: "AI 매일 갱신", days };
+  if (days < OLD_AFTER_DAYS) return { level: "stale", label: `갱신 ${days}일 지연`, days };
+  return { level: "old", label: `${days}일째 갱신 안 됨`, days };
+}
+
+/** 계산기 하단 '정책 기준일' 표시 — 오래됐으면 경고를 함께 노출 */
+function renderPolicyDate(el, data) {
+  if (!el) return;
+  const f = policyFreshness(data);
+  el.textContent = data?.meta?.updated_at || "확인 불가";
+  if (f.level === "fresh") return;
+  const warn = document.createElement("span");
+  warn.className = "policy-stale " + f.level;
+  warn.textContent = f.level === "unknown" ? " 기준일 미상" : ` ⚠ ${f.label}`;
+  el.after(warn);
+}
+
 function renderPolicyBanner(el, data) {
   if (!el) return;
+  const f = policyFreshness(data);
   const items = (data.highlights || []).slice(0, 3);
   const list = items
     .map(
@@ -57,13 +92,17 @@ function renderPolicyBanner(el, data) {
       </div>`
     )
     .join("");
+  // 갱신이 밀렸으면 'AI 매일 갱신' 배지 대신 지연 사실을 알린다
+  const badge = f.level === "fresh"
+    ? `<span class="live"><span class="pulse"></span>${f.label}</span>`
+    : `<span class="live stale">⚠ ${f.label}</span>`;
   el.innerHTML = `
     <div class="policy-banner">
-      <span class="live"><span class="pulse"></span>AI 매일 갱신</span>
+      ${badge}
       <div class="headline">${data.headline || "최신 부동산·금융 정책 반영 중"}</div>
-      <div class="updated">기준일 ${data.meta.updated_at}</div>
+      <div class="updated">기준일 ${data.meta.updated_at || "확인 불가"}</div>
     </div>
     ${items.length ? `<div class="policy-list" style="margin-top:14px">${list}</div>` : ""}`;
 }
 
-window.HPPolicy = { loadPolicy, renderPolicyBanner };
+window.HPPolicy = { loadPolicy, renderPolicyBanner, renderPolicyDate, policyFreshness, policyAgeDays };

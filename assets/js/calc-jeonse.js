@@ -250,7 +250,7 @@ function bindInputs() {
 HP.mount("jeonse");
 HPPolicy.loadPolicy().then((data) => {
   P = data;
-  document.getElementById("policy-date").textContent = data.meta.updated_at;
+  HPPolicy.renderPolicyDate(document.getElementById("policy-date"), data);
   bindInputs();
   render();
 });

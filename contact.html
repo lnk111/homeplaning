@@ -43,7 +43,7 @@
           <textarea class="input" id="msg" rows="5" placeholder="예: 6억 수도권 아파트, 소득 6천만원 조건으로 대출 상담받고 싶어요."></textarea>
         </div>
         <button type="submit" class="btn btn-accent btn-block btn-lg">문의 보내기</button>
-        <p class="note" id="form-note">버튼을 누르면 메일 앱으로 내용이 정리되어 열립니다. 개인정보는 회신 목적으로만 사용됩니다.</p>
+        <p class="note" id="form-note">보내주시면 담당자에게 바로 전달됩니다. 개인정보는 회신 목적으로만 사용됩니다.</p>
       </form>
     </div>
 
@@ -84,6 +84,11 @@
         }
       }
     })();
+    // 안내문은 실제 전송 방식을 따라간다 (설정과 문구가 어긋나지 않도록)
+    document.getElementById("form-note").textContent = HPForms.isConfigured()
+      ? "보내주시면 담당자에게 바로 전달됩니다. 개인정보는 회신 목적으로만 사용됩니다."
+      : "버튼을 누르면 메일 앱으로 내용이 정리되어 열립니다. 개인정보는 회신 목적으로만 사용됩니다.";
+
     document.getElementById("contact-form").addEventListener("submit", async function (e) {
       e.preventDefault();
       const type = document.getElementById("type").value;
