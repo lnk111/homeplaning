@@ -130,6 +130,26 @@
               <div class="v" id="g-found">–</div>
             </div>
           </div>
+          <div id="move-box" hidden style="margin-top:14px">
+            <!-- .btn 이 inline-flex 라 안에 span 을 넣으면 줄이 쪼개진다. 문구는 JS에서 통째로 넣는다 -->
+            <button type="button" class="btn btn-accent btn-block" id="move-btn">미파악 지출, 저축으로 돌리기</button>
+            <p class="small muted" style="margin:8px 0 0;line-height:1.5">
+              가계부를 한 달만 써 보면 이 돈의 행방이 보입니다. <b>실제로 그 지출을 줄였을 때</b> 눌러 주세요 —
+              돈이 저절로 생기는 건 아니니까요.
+            </p>
+          </div>
+
+          <div id="move-done" hidden style="margin-top:14px">
+            <div class="insight">
+              <span class="ic">🎉</span>
+              <div>
+                <div class="it" id="move-done-t">저축으로 옮겼어요</div>
+                <div class="id" id="move-done-s"></div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-ghost btn-block" id="move-undo" style="margin-top:8px">되돌리기</button>
+          </div>
+
           <p class="note" style="margin:12px 0 0">
             ※ 납입액만 단순 합산한 값이에요. 적금 이자·정부기여금·투자 수익이 붙으면 더 빨라질 수 있고,
             투자금은 원금 손실 가능성도 있습니다.
@@ -164,6 +184,7 @@
     const UNKNOWN_COLOR = "#c9ccd1";     // 미파악 — 생활·여가(#9e9e9e)와 구분되는 더 옅은 회색
     const EMERGENCY_MONTHS = 3;          // 비상금 목표: 월 실수령의 3개월치
     let YOUTH = null;                    // 정책 데이터에서 주입되는 청년 적금 상품
+    let moved = null;                    // 미파악 금액을 저축으로 옮긴 기록 (되돌리기용)
 
     /* 저축액을 우선순위대로 쪼갠다.
        1) 정부가 확정으로 얹어주는 청년 적금  2) 사고를 막는 비상금  3) 나머지 투자
@@ -239,11 +260,28 @@
       const base = saveAmt > 0 ? Math.ceil(need / saveAmt) : Infinity;
       document.getElementById("g-base").innerHTML = monthsText(base);
       const card = document.getElementById("gc-found");
-      if (unknownAmt > 0.5 && saveAmt + unknownAmt > 0) {
+      const hasUnknown = unknownAmt > 0.5 && saveAmt + unknownAmt > 0;
+      if (hasUnknown) {
         card.style.display = "";
         document.getElementById("g-found").innerHTML = monthsText(Math.ceil(need / (saveAmt + unknownAmt)));
       } else {
         card.style.display = "none"; // 미파악이 없으면 비교할 대상이 없다
+      }
+
+      // 미파악이 있으면 옮기기 버튼, 옮긴 뒤에는 결과와 되돌리기
+      document.getElementById("move-box").hidden = !hasUnknown;
+      document.getElementById("move-done").hidden = hasUnknown || !moved;
+      if (hasUnknown) {
+        document.getElementById("move-btn").textContent =
+          `🔍 미파악 ${HP.fmtMan(unknownAmt)}원, 저축으로 돌리기`;
+      } else if (moved) {
+        const gain = moved.months - base;
+        document.getElementById("move-done-t").textContent =
+          `미파악 ${HP.fmtMan(moved.amt)}원을 저축으로 돌렸어요`;
+        document.getElementById("move-done-s").innerHTML =
+          gain > 0
+            ? `목표 도달이 <b>${moved.months}개월 → ${base}개월</b>로 ${gain}개월 당겨졌습니다.`
+            : `매달 저축이 <b>${HP.fmtMan(saveAmt)}원</b>이 됐습니다.`;
       }
     }
 
@@ -337,6 +375,28 @@
     // 비상금·목표 금액
     document.getElementById("emergency").oninput = (e) => { S.emergency = Math.max(0, +e.target.value || 0); render(); };
     document.getElementById("goal-target").oninput = (e) => { S.target = Math.max(0, +e.target.value || 0); render(); };
+
+    /* 미파악 금액을 저축으로 옮기기 — 옮기기 전 상태를 남겨 되돌릴 수 있게 한다 */
+    document.getElementById("move-btn").onclick = () => {
+      const unknownPct = Math.max(0, 100 - (S.fixed + S.life + S.save));
+      if (unknownPct <= 0) return;
+      const saveAmt = (S.net * S.save) / 100;
+      moved = {
+        save: S.save,
+        amt: (S.net * unknownPct) / 100,
+        months: saveAmt > 0 ? Math.ceil(S.target / saveAmt) : 0,
+      };
+      S.save += unknownPct;
+      markCustom(); syncInputs(); render();
+      document.getElementById("move-done").scrollIntoView({ behavior: "smooth", block: "center" });
+      window.HPTrack?.track("unknown_moved");
+    };
+    document.getElementById("move-undo").onclick = () => {
+      if (!moved) return;
+      S.save = moved.save;
+      moved = null;
+      markCustom(); syncInputs(); render();
+    };
 
     HP.mount("salary");
 
