@@ -96,6 +96,7 @@ function render() {
 
   // 섹션3 — 현금을 더 모으면 살 수 있는 집값
   renderCashChart(price);
+  renderBuyVsRent(price, monthly, cashUsed);
 
   // 정책대출 인사이트 카드
   const rows = HPHome.policyRows(P, state, loan, price);
@@ -199,6 +200,79 @@ function bindInputs() {
   bindChips("region", "region");
   bindChips("household", "household");
   bindChips("bank", "bank");
+}
+
+/* ---------- 매매 vs 전세 ----------
+   2030의 진짜 갈림길인데 계산기가 따로 놀았다.
+   같은 현금으로 전세를 얻으면 월 부담이 얼마나 줄고, 그 차액을 모으면
+   언제 더 좋은 집을 살 수 있는지까지 이어서 보여준다. */
+function bestJeonse() {
+  const capital = state.region !== "지방";
+  let best = null;
+  for (const pl of P.jeonse_loans || []) {
+    // 자격: 나이·소득·무주택·면적 (신혼 전용 상품은 여기서 판단 불가하므로 제외)
+    if (pl.requires_newlywed && state.household !== "신혼") continue;
+    if (pl.requires_no_house && state.hasHouse) continue;
+    if (pl.requires_small_area && !state.smallArea) continue;
+    if (pl.age_min && state.age < pl.age_min) continue;
+    if (pl.age_max && state.age > pl.age_max) continue;
+    const iCap = state.household === "신혼" && pl.income_cap_newlywed_man
+      ? pl.income_cap_newlywed_man : pl.income_cap_man;
+    if (iCap && state.income > iCap) continue;
+    if (pl.net_worth_cap_man && state.cash > pl.net_worth_cap_man) continue;
+
+    // 내 현금으로 얻을 수 있는 최대 보증금
+    const loanCap = capital ? pl.limit_capital_man : pl.limit_local_man;
+    const depCap = capital ? pl.deposit_cap_capital_man : pl.deposit_cap_local_man;
+    const byRatio = pl.ltv_ratio < 1 ? state.cash / (1 - pl.ltv_ratio) : Infinity;
+    const deposit = Math.min(byRatio, state.cash + loanCap, depCap);
+    if (deposit <= state.cash) continue; // 대출 없이 현금만이면 비교 의미가 없다
+    const loan = Math.min(deposit - state.cash, loanCap, deposit * pl.ltv_ratio);
+    const monthly = loan * (pl.rate_min / 100) / 12;
+    if (!best || pl.rate_min < best.rate) {
+      best = { name: pl.name, deposit, loan, rate: pl.rate_min, monthly };
+    }
+  }
+  return best;
+}
+
+function renderBuyVsRent(price, buyMonthly, cashUsed) {
+  const card = document.getElementById("buy-vs-rent-card");
+  const body = document.querySelector("#bvr-table tbody");
+  const note = document.getElementById("bvr-note");
+  const j = bestJeonse();
+
+  if (!j) {
+    card.style.display = "none"; // 자격 있는 전세대출이 없으면 비교를 만들지 않는다
+    return;
+  }
+  card.style.display = "";
+
+  body.innerHTML = [
+    ["구할 수 있는 집", HP.fmtMan(price), HP.fmtMan(j.deposit) + " 전세"],
+    ["빌리는 돈", HP.fmtMan(Math.max(0, price - cashUsed)), HP.fmtMan(j.loan)],
+    ["월 부담", HP.fmtMan(buyMonthly) + "원", HP.fmtMan(j.monthly) + "원", true],
+    ["들어가는 내 현금", HP.fmtMan(cashUsed), HP.fmtMan(state.cash)],
+  ].map(([k, a, b, hi]) =>
+    `<tr><td>${k}</td><td${hi ? ' class="net"' : ""}>${a}</td><td${hi ? ' class="net"' : ""}>${b}</td></tr>`
+  ).join("");
+
+  const save = buyMonthly - j.monthly;
+  if (save <= 0) {
+    note.innerHTML = `이 조건에선 <b>매매의 월 부담이 전세보다 크지 않습니다.</b>
+      대출 금리와 전세 조건에 따라 달라지니 <a href="jeonse.html" style="color:var(--accent);font-weight:700">전세 계산기</a>에서도 확인해 보세요.`;
+    return;
+  }
+  // 차액을 모으면 현금이 늘고, 그만큼 더 좋은 집을 살 수 있다
+  const years = 3;
+  const extra = save * 12 * years;
+  const better = priceForCash(state.cash + extra);
+  note.innerHTML = `전세로 살면 월 <b>${HP.fmtMan(save)}원</b>을 덜 씁니다.
+    그 차액을 <b>${years}년</b> 모으면 ${HP.fmtMan(extra)}원이 더 생겨,
+    그때는 <b>${HP.fmtMan(better)}</b>짜리 집을 볼 수 있어요
+    (지금 ${HP.fmtMan(price)} → <b>+${HP.fmtMan(better - price)}</b>).
+    다만 전세는 <b>보증금을 떼일 위험</b>이 있으니
+    <a href="jeonse.html" style="color:var(--accent);font-weight:700">전세가율과 체크리스트</a>를 꼭 확인하세요.`;
 }
 
 /* 링크로 넘어온 값 반영 — 외부 입력이라 범위를 검증한다 */

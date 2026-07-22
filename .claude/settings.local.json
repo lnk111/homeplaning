@@ -132,7 +132,9 @@
       "Bash(git commit -q -m 'fix: 2단 입력칸이 라벨 줄 수에 따라 어긋나던 정렬 교정 *)",
       "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -c \"import json,io; d=json.load\\(io.open\\('data/policy.json',encoding='utf-8'\\)\\); [print\\(p.get\\('name'\\),'::',p.get\\('note',''\\)\\) for p in d.get\\('savings_products',[]\\)]\")",
       "Bash(git commit -q -m 'feat: 전세 계약 체크리스트 — 읽는 글을 쓰는 도구로 *)",
-      "Bash(git commit -q -m 'feat: 복리 실질가치·변동성 안내 + 적금 가입 자격 판정 *)"
+      "Bash(git commit -q -m 'feat: 복리 실질가치·변동성 안내 + 적금 가입 자격 판정 *)",
+      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -c \"import json,io; d=json.load\\(io.open\\('data/policy.json',encoding='utf-8'\\)\\); [print\\(json.dumps\\(j,ensure_ascii=False\\)\\) for j in d['jeonse_loans']]\")",
+      "Bash(git commit -q -m 'feat: 자산목표 연차별 이정표 + 내집찾기 매매 vs 전세 비교 *)"
     ]
   }
 }

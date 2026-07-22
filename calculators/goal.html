@@ -87,6 +87,20 @@
 
           <div id="chart" style="margin-top:20px"></div>
         </div>
+
+        <div class="card card-pad" style="margin-bottom:12px">
+          <h3 style="font-size:16px;color:var(--navy);margin-bottom:4px">언제 얼마쯤 돼 있을까</h3>
+          <p class="small muted" style="margin:0 0 14px;line-height:1.5">
+            "1억"은 멀게 느껴지지만 <b>중간 지점</b>이 보이면 다릅니다. 지나갈 이정표를 짚어 봤어요.
+          </p>
+          <div style="overflow-x:auto">
+            <table class="compare" id="milestone">
+              <thead><tr><th>시점</th><th>납입 원금</th><th>총 자산</th><th>목표 대비</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="small" id="ms-note" style="margin:12px 0 0;line-height:1.6;color:var(--text-2)"></p>
+        </div>
         <a href="home-afford.html" id="next-home" class="cta-orange">
           <div>
             <div class="t">이 종잣돈으로 살 수 있는 집은?</div>
@@ -155,7 +169,41 @@
         points: pts, baseColor: "rgba(0,0,0,.38)", totalColor: "var(--accent)",
         fmt: (v) => HP.fmtMan(v) + "원", axisFmt: (v) => (v ? HP.fmtManShort(v) : "0"),
       });
+      renderMilestones(pts, monthly, months);
     }
+    /* 연차별 이정표 — 목표까지의 중간 지점을 숫자로 보여준다.
+       '1억'은 막연하지만 '3년 뒤 5,400만'은 손에 잡힌다. */
+    function renderMilestones(pts, monthly, months) {
+      const body = document.querySelector("#milestone tbody");
+      const total = Math.ceil(months / 12);
+      // 1·3·5·10년 중 기간 안에 드는 것 + 마지막 해
+      const marks = [1, 3, 5, 10, 15, 20].filter((y) => y < total);
+      marks.push(total);
+
+      const at = (y) => {
+        // pts 는 연 단위 지점. 없으면 가장 가까운 앞 지점을 쓴다.
+        let best = pts[0];
+        for (const p of pts) if (p.year <= y + 0.001) best = p;
+        return best;
+      };
+      body.innerHTML = marks.map((y) => {
+        const p = at(y);
+        const pct = S.target > 0 ? Math.round((p.total / S.target) * 100) : 0;
+        const last = y === total;
+        return `<tr class="${last ? "best" : ""}">
+          <td>${last ? "🎯 " : ""}${y}년${last ? " (목표)" : ""}</td>
+          <td>${HP.fmtMan(p.base)}</td>
+          <td class="net">${HP.fmtMan(p.total)}</td>
+          <td>${pct}%</td></tr>`;
+      }).join("");
+
+      const half = pts.find((p) => p.total >= S.target / 2);
+      document.getElementById("ms-note").innerHTML = half && half.year > 0
+        ? `목표의 <b>절반(${HP.fmtMan(S.target / 2)})</b>은 <b>${half.year}년</b>쯤 넘어섭니다.
+           초반이 가장 더디게 느껴지지만, 복리는 뒤로 갈수록 빨라집니다.`
+        : `납입 원금과 총 자산의 차이가 <b>복리로 붙는 수익</b>입니다. 기간이 길수록 격차가 커집니다.`;
+    }
+
     function clearResult(msg) {
       ["g-total", "g-principal", "g-rate", "g-interest"].forEach((id) => document.getElementById(id).textContent = "–");
       document.getElementById("g-plabel").textContent = "납입금 –";
@@ -163,6 +211,8 @@
       document.getElementById("g-pbar").style.width = "0%";
       document.getElementById("g-ybar").style.width = "0%";
       document.getElementById("chart").innerHTML = `<p class="note" style="text-align:center;padding:24px 0">${msg || ""}</p>`;
+      document.querySelector("#milestone tbody").innerHTML = "";
+      document.getElementById("ms-note").textContent = msg || "";
     }
     function render() {
       if (S.mode === "monthly") {
