@@ -13,5 +13,5 @@ window.HP_CONFIG = {
   // Google Analytics 4 측정 ID. analytics.google.com → 관리 → 데이터 스트림에서 발급.
   // 비워 두면 분석 스크립트를 아예 불러오지 않습니다(추적 없음).
   // ⚠️ 계산기 URL의 쿼리(소득·자산 값)는 전송 전에 제거됩니다 — analytics.js 참고.
-  GA_ID: "",
+  GA_ID: "G-PLGV5HV9WH",
 };

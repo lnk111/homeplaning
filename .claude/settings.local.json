@@ -114,7 +114,8 @@
       "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python \"C:\\\\Users\\\\72949\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-72949-Desktop-homeplaning\\\\b71528a4-fe78-43fa-92c3-7ecc12442b78\\\\scratchpad\\\\build_guide.py\")",
       "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python \"C:\\\\Users\\\\72949\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-72949-Desktop-homeplaning\\\\b71528a4-fe78-43fa-92c3-7ecc12442b78\\\\scratchpad\\\\build_og.py\")",
       "Bash(git commit -q -m 'feat: 재테크자료 8편을 개별 페이지로 분리 + 공유 썸네일 도입 *)",
-      "Bash(git commit -q -m 'fix: 제휴 상담사가 없으므로 '\\\\''무료 상담 연결'\\\\'' 약속 철회 *)"
+      "Bash(git commit -q -m 'fix: 제휴 상담사가 없으므로 '\\\\''무료 상담 연결'\\\\'' 약속 철회 *)",
+      "Bash(git commit -q -m 'chore: GA4 측정 ID 설정 \\(G-PLGV5HV9WH\\) *)"
     ]
   }
 }
