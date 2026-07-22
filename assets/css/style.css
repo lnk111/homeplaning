@@ -206,6 +206,13 @@ h1, h2, h3, h4 { line-height: 1.2; letter-spacing: -0.01562em; margin: 0; }
 /* 한글은 기본값(break-all 유사)으로 두면 '합/산'처럼 단어 중간이 잘린다 */
 .field label { display: block; font-weight: 500; font-size: 14px; color: var(--text); margin-bottom: 8px;
   word-break: keep-all; }
+
+/* 2단으로 나란히 놓인 입력칸은 라벨 줄 수가 달라도 입력칸 높이가 맞아야 한다.
+   subgrid로 라벨끼리 같은 행을 쓰게 해서, 긴 라벨이 자기 칸만 밀어내지 않도록. */
+.field[style*="grid-template-columns"] { grid-template-rows: auto auto; align-items: start; }
+.field[style*="grid-template-columns"] > div {
+  display: grid; grid-template-rows: subgrid; grid-row: span 2;
+}
 .field .hint { font-weight: 400; color: var(--text-3); font-size: 12px; margin-left: 4px; }
 .input, select {
   width: 100%; min-width: 0; padding: 12.5px 14px; border: 1px solid rgba(0, 0, 0, 0.23);
