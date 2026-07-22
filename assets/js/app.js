@@ -116,6 +116,7 @@ function mount(active) {
    입력칸이 11~12개면 처음 온 사람은 시작도 하기 전에 지친다.
    자주 안 바꾸는 항목은 접어 두되, 값이 바뀌면 '변경됨'을 표시해
    숨겨진 설정이 결과에 영향을 준다는 사실을 감추지 않는다. */
+const ADV_WIDE = "(min-width: 861px)"; // CSS의 .adv-body 미디어쿼리와 같은 지점
 const advPanels = [];
 
 function initAdvanced(root) {
@@ -131,24 +132,35 @@ function initAdvanced(root) {
     const initial = snapshot();
     const mark = adv.querySelector(".adv-mark");
 
+    // hidden 속성 대신 클래스로 여닫는다 — CSS의 화면별 초기값과 규칙을 맞추기 위해
+    const isOpen = () => adv.classList.contains("open");
     const setOpen = (open) => {
-      body.hidden = !open;
-      btn.setAttribute("aria-expanded", String(open));
       adv.classList.toggle("open", open);
+      adv.classList.toggle("closed", !open);
+      btn.setAttribute("aria-expanded", String(open));
     };
     const refresh = () => {
       if (mark) mark.hidden = snapshot() === initial;
     };
 
-    btn.addEventListener("click", () => setOpen(body.hidden));
+    // 사용자가 직접 여닫은 뒤에는 화면 크기가 바뀌어도 그 선택을 존중한다
+    let userSet = false;
+    btn.addEventListener("click", () => { userSet = true; setOpen(!isOpen()); });
     body.addEventListener("input", refresh);
     body.addEventListener("change", refresh);
     body.addEventListener("click", (e) => { if (e.target.closest(".chip")) setTimeout(refresh, 0); });
 
-    setOpen(true); // 기본은 펼침 — 어떤 설정이 결과에 반영되는지 먼저 보이게
+    // 기본값: 데스크톱은 펼침, 모바일은 접힘. 창 크기가 바뀌면 따라간다.
+    const wide = window.matchMedia(ADV_WIDE);
+    const applyDefault = () => { if (!userSet) setOpen(wide.matches); };
+    wide.addEventListener("change", applyDefault);
+    applyDefault();
     refresh();
     // 계산기가 링크 값을 반영한 뒤 다시 부를 수 있게 등록해 둔다
-    advPanels.push({ snapshot, initial, setOpen, refresh });
+    advPanels.push({
+      snapshot, initial, refresh,
+      forceOpen: () => { userSet = true; setOpen(true); },
+    });
   });
 }
 
@@ -156,7 +168,7 @@ function initAdvanced(root) {
     숨겨진 채로 결과만 달라지면 사용자가 이유를 알 수 없다. */
 function refreshAdvanced() {
   advPanels.forEach((p) => {
-    if (p.snapshot() !== p.initial) p.setOpen(true);
+    if (p.snapshot() !== p.initial) p.forceOpen();
     p.refresh();
   });
 }
