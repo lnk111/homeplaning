@@ -36,7 +36,11 @@ jobs:
       - name: AI 정책 갱신 실행
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: npm run update-policy
+        # 실패 원인을 이슈에 그대로 싣기 위해 출력을 파일로도 남긴다.
+        # (로그를 열어보지 않고 알림만으로 판단할 수 있게)
+        run: |
+          set -o pipefail
+          npm run update-policy 2>&1 | tee /tmp/update-policy.log
 
       - name: 변경사항 커밋 & 푸시
         run: |
@@ -56,7 +60,15 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const fs = require("fs");
             const title = "정책 자동 갱신 실패 — 계산기 데이터가 낡고 있습니다";
+            // 스크립트가 남긴 실제 오류 메시지를 이슈에 그대로 싣는다.
+            // 로그를 열지 않고도 크레딧 문제인지 키 문제인지 바로 알 수 있게.
+            let log = "";
+            try { log = fs.readFileSync("/tmp/update-policy.log", "utf8").trim().slice(-1200); } catch (e) {}
+            const errBlock = log
+              ? ["실제 오류 메시지:", "```", log, "```"].join("\n")
+              : "_오류 메시지를 읽지 못했습니다. 아래 실행 로그를 확인하세요._";
             const { data: open } = await github.rest.issues.listForRepo({
               owner: context.repo.owner, repo: context.repo.repo,
               state: "open", labels: "policy-pipeline",
@@ -66,7 +78,7 @@ jobs:
               await github.rest.issues.createComment({
                 owner: context.repo.owner, repo: context.repo.repo,
                 issue_number: open[0].number,
-                body: `또 실패했습니다 (${new Date().toISOString().slice(0, 10)}) — ${runUrl}`,
+                body: [`또 실패했습니다 — ${runUrl}`, ``, errBlock].join("\n"),
               });
               return;
             }
@@ -75,6 +87,8 @@ jobs:
               title, labels: ["policy-pipeline"],
               body: [
                 `정책 자동 갱신 워크플로가 실패했습니다.`,
+                ``,
+                errBlock,
                 ``,
                 `실행 로그: ${runUrl}`,
                 ``,
