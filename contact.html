@@ -59,7 +59,8 @@
     </div>
   </main>
   <div id="app-footer"></div>
-  <script src="assets/js/config.js"></script>
+  <script src="assets/js/config.js?v=2"></script>
+  <script src="assets/js/analytics.js?v=1"></script>
   <script src="assets/js/app.js?v=13"></script>
   <script src="assets/js/forms.js"></script>
   <script>
@@ -107,6 +108,9 @@
           title: "문의가 접수됐습니다",
           msg: "회신처로 빠르게 연락드리겠습니다. 감사합니다.",
         });
+        // 전환 지표 — 분류용 유형만 보낸다 (이름·연락처는 절대 보내지 않음).
+        // 광고 차단기가 analytics.js를 막아도 접수 결과에 영향이 없도록 성공 처리 뒤에, 옵셔널로 호출.
+        window.HPTrack?.track("lead_submit", { form: "contact", lead_type: type });
       } catch (err) {
         btn.disabled = false; btn.textContent = "문의 보내기";
         document.getElementById("form-note").innerHTML =

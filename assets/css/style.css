@@ -3,7 +3,10 @@
    2030 자산형성 플랫폼
    ========================================================= */
 
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
+/* 동적 서브셋 + 가변 폰트.
+   정적 pretendard.css 는 굵기 6종의 전체 한글 폰트(각 ~770KB, 합계 4.6MB)를 내려받는다.
+   동적 서브셋은 실제 쓰인 글자 범위만, 가변 폰트는 굵기를 파일 하나로 처리한다. */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
 :root {
   /* ── MUI Primary (Blue) ── */
@@ -60,7 +63,8 @@
   --shadow: var(--shadow-1);
   --shadow-lg: var(--shadow-8);
 
-  --ff: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  /* 가변 폰트는 'Pretendard Variable'로 등록된다. 뒤의 'Pretendard'는 구버전 캐시 대비 */
+  --ff: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }

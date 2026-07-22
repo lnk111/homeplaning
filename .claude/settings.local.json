@@ -103,7 +103,12 @@
       "Bash(node --check assets/js/app.js)",
       "Bash(node --check assets/js/calc-home-afford.js)",
       "Bash(node --check assets/js/calc-jeonse.js)",
-      "Bash(git commit -q -m 'feat: 계산기 간 값 이어받기 + 결과 링크 공유 *)"
+      "Bash(git commit -q -m 'feat: 계산기 간 값 이어받기 + 결과 링크 공유 *)",
+      "Bash(node --check assets/js/analytics.js)",
+      "WebFetch(domain:github.com)",
+      "Bash(curl -s -o /dev/null -w \"variable-dynamic-subset: HTTP %{http_code}  \\(%{size_download} bytes\\)\\\\n\" \"https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css\")",
+      "Bash(curl -s \"https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css\")",
+      "Bash(git commit -q -m 'feat: 방문·전환 측정\\(GA4\\) 도입 + 폰트 4.6MB → 0.5MB *)"
     ]
   }
 }
