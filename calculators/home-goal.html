@@ -7,7 +7,7 @@
   <meta name="description" content="가고 싶은 집 매매가를 넣으면 필요한 현금, 대출 가능액, 부대비용(취득세·중개보수), 월 상환액, 정책대출 비교까지. 2026 LTV·DSR 반영." />
   <meta name="keywords" content="내집자금 계산기, 주택 구입 필요자금, 대출 한도, 필요 현금, 취득세, 정책대출 비교" />
   <link rel="canonical" href="https://homeplaning.kr/calculators/home-goal.html" />
-  <link rel="stylesheet" href="../assets/css/style.css?v=2" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=3" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="alternate icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -42,22 +42,22 @@
       <div class="card card-pad">
         <div class="field">
           <label>가고 싶은 집 매매가 <span class="hint">목표 집값</span></label>
-          <div class="input-suffix"><input class="input" type="number" id="price" value="50000" min="1000" step="1000" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
+          <div class="input-suffix"><input class="input" type="number" id="price" value="40000" min="1000" step="1000" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
         </div>
         <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div>
             <label>부부합산 연 소득 <span class="hint">세전</span></label>
-            <div class="input-suffix"><input class="input" type="number" id="income" value="6000" min="0" step="100"><span class="suffix">만원</span></div>
+            <div class="input-suffix"><input class="input" type="number" id="income" value="3500" min="0" step="100"><span class="suffix">만원</span></div>
           </div>
           <div>
             <label>나이 <span class="hint">만</span></label>
-            <div class="input-suffix"><input class="input" type="number" id="age" value="34" min="20" max="65" step="1"><span class="suffix">세</span></div>
+            <div class="input-suffix"><input class="input" type="number" id="age" value="29" min="20" max="65" step="1"><span class="suffix">세</span></div>
           </div>
         </div>
         <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div>
             <label>보유 현금 <span class="hint">자기자본</span></label>
-            <div class="input-suffix"><input class="input" type="number" id="cash" value="15000" min="0" step="500"><span class="suffix">만원</span></div>
+            <div class="input-suffix"><input class="input" type="number" id="cash" value="4000" min="0" step="500"><span class="suffix">만원</span></div>
           </div>
           <div>
             <label>기존 대출 연 상환액 <span class="hint">없으면 0</span></label>
@@ -181,9 +181,9 @@
 
   <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/analytics.js?v=1"></script>
-  <script src="../assets/js/app.js?v=13"></script>
+  <script src="../assets/js/app.js?v=16"></script>
   <script src="../assets/js/policy.js?v=2"></script>
   <script src="../assets/js/calc-home-core.js?v=5"></script>
-  <script src="../assets/js/calc-home-goal.js?v=7"></script>
+  <script src="../assets/js/calc-home-goal.js?v=8"></script>
 </body>
 </html>

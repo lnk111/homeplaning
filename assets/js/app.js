@@ -108,6 +108,52 @@ function mount(active) {
   initReveal();
   initAmountHints();
   scrollActiveTabIntoView();
+  initMiniResult();
+}
+
+/* ---------- 모바일 고정 결과 바 ----------
+   모바일은 입력칸이 위, 결과가 아래로 쌓인다. 계산기에 따라 결과까지
+   1,100~1,400px를 내려야 해서, 값을 바꿔도 답이 화면 밖에 있다.
+   = 계산기의 핵심 동작(바꾸면 바로 보인다)이 끊긴다.
+   결과 히어로를 화면 하단에 거울처럼 띄워 항상 보이게 한다. */
+const MINI_BREAKPOINT = "(max-width: 860px)"; // 레이아웃이 1단으로 접히는 지점
+
+function initMiniResult() {
+  const hero = document.querySelector(".result-hero");
+  const big = hero && hero.querySelector(".big");
+  if (!big) return;
+  const label = hero.querySelector(".label");
+
+  const bar = document.createElement("button");
+  bar.type = "button";
+  bar.className = "mini-result";
+  bar.setAttribute("aria-label", "계산 결과로 이동");
+  bar.innerHTML = '<span class="mr-t"><span class="mr-k"></span><span class="mr-v"></span></span><span class="mr-go">결과 보기 ↓</span>';
+  document.body.appendChild(bar);
+
+  const sync = () => {
+    bar.querySelector(".mr-k").textContent = label ? label.textContent.trim() : "계산 결과";
+    bar.querySelector(".mr-v").textContent = big.textContent.replace(/\s+/g, " ").trim();
+  };
+  sync();
+  // 입력이 바뀌면 히어로가 다시 그려지므로 그 변화를 그대로 따라간다
+  new MutationObserver(sync).observe(hero, { subtree: true, childList: true, characterData: true });
+
+  bar.addEventListener("click", () => hero.scrollIntoView({ behavior: "smooth", block: "center" }));
+
+  // 결과가 이미 화면에 있으면 바를 숨긴다.
+  // (IntersectionObserver 대신 위치 비교 — 어디서든 같게 동작하고 검증하기 쉽다)
+  const apply = () => {
+    const r = hero.getBoundingClientRect();
+    const heroVisible = r.top < window.innerHeight * 0.9 && r.bottom > 0;
+    const show = !heroVisible && window.matchMedia(MINI_BREAKPOINT).matches;
+    bar.classList.toggle("on", show);
+    document.body.classList.toggle("has-mini", show);
+  };
+  // rect 읽기 한 번뿐이라 스로틀 없이도 가볍다. 단순한 편이 더 안전하다.
+  window.addEventListener("scroll", apply, { passive: true });
+  window.addEventListener("resize", apply, { passive: true });
+  apply();
 }
 
 /* 모바일에서 탭 줄이 가로 스크롤되면 현재 탭이 화면 밖에 있을 수 있다 */

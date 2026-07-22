@@ -4,7 +4,7 @@
    ========================================================= */
 
 const state = {
-  income: 6000, existing: 0, cash: 15000, age: 34,
+  income: 3500, existing: 0, cash: 4000, age: 29,
   region: "수도권_비규제", household: "일반",
   first: false, newborn: false, smallArea: true, hasHouse: false,
   dualIncome: false,

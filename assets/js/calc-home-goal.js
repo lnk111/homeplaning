@@ -4,11 +4,11 @@
    ========================================================= */
 
 const state = {
-  price: 50000, income: 6000, existing: 0, cash: 15000,
+  price: 40000, income: 3500, existing: 0, cash: 4000,
   region: "수도권_비규제", household: "일반",
   first: false, newborn: false, smallArea: true, hasHouse: false,
   dualIncome: false,
-  rate: 4.0, years: 30, age: 34, bank: "은행",
+  rate: 4.0, years: 30, age: 29, bank: "은행",
 };
 let P = null;
 

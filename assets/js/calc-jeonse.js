@@ -5,7 +5,7 @@
    ========================================================= */
 
 const state = {
-  deposit: 25000, income: 4000, cash: 5000, age: 30,
+  deposit: 18000, income: 3500, cash: 3000, age: 28,
   region: "수도권", household: "일반",
   smallArea: true, hasHouse: false,
   rate: 3.5, marketPrice: 0, // 매매 시세(선택) — 전세가율 계산용
