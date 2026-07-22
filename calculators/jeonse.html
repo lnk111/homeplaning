@@ -47,17 +47,17 @@
         <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div>
             <label>부부합산 연 소득 <span class="hint">세전</span></label>
-            <div class="input-suffix"><input class="input" type="number" id="income" value="3500" min="0" step="100"><span class="suffix">만원</span></div>
+            <div class="input-suffix"><input class="input" type="number" id="income" value="3500" min="0" step="100" inputmode="numeric"><span class="suffix">만원</span></div>
           </div>
           <div>
             <label>나이 <span class="hint">만</span></label>
-            <div class="input-suffix"><input class="input" type="number" id="age" value="28" min="19" max="65" step="1"><span class="suffix">세</span></div>
+            <div class="input-suffix"><input class="input" type="number" id="age" value="28" min="19" max="65" step="1" inputmode="numeric"><span class="suffix">세</span></div>
           </div>
         </div>
         <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div>
             <label>보유 현금 <span class="hint">내 돈</span></label>
-            <div class="input-suffix"><input class="input" type="number" id="cash" value="3000" min="0" step="500"><span class="suffix">만원</span></div>
+            <div class="input-suffix"><input class="input" type="number" id="cash" value="3000" min="0" step="500" inputmode="numeric"><span class="suffix">만원</span></div>
           </div>
           <div>
             <label>매매 시세 <span class="hint">선택</span></label>
@@ -92,7 +92,7 @@
         </div>
         <div class="field">
           <label>일반 전세대출 금리 <span class="hint">정책대출 불가 시</span></label>
-          <div class="input-suffix"><input class="input" type="number" id="rate" value="3.5" step="0.1" min="0"><span class="suffix">%</span></div>
+          <div class="input-suffix"><input class="input" type="number" id="rate" value="3.5" step="0.1" min="0" inputmode="decimal"><span class="suffix">%</span></div>
         </div>
 
         <div class="field" style="border-top:1px solid var(--line);padding-top:18px">
@@ -211,7 +211,7 @@
 
   <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/analytics.js?v=1"></script>
-  <script src="../assets/js/app.js?v=17"></script>
+  <script src="../assets/js/app.js?v=18"></script>
   <script src="../assets/js/policy.js?v=2"></script>
   <script src="../assets/js/calc-jeonse.js?v=7"></script>
 </body>

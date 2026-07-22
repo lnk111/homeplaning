@@ -169,10 +169,11 @@ function refreshAdvanced() {
 const MINI_BREAKPOINT = "(max-width: 860px)"; // 레이아웃이 1단으로 접히는 지점
 
 function initMiniResult() {
-  const hero = document.querySelector(".result-hero");
-  const big = hero && hero.querySelector(".big");
-  if (!big) return;
-  const label = hero.querySelector(".label");
+  // 탭이 있는 계산기(적금·배당)는 결과 영역이 여러 개다.
+  // 첫 번째를 붙잡으면 탭을 바꿔도 숨겨진 패널의 숫자를 계속 보여준다.
+  const heroes = [...document.querySelectorAll(".result-hero")].filter((h) => h.querySelector(".big"));
+  if (!heroes.length) return;
+  const current = () => heroes.find((h) => h.offsetParent !== null) || heroes[0];
 
   const bar = document.createElement("button");
   bar.type = "button";
@@ -181,28 +182,32 @@ function initMiniResult() {
   bar.innerHTML = '<span class="mr-t"><span class="mr-k"></span><span class="mr-v"></span></span><span class="mr-go">결과 보기 ↓</span>';
   document.body.appendChild(bar);
 
-  const sync = () => {
+  // 보이는 결과 영역만 따라간다. 값·위치·표시여부를 한 번에 갱신.
+  const apply = () => {
+    const hero = current();
+    const label = hero.querySelector(".label");
+    const big = hero.querySelector(".big");
     bar.querySelector(".mr-k").textContent = label ? label.textContent.trim() : "계산 결과";
     bar.querySelector(".mr-v").textContent = big.textContent.replace(/\s+/g, " ").trim();
-  };
-  sync();
-  // 입력이 바뀌면 히어로가 다시 그려지므로 그 변화를 그대로 따라간다
-  new MutationObserver(sync).observe(hero, { subtree: true, childList: true, characterData: true });
 
-  bar.addEventListener("click", () => hero.scrollIntoView({ behavior: "smooth", block: "center" }));
-
-  // 결과가 이미 화면에 있으면 바를 숨긴다.
-  // (IntersectionObserver 대신 위치 비교 — 어디서든 같게 동작하고 검증하기 쉽다)
-  const apply = () => {
     const r = hero.getBoundingClientRect();
     const heroVisible = r.top < window.innerHeight * 0.9 && r.bottom > 0;
     const show = !heroVisible && window.matchMedia(MINI_BREAKPOINT).matches;
     bar.classList.toggle("on", show);
     document.body.classList.toggle("has-mini", show);
   };
+
+  // 입력이 바뀌면 히어로가 다시 그려지므로 그 변화를 그대로 따라간다
+  heroes.forEach((h) => new MutationObserver(apply)
+    .observe(h, { subtree: true, childList: true, characterData: true }));
+
+  bar.addEventListener("click", () => current().scrollIntoView({ behavior: "smooth", block: "center" }));
+
   // rect 읽기 한 번뿐이라 스로틀 없이도 가볍다. 단순한 편이 더 안전하다.
   window.addEventListener("scroll", apply, { passive: true });
   window.addEventListener("resize", apply, { passive: true });
+  // 탭 전환은 클릭으로 일어난다 — 보이는 패널이 바뀌면 바도 따라가야 한다
+  document.addEventListener("click", () => setTimeout(apply, 0), { passive: true });
   apply();
 }
 

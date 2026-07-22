@@ -43,21 +43,21 @@
         <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div>
             <label>부부합산 연 소득 <span class="hint">세전</span></label>
-            <div class="input-suffix"><input class="input" type="number" id="income" value="3500" min="0" step="100"><span class="suffix">만원</span></div>
+            <div class="input-suffix"><input class="input" type="number" id="income" value="3500" min="0" step="100" inputmode="numeric"><span class="suffix">만원</span></div>
           </div>
           <div>
             <label>나이 <span class="hint">만</span></label>
-            <div class="input-suffix"><input class="input" type="number" id="age" value="29" min="20" max="65" step="1"><span class="suffix">세</span></div>
+            <div class="input-suffix"><input class="input" type="number" id="age" value="29" min="20" max="65" step="1" inputmode="numeric"><span class="suffix">세</span></div>
           </div>
         </div>
         <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div>
             <label>보유 현금 <span class="hint">자기자본</span></label>
-            <div class="input-suffix"><input class="input" type="number" id="cash" value="4000" min="0" step="500"><span class="suffix">만원</span></div>
+            <div class="input-suffix"><input class="input" type="number" id="cash" value="4000" min="0" step="500" inputmode="numeric"><span class="suffix">만원</span></div>
           </div>
           <div>
             <label>기존 대출 연 상환액 <span class="hint">없으면 0</span></label>
-            <div class="input-suffix"><input class="input" type="number" id="existing" value="0" min="0" step="100"><span class="suffix">만원/년</span></div>
+            <div class="input-suffix"><input class="input" type="number" id="existing" value="0" min="0" step="100" inputmode="numeric"><span class="suffix">만원/년</span></div>
           </div>
         </div>
         <div class="field">
@@ -95,11 +95,11 @@
         <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div>
             <label>대출 금리 <span class="hint">연</span></label>
-            <div class="input-suffix"><input class="input" type="number" id="rate" value="4.0" step="0.1" min="0"><span class="suffix">%</span></div>
+            <div class="input-suffix"><input class="input" type="number" id="rate" value="4.0" step="0.1" min="0" inputmode="decimal"><span class="suffix">%</span></div>
           </div>
           <div>
             <label>희망 상환 기간</label>
-            <div class="input-suffix"><input class="input" type="number" id="years" value="30" step="1" min="1" max="50"><span class="suffix">년</span></div>
+            <div class="input-suffix"><input class="input" type="number" id="years" value="30" step="1" min="1" max="50" inputmode="numeric"><span class="suffix">년</span></div>
           </div>
         </div>
         <div class="field">
@@ -201,7 +201,7 @@
 
   <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/analytics.js?v=1"></script>
-  <script src="../assets/js/app.js?v=17"></script>
+  <script src="../assets/js/app.js?v=18"></script>
   <script src="../assets/js/policy.js?v=2"></script>
   <script src="../assets/js/calc-home-core.js?v=5"></script>
   <script src="../assets/js/calc-home-afford.js?v=15"></script>

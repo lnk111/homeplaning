@@ -100,17 +100,17 @@
             </div>
             <div>
               <label>평수</label>
-              <div class="input-suffix"><input class="input" id="area" type="number" min="1" placeholder="숫자만 입력" /><span class="suffix">평</span></div>
+              <div class="input-suffix"><input class="input" id="area" type="number" min="1" placeholder="숫자만 입력" inputmode="numeric"><span class="suffix">평</span></div>
             </div>
           </div>
           <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div>
               <label>방</label>
-              <div class="input-suffix"><input class="input" id="rooms" type="number" min="0" placeholder="숫자만 입력" /><span class="suffix">칸</span></div>
+              <div class="input-suffix"><input class="input" id="rooms" type="number" min="0" placeholder="숫자만 입력" inputmode="numeric"><span class="suffix">칸</span></div>
             </div>
             <div>
               <label>욕실</label>
-              <div class="input-suffix"><input class="input" id="baths" type="number" min="0" placeholder="숫자만 입력" /><span class="suffix">칸</span></div>
+              <div class="input-suffix"><input class="input" id="baths" type="number" min="0" placeholder="숫자만 입력" inputmode="numeric"><span class="suffix">칸</span></div>
             </div>
           </div>
           <div class="field">
@@ -129,7 +129,7 @@
           </div>
           <div class="field">
             <label>공사 예산</label>
-            <div class="input-suffix"><input class="input" id="budget" type="number" min="0" step="100" placeholder="숫자만 입력" /><span class="suffix">만원</span></div>
+            <div class="input-suffix"><input class="input" id="budget" type="number" min="0" step="100" placeholder="숫자만 입력" inputmode="numeric"><span class="suffix">만원</span></div>
           </div>
           <!-- 희망 공사 범위 — designfor.kr 상담 폼과 동일 구성 -->
           <div class="field" style="border-top:1px solid var(--line);padding-top:18px">
@@ -276,7 +276,7 @@
 
   <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/analytics.js?v=1"></script>
-  <script src="../assets/js/app.js?v=17"></script>
+  <script src="../assets/js/app.js?v=18"></script>
   <script src="../assets/js/forms.js"></script>
   <script>
     /* 시공사례 — 디자인포(designfor.kr) 실제 포트폴리오 사진 (Cloudinary CDN).
@@ -375,7 +375,11 @@
       const g = (id) => document.getElementById(id).value.trim();
       const name = g("name"), phone = g("phone"), address = g("address");
       const note = document.getElementById("form-note");
-      if (!name || !phone || !address) return;
+      // 브라우저 기본 검증이 먼저 막지만, 우회되는 경우에도 조용히 끝나면 안 된다
+      if (!name || !phone || !address) {
+        note.innerHTML = `<span style="color:var(--accent)">이름·연락처·공사 지역은 꼭 입력해 주세요.</span>`;
+        return;
+      }
       if (!document.getElementById("agree").checked) {
         note.innerHTML = `<span style="color:var(--accent)">개인정보 수집 및 이용에 동의해 주세요.</span>`;
         return;

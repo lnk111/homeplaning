@@ -35,7 +35,7 @@
       <div class="card card-pad">
         <div class="field">
           <label>월 실수령액 <span class="hint">세후</span></label>
-          <div class="input-suffix"><input class="input" type="number" id="net" value="250" min="0" step="10" autocomplete="off"><span class="suffix">만원</span></div>
+          <div class="input-suffix"><input class="input" type="number" id="net" value="250" min="0" step="10" autocomplete="off" inputmode="numeric"><span class="suffix">만원</span></div>
         </div>
         <div class="field">
           <label>배분 원칙</label>
@@ -102,7 +102,7 @@
 
   <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/analytics.js?v=1"></script>
-  <script src="../assets/js/app.js?v=17"></script>
+  <script src="../assets/js/app.js?v=18"></script>
   <script>
     // 상태: 각 항목은 '퍼센트'가 기준값(정확한 실수). 금액 = 실수령액 × %/100.
     // 50·30·20 — 저축·투자 50 / 고정지출 30 / 생활·여가 20 (저축 우선 배분)

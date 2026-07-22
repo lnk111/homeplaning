@@ -35,7 +35,7 @@
       <div class="card card-pad">
         <div class="field">
           <label>초기 투자금</label>
-          <div class="input-suffix"><input class="input" type="number" id="initial" value="500" min="0" step="100"><span class="suffix">만원</span></div>
+          <div class="input-suffix"><input class="input" type="number" id="initial" value="500" min="0" step="100" inputmode="numeric"><span class="suffix">만원</span></div>
         </div>
         <div class="field">
           <label>매월 적립액</label>
@@ -95,7 +95,7 @@
 
   <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/analytics.js?v=1"></script>
-  <script src="../assets/js/app.js?v=17"></script>
+  <script src="../assets/js/app.js?v=18"></script>
   <script>
     const S = { initial: 500, monthly: 30, rate: 7, years: 20 };
     function grow(monthlyContribute, annualRate, years, initial) {

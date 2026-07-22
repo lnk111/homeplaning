@@ -42,11 +42,11 @@
         </div>
         <div class="field">
           <label>목표 금액</label>
-          <div class="input-suffix"><input class="input" type="number" id="target" value="10000" min="100" step="500"><span class="suffix">만원</span></div>
+          <div class="input-suffix"><input class="input" type="number" id="target" value="10000" min="100" step="500" inputmode="numeric"><span class="suffix">만원</span></div>
         </div>
         <div class="field">
           <label>현재 보유 자산</label>
-          <div class="input-suffix"><input class="input" type="number" id="current" value="1000" min="0" step="100"><span class="suffix">만원</span></div>
+          <div class="input-suffix"><input class="input" type="number" id="current" value="1000" min="0" step="100" inputmode="numeric"><span class="suffix">만원</span></div>
         </div>
         <div class="field">
           <label>연 수익률 <span class="hint">저축·투자 기대치</span></label>
@@ -58,7 +58,7 @@
         </div>
         <div class="field" id="monthly-field" style="display:none">
           <label>매월 저축 가능액</label>
-          <div class="input-suffix"><input class="input" type="number" id="monthly" value="80" min="1" step="5"><span class="suffix">만원</span></div>
+          <div class="input-suffix"><input class="input" type="number" id="monthly" value="80" min="1" step="5" inputmode="numeric"><span class="suffix">만원</span></div>
         </div>
       </div>
 
@@ -105,7 +105,7 @@
 
   <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/analytics.js?v=1"></script>
-  <script src="../assets/js/app.js?v=17"></script>
+  <script src="../assets/js/app.js?v=18"></script>
   <script>
     const S = { mode: "monthly", target: 10000, current: 1000, rate: 4, years: 10, monthly: 80 };
 

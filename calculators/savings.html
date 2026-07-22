@@ -51,7 +51,7 @@
         </div>
         <div class="field">
           <label>은행 기본 금리 <span class="hint">연</span></label>
-          <div class="input-suffix"><input class="input" type="number" id="y-rate" value="4.5" step="0.1" min="0"><span class="suffix">%</span></div>
+          <div class="input-suffix"><input class="input" type="number" id="y-rate" value="4.5" step="0.1" min="0" inputmode="decimal"><span class="suffix">%</span></div>
         </div>
         <p class="note" id="y-desc"></p>
       </div>
@@ -90,7 +90,7 @@
         </div>
         <div class="field">
           <label>투자 원금 <span class="hint">처음 넣는 목돈</span></label>
-          <div class="input-suffix"><input class="input" type="number" id="d-principal" value="3000" min="0" step="100"><span class="suffix">만원</span></div>
+          <div class="input-suffix"><input class="input" type="number" id="d-principal" value="3000" min="0" step="100" inputmode="numeric"><span class="suffix">만원</span></div>
         </div>
         <div class="field">
           <label>월 납입액 <span class="hint">매달 추가 매수</span></label>
@@ -172,7 +172,7 @@
 
   <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/analytics.js?v=1"></script>
-  <script src="../assets/js/app.js?v=17"></script>
+  <script src="../assets/js/app.js?v=18"></script>
   <script src="../assets/js/policy.js?v=2"></script>
   <script>
     let PROD = [];
