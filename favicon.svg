@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="홈플래닝">
+  <!-- 브랜드 컬러(--primary #1976d2) 배경. 라이트/다크 탭 어디서도 보이도록 채운 사각형 -->
+  <rect width="64" height="64" rx="14" fill="#1976d2"/>
+  <!-- 집: 16px 로 줄여도 형태가 남도록 굵고 단순하게 -->
+  <path d="M12 30 L32 14 L52 30" fill="none" stroke="#fff" stroke-width="5.5"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M18 30 V49 H46 V30" fill="none" stroke="#fff" stroke-width="5.5"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 문 = 자산이 쌓이는 기둥. 브랜드의 '모으다' 의미 -->
+  <rect x="28" y="37" width="8" height="12" rx="1.5" fill="#fff"/>
+</svg>
