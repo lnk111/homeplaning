@@ -145,7 +145,7 @@ function initAdvanced(root) {
     body.addEventListener("change", refresh);
     body.addEventListener("click", (e) => { if (e.target.closest(".chip")) setTimeout(refresh, 0); });
 
-    setOpen(false);
+    setOpen(true); // 기본은 펼침 — 어떤 설정이 결과에 반영되는지 먼저 보이게
     refresh();
     // 계산기가 링크 값을 반영한 뒤 다시 부를 수 있게 등록해 둔다
     advPanels.push({ snapshot, initial, setOpen, refresh });

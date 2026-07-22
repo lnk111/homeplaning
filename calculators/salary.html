@@ -70,14 +70,14 @@
           <div class="sum-box" id="sum-box"><span id="sum-msg"></span><span class="total" id="sum-total"></span></div>
         </div>
 
-        <div class="adv">
-          <button type="button" class="adv-toggle" aria-expanded="false">
+        <div class="adv open">
+          <button type="button" class="adv-toggle" aria-expanded="true">
             <span>자세히 설정</span>
             <span class="adv-hint">이미 모은 비상금</span>
             <span class="adv-mark" hidden>변경됨</span>
             <span class="adv-caret">▾</span>
           </button>
-          <div class="adv-body" hidden>
+          <div class="adv-body">
             <div class="field">
               <label>이미 모은 비상금 <span class="hint">파킹통장·수시입출금</span></label>
               <div class="input-suffix"><input class="input" type="number" id="emergency" value="0" min="0" step="100" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
@@ -172,7 +172,7 @@
 
   <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/analytics.js?v=1"></script>
-  <script src="../assets/js/app.js?v=19"></script>
+  <script src="../assets/js/app.js?v=20"></script>
   <script src="../assets/js/policy.js?v=2"></script>
   <script>
     // 상태: 각 항목은 '퍼센트'가 기준값(정확한 실수). 금액 = 실수령액 × %/100.
