@@ -121,7 +121,9 @@
       "Bash(git commit -q -m 'fix: 실패 이슈에 실제 오류 메시지를 싣는다 *)",
       "Bash(curl -s \"http://localhost:8000/assets/js/app.js?v=15\")",
       "Bash(git commit -q -m 'feat: 사회초년생 기준으로 첫 화면·기본값 재정렬 + 모바일 결과 고정 바 *)",
-      "Bash(git commit -q -m 'feat: 계산기 입력칸 접기 — 처음 보는 항목 12개 → 4~5개 *)"
+      "Bash(git commit -q -m 'feat: 계산기 입력칸 접기 — 처음 보는 항목 12개 → 4~5개 *)",
+      "Bash(node --check assets/js/calc-home-goal.js)",
+      "Bash(git commit -q -m 'feat: 생애최초 기본값 ON + 결과에 적용 사실 표시 *)"
     ]
   }
 }

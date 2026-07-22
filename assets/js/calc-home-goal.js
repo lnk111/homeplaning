@@ -6,7 +6,7 @@
 const state = {
   price: 40000, income: 3500, existing: 0, cash: 4000,
   region: "수도권_비규제", household: "일반",
-  first: false, newborn: false, smallArea: true, hasHouse: false,
+  first: true, newborn: false, smallArea: true, hasHouse: false, // 사회초년생 대다수가 생애최초
   dualIncome: false,
   rate: 4.0, years: 30, age: 29, bank: "은행",
 };
@@ -32,7 +32,9 @@ function render() {
   // 히어로 + 상태 배지
   document.getElementById("r-need").innerHTML =
     (need > 0 ? HP.fmtMan(need) : "충분") + (need > 0 ? '<span class="unit"> 원</span>' : "");
+  // 생애최초는 기본으로 켜 두므로(사회초년생 대다수가 해당), 적용 사실을 결과에 밝힌다.
   document.getElementById("r-term").textContent =
+    (state.first ? "생애최초 우대 적용 · " : "") +
     `한도 ${bindKey} 기준 (LTV ${HP.fmtMan(limits.LTV)} · DSR ${HP.fmtMan(limits.DSR)} · 절대캡 ${
       limits.절대캡 === Infinity ? "없음" : HP.fmtMan(limits.절대캡)})`;
   const shortfall = need > 0;
