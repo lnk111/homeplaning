@@ -203,7 +203,9 @@ h1, h2, h3, h4 { line-height: 1.2; letter-spacing: -0.01562em; margin: 0; }
 /* 2단 배치된 field 안에서도 같은 문제가 난다.
    특히 type="date" 는 브라우저 기본 UI 때문에 최소 폭(~158px)이 커서 트랙을 밀어낸다. */
 .field > * { min-width: 0; }
-.field label { display: block; font-weight: 500; font-size: 14px; color: var(--text); margin-bottom: 8px; }
+/* 한글은 기본값(break-all 유사)으로 두면 '합/산'처럼 단어 중간이 잘린다 */
+.field label { display: block; font-weight: 500; font-size: 14px; color: var(--text); margin-bottom: 8px;
+  word-break: keep-all; }
 .field .hint { font-weight: 400; color: var(--text-3); font-size: 12px; margin-left: 4px; }
 .input, select {
   width: 100%; min-width: 0; padding: 12.5px 14px; border: 1px solid rgba(0, 0, 0, 0.23);
