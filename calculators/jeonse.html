@@ -7,7 +7,7 @@
   <meta name="description" content="전세 보증금을 넣으면 필요한 현금·전세대출 한도·월 이자를 계산합니다. 버팀목·청년전용·신혼부부 전세대출 비교와 전세가율(깡통전세) 위험까지 확인하세요." />
   <meta name="keywords" content="전세 계산기, 전세자금대출, 버팀목 전세대출, 청년 전세대출, 전세가율, 깡통전세, 전세보증금" />
   <link rel="canonical" href="https://homeplaning.kr/calculators/jeonse.html" />
-  <link rel="stylesheet" href="../assets/css/style.css?v=7" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=9" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="alternate icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -168,6 +168,21 @@
         </div>
 
         <div class="card" style="margin-bottom:12px">
+          <div class="ck-head">
+            <div>
+              <h3 style="font-size:16px;color:var(--navy);margin:0 0 4px">계약 전에 꼭 확인할 것</h3>
+              <p class="small muted" style="margin:0;line-height:1.5">
+                하나라도 빠지면 보증금을 못 지킬 수 있어요. 체크하며 진행하세요.
+              </p>
+            </div>
+            <div class="ck-count"><b id="ck-done">0</b>/<span id="ck-total">0</span></div>
+          </div>
+          <div class="ck-bar"><span id="ck-fill"></span></div>
+          <div id="checklist"></div>
+          <p class="small" id="ck-note" style="margin:14px 0 0;line-height:1.6;color:var(--text-2)"></p>
+        </div>
+
+        <div class="card" style="margin-bottom:12px">
           <h3 style="font-size:16px;color:var(--navy);margin-bottom:4px">전세 vs 월세 — 어느 쪽이 이득?</h3>
           <p class="small muted" style="margin:0 0 14px;line-height:1.5">
             월 지출만 보면 답이 틀립니다. <b>묶이는 목돈의 기회비용</b>까지 같이 비교해요.
@@ -213,6 +228,6 @@
   <script src="../assets/js/analytics.js?v=1"></script>
   <script src="../assets/js/app.js?v=18"></script>
   <script src="../assets/js/policy.js?v=2"></script>
-  <script src="../assets/js/calc-jeonse.js?v=7"></script>
+  <script src="../assets/js/calc-jeonse.js?v=10"></script>
 </body>
 </html>

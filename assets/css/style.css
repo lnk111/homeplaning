@@ -423,6 +423,25 @@ table.compare td.net { color: var(--accent-dark); font-weight: 800; }
 .insight .id { font-size: 13px; color: var(--text-2); line-height: 1.55; }
 .insight .id a { color: var(--accent); font-weight: 700; }
 
+/* ---------- 계약 체크리스트 (전세) ---------- */
+.ck-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+.ck-count { flex: none; font-size: 13px; color: var(--text-3); font-weight: 700; white-space: nowrap; }
+.ck-count b { font-size: 20px; color: var(--primary); }
+.ck-bar { height: 6px; border-radius: 999px; background: rgba(0, 0, 0, .08); overflow: hidden; margin-bottom: 6px; }
+.ck-bar span { display: block; height: 100%; width: 0; border-radius: 999px;
+  background: var(--primary); transition: width .25s ease; }
+.ck-group { margin-top: 16px; }
+.ck-group > .g { font-size: 12px; font-weight: 800; color: var(--primary-dark); letter-spacing: .02em; margin-bottom: 6px; }
+.ck-item { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.ck-group:last-child .ck-item:last-child { border-bottom: none; padding-bottom: 0; }
+.ck-item input { flex: none; width: 19px; height: 19px; margin-top: 2px; accent-color: var(--primary); cursor: pointer; }
+.ck-item .tx { flex: 1; min-width: 0; }
+/* span 이라 기본이 inline — block 을 주지 않으면 제목과 설명이 한 줄로 붙는다 */
+.ck-item .t { display: block; font-size: 14.5px; font-weight: 600; color: var(--text); word-break: keep-all; }
+.ck-item .w { display: block; font-size: 12.5px; color: var(--text-2); margin-top: 3px; line-height: 1.55; word-break: keep-all; }
+.ck-item input:checked ~ .tx .t { color: var(--text-3); text-decoration: line-through; }
+.ck-item input:checked ~ .tx .w { color: var(--text-3); }
+
 /* ---------- 저축액 배분 계획 (월급배분) ---------- */
 .plan-row { display: flex; gap: 12px; align-items: flex-start; padding: 13px 0; border-bottom: 1px solid var(--line); }
 .plan-row:last-child { border-bottom: none; padding-bottom: 0; }

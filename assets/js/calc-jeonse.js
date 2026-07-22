@@ -17,6 +17,85 @@ const ICO_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strok
 const ICO_WARN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>';
 const NAVY = "#1976d2";
 
+/* ---------- 계약 체크리스트 ----------
+   재테크자료의 3단계를 '읽는 글'이 아니라 '쓰는 도구'로 옮긴 것.
+   각 항목에 '안 하면 무슨 일이 생기는지'를 붙여야 체크할 이유가 생긴다.
+   계약은 몇 주에 걸쳐 진행되므로 체크 상태를 브라우저에 남긴다. */
+const CK_KEY = "hp.jeonse.checklist";
+const CHECKLIST = [
+  { g: "계약 전", items: [
+    { id: "reg", t: "등기부등본 확인", w: "집주인이 이미 받은 대출(선순위 근저당)이 있으면, 경매 때 그 사람이 먼저 받고 내 순서가 밀립니다." },
+    { id: "ratio", t: "전세가율 계산", w: "보증금이 매매가에 가까울수록 위험합니다. 위 계산 결과에서 80%를 넘으면 반환보증을 필수로 보세요." },
+    { id: "tax", t: "집주인 세금 체납 확인", w: "체납된 세금은 내 보증금보다 먼저 변제됩니다. 계약 전에 납세증명서를 요청하세요." },
+    { id: "guar", t: "반환보증 가입 가능 여부", w: "계약하고 나서 '가입이 안 된다'는 걸 알면 이미 늦습니다. HUG는 전세가율 90%를 넘으면 가입이 막힙니다." },
+  ]},
+  { g: "잔금·이사 당일", items: [
+    { id: "recheck", t: "잔금 전 등기부 재확인", w: "이사 당일 집주인이 대출을 받으면 그 근저당이 내 권리보다 앞섭니다. 계약서에 '잔금일까지 추가 담보 설정 금지' 특약을 넣으세요." },
+    { id: "move", t: "전입신고", w: "대항력이 생깁니다. 단 효력은 신고 다음 날 0시부터라, 당일에는 보호받지 못합니다." },
+    { id: "date", t: "확정일자 받기", w: "우선변제권이 생겨 경매 대금에서 내 순서를 확보합니다. 주민센터나 인터넷등기소에서 받습니다." },
+    { id: "live", t: "실제로 거주 시작", w: "전입신고만 하고 실제로 살지 않으면 대항력이 인정되지 않습니다." },
+  ]},
+  { g: "계약 후", items: [
+    { id: "join", t: "전세보증금 반환보증 가입", w: "집주인이 못 돌려줘도 보증기관(HUG·HF·SGI)이 대신 줍니다. 보증료는 임차인이 냅니다." },
+  ]},
+];
+
+function loadChecks() {
+  try { return JSON.parse(localStorage.getItem(CK_KEY)) || {}; } catch { return {}; }
+}
+function saveChecks(v) {
+  try { localStorage.setItem(CK_KEY, JSON.stringify(v)); } catch { /* 저장 불가여도 사용에는 지장 없음 */ }
+}
+
+function renderChecklist() {
+  const checked = loadChecks(); // 계산기 state 와 이름이 겹치지 않게
+  const box = document.getElementById("checklist");
+  box.innerHTML = CHECKLIST.map((grp) => `
+    <div class="ck-group">
+      <div class="g">${grp.g}</div>
+      ${grp.items.map((it) => `
+        <label class="ck-item">
+          <input type="checkbox" data-ck="${it.id}"${checked[it.id] ? " checked" : ""}>
+          <span class="tx"><span class="t">${it.t}</span><span class="w">${it.w}</span></span>
+        </label>`).join("")}
+    </div>`).join("");
+
+  box.querySelectorAll("[data-ck]").forEach((el) => {
+    el.onchange = () => {
+      const s = loadChecks();
+      s[el.dataset.ck] = el.checked;
+      saveChecks(s);
+      updateCheckCount();
+      if (el.checked) window.HPTrack?.track("jeonse_check", { item: el.dataset.ck });
+    };
+  });
+  updateCheckCount();
+}
+
+function updateCheckCount() {
+  const all = [...document.querySelectorAll("#checklist [data-ck]")];
+  const done = all.filter((e) => e.checked).length;
+  document.getElementById("ck-done").textContent = done;
+  document.getElementById("ck-total").textContent = all.length;
+  document.getElementById("ck-fill").style.width = all.length ? (done / all.length) * 100 + "%" : "0%";
+
+  // 남은 것 중 가장 위험한 항목을 짚어 준다
+  const critical = { date: "확정일자", move: "전입신고", live: "실제 거주" };
+  const missing = all.filter((e) => !e.checked).map((e) => e.dataset.ck);
+  const note = document.getElementById("ck-note");
+  const legal = missing.filter((m) => critical[m]);
+  if (done === all.length) {
+    note.innerHTML = "✅ 다 확인하셨어요. 계약서와 증빙은 이사 후에도 보관하세요.";
+  } else if (legal.length) {
+    note.innerHTML = `⚠️ <b>${legal.map((m) => critical[m]).join(" · ")}</b>가 빠져 있어요.
+      <b>전입신고 · 확정일자 · 실제 거주</b> 셋이 모두 갖춰져야 법이 보증금을 지켜 줍니다 —
+      <a href="../guide/jeonse.html" style="color:var(--accent);font-weight:700">자세히 보기 →</a>`;
+  } else {
+    note.innerHTML = `남은 항목을 계약 전에 확인하세요 —
+      <a href="../guide/jeonse.html" style="color:var(--accent);font-weight:700">각 항목이 왜 필요한지 →</a>`;
+  }
+}
+
 /* 전세가율 위험 구간 — 보증금이 매매가에 근접할수록 반환 위험이 커진다 */
 const RATIO_WARN = 80;   // 이 이상이면 주의
 const RATIO_DANGER = 90; // 이 이상이면 위험(깡통전세)
@@ -283,6 +362,7 @@ HPPolicy.loadPolicy().then((data) => {
   bindInputs();
   applyIncoming();
   render();
+  renderChecklist();
   HP.initShare(document.getElementById("share"), () => ({
     deposit: state.deposit, cash: state.cash, income: state.income, age: state.age,
     marketPrice: state.marketPrice || "", region: state.region, household: state.household,

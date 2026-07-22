@@ -129,7 +129,9 @@
       "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -c \"import json,io; d=json.load\\(io.open\\('data/policy.json',encoding='utf-8'\\)\\); [print\\('-',p.get\\('name'\\),'| 월최대',p.get\\('monthly_max_man'\\),'만 | 기여',p.get\\('gov_match_rate'\\),'| 기간',p.get\\('term_months'\\),'개월'\\) for p in d.get\\('savings_products',[]\\)]\")",
       "Bash(git commit -q -m 'feat: 월급배분에 '\\\\''어디에 넣을까'\\\\''·'\\\\''미파악 지출'\\\\''·'\\\\''목표까지 몇 개월'\\\\'' 추가 *)",
       "Bash(git commit -q -m 'feat: 미파악 지출을 저축으로 돌리는 버튼 + 되돌리기 *)",
-      "Bash(git commit -q -m 'fix: 2단 입력칸이 라벨 줄 수에 따라 어긋나던 정렬 교정 *)"
+      "Bash(git commit -q -m 'fix: 2단 입력칸이 라벨 줄 수에 따라 어긋나던 정렬 교정 *)",
+      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -c \"import json,io; d=json.load\\(io.open\\('data/policy.json',encoding='utf-8'\\)\\); [print\\(p.get\\('name'\\),'::',p.get\\('note',''\\)\\) for p in d.get\\('savings_products',[]\\)]\")",
+      "Bash(git commit -q -m 'feat: 전세 계약 체크리스트 — 읽는 글을 쓰는 도구로 *)"
     ]
   }
 }
