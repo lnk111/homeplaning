@@ -416,6 +416,31 @@ table.compare td.net { color: var(--accent-dark); font-weight: 800; }
 .insight .id { font-size: 13px; color: var(--text-2); line-height: 1.55; }
 .insight .id a { color: var(--accent); font-weight: 700; }
 
+/* ---------- 저축액 배분 계획 (월급배분) ---------- */
+.plan-row { display: flex; gap: 12px; align-items: flex-start; padding: 13px 0; border-bottom: 1px solid var(--line); }
+.plan-row:last-child { border-bottom: none; padding-bottom: 0; }
+.plan-n { flex: none; width: 22px; height: 22px; margin-top: 2px; border-radius: 50%;
+  background: var(--primary); color: #fff; font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; }
+.plan-row.off .plan-n { background: var(--text-3); }
+.plan-t { flex: 1; min-width: 0; }
+.plan-t .t { font-weight: 700; font-size: 15px; color: var(--text); word-break: keep-all; }
+.plan-t .s { font-size: 12.5px; color: var(--text-2); margin-top: 3px; line-height: 1.55; word-break: keep-all; }
+.plan-v { flex: none; font-weight: 800; font-size: 16.5px; color: var(--primary-dark); white-space: nowrap; }
+.plan-row.off .plan-v { color: var(--text-3); }
+
+/* ---------- 목표 도달 기간 ---------- */
+.goal-input { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.goal-input input { width: 130px; text-align: right; font-weight: 700; }
+.goal-input span { font-size: 14px; color: var(--text-2); font-weight: 600; }
+.goal-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.goal-cards .gc { background: var(--surface-2); border-radius: var(--radius-sm); padding: 14px 12px; text-align: center; }
+.goal-cards .gc .k { font-size: 12px; color: var(--text-2); font-weight: 600; word-break: keep-all; }
+.goal-cards .gc .v { font-size: 26px; font-weight: 800; color: var(--text); margin-top: 5px; letter-spacing: -.02em; }
+.goal-cards .gc.hi { background: var(--navy); }
+.goal-cards .gc.hi .k { color: rgba(255, 255, 255, .8); }
+.goal-cards .gc.hi .v { color: #ffccbc; }
+
 /* ---------- 세부 설정 접기 ---------- */
 .adv { border-top: 1px solid var(--line); margin-top: 4px; padding-top: 14px; }
 .adv-toggle {

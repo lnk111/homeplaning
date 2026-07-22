@@ -7,7 +7,7 @@
   <meta name="description" content="월 실수령액을 넣으면 50-30-20 등 원칙에 따라 고정지출·생활비·저축·투자로 자동 배분. 사회초년생 예산 관리." />
   <meta name="keywords" content="월급배분 계산기, 50 30 20 법칙, 예산 관리, 사회초년생 재테크, 월급 관리" />
   <link rel="canonical" href="https://homeplaning.kr/calculators/salary.html" />
-  <link rel="stylesheet" href="../assets/css/style.css?v=5" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=6" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="alternate icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -69,6 +69,24 @@
           </div>
           <div class="sum-box" id="sum-box"><span id="sum-msg"></span><span class="total" id="sum-total"></span></div>
         </div>
+
+        <div class="adv">
+          <button type="button" class="adv-toggle" aria-expanded="false">
+            <span>자세히 설정</span>
+            <span class="adv-hint">이미 모은 비상금</span>
+            <span class="adv-mark" hidden>변경됨</span>
+            <span class="adv-caret">▾</span>
+          </button>
+          <div class="adv-body" hidden>
+            <div class="field">
+              <label>이미 모은 비상금 <span class="hint">파킹통장·수시입출금</span></label>
+              <div class="input-suffix"><input class="input" type="number" id="emergency" value="0" min="0" step="100" inputmode="numeric" autocomplete="off"><span class="suffix">만원</span></div>
+              <p class="small muted" style="margin:8px 0 0;line-height:1.5">
+                비상금이 없으면 사고 한 번에 적금을 깨게 됩니다. 그래서 투자보다 먼저 채우는 걸 권해요.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div>
@@ -86,7 +104,39 @@
           </div>
         </div>
 
-        <a href="goal.html" id="next-goal" class="cta-orange">
+        <div class="card card-pad" style="margin-top:14px">
+          <h3 style="font-size:16px;color:var(--navy);margin-bottom:4px">이 돈, 어디에 넣을까</h3>
+          <p class="small muted" style="margin:0 0 4px;line-height:1.5">
+            순서가 중요해요 — <b>확정으로 얹어주는 돈</b>이 먼저, 그다음 <b>안전판</b>, 투자는 마지막입니다.
+          </p>
+          <div id="plan-list"></div>
+          <p class="small" id="plan-note" style="margin:12px 0 0;line-height:1.6;color:var(--text-2)"></p>
+        </div>
+
+        <div class="card card-pad" style="margin-top:12px">
+          <h3 style="font-size:16px;color:var(--navy);margin-bottom:10px">첫 목표까지 얼마나 걸릴까</h3>
+          <div class="goal-input">
+            <input class="input" type="number" id="goal-target" value="1000" min="10" step="100"
+                   inputmode="numeric" autocomplete="off" aria-label="목표 금액">
+            <span>만원 모으기</span>
+          </div>
+          <div class="goal-cards">
+            <div class="gc">
+              <div class="k">지금 저축액으로</div>
+              <div class="v" id="g-base">–</div>
+            </div>
+            <div class="gc hi" id="gc-found">
+              <div class="k">미파악 지출까지 찾으면</div>
+              <div class="v" id="g-found">–</div>
+            </div>
+          </div>
+          <p class="note" style="margin:12px 0 0">
+            ※ 납입액만 단순 합산한 값이에요. 적금 이자·정부기여금·투자 수익이 붙으면 더 빨라질 수 있고,
+            투자금은 원금 손실 가능성도 있습니다.
+          </p>
+        </div>
+
+        <a href="goal.html" id="next-goal" class="cta-orange" style="margin-top:12px">
           <div>
             <div class="t">이 금액으로 목표까지 몇 년?</div>
             <div class="s" id="cta-sub">연간 – 저축</div>
@@ -103,13 +153,99 @@
   <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/analytics.js?v=1"></script>
   <script src="../assets/js/app.js?v=18"></script>
+  <script src="../assets/js/policy.js?v=2"></script>
   <script>
     // 상태: 각 항목은 '퍼센트'가 기준값(정확한 실수). 금액 = 실수령액 × %/100.
     // 50·30·20 — 저축·투자 50 / 고정지출 30 / 생활·여가 20 (저축 우선 배분)
-    const S = { net: 250, rule: "503020", fixed: 30, life: 20, save: 50 };
+    const S = { net: 250, rule: "503020", fixed: 30, life: 20, save: 50, emergency: 0, target: 1000 };
     const PRESETS = { "503020": [30, 20, 50], save80: [15, 5, 80] };
     const KEYS = ["fixed", "life", "save"];
     const LIFE_COLOR = "#9e9e9e";
+    const UNKNOWN_COLOR = "#c9ccd1";     // 미파악 — 생활·여가(#9e9e9e)와 구분되는 더 옅은 회색
+    const EMERGENCY_MONTHS = 3;          // 비상금 목표: 월 실수령의 3개월치
+    let YOUTH = null;                    // 정책 데이터에서 주입되는 청년 적금 상품
+
+    /* 저축액을 우선순위대로 쪼갠다.
+       1) 정부가 확정으로 얹어주는 청년 적금  2) 사고를 막는 비상금  3) 나머지 투자
+       비상금 없이 투자부터 하면 사고 한 번에 적금을 깨서 혜택이 날아간다. */
+    function savingPlan(saveAmt) {
+      const rows = [];
+      let rest = saveAmt;
+
+      const cap = YOUTH ? YOUTH.monthly_max_man : 0;
+      if (cap > 0) {
+        const v = Math.min(rest, cap);
+        rest -= v;
+        const pct = Math.round((YOUTH.gov_match_rate || 0) * 100);
+        rows.push({
+          t: YOUTH.name, v,
+          s: `월 최대 ${cap}만원 · 정부기여금 ${pct}%${YOUTH.term_months ? ` · ${YOUTH.term_months / 12}년 만기` : ""} · 만 19~34세`,
+        });
+      }
+
+      const eTarget = S.net * EMERGENCY_MONTHS;
+      const eShort = Math.max(0, eTarget - S.emergency);
+      if (eShort > 0 && rest > 0) {
+        const v = rest;
+        rest = 0;
+        rows.push({
+          t: "비상금 파킹", v,
+          s: `월급 ${EMERGENCY_MONTHS}개월치(${HP.fmtMan(eTarget)})까지 · ${HP.fmtMan(eShort)} 남음`,
+        });
+      }
+      if (rest > 0) {
+        rows.push({
+          t: "자유 저축·투자", v: rest,
+          s: "ISA·연금저축·IRP 등. 지수형 ETF처럼 분산된 상품이 무난합니다",
+        });
+      }
+      if (eShort <= 0 && S.emergency > 0) {
+        rows.push({ t: "비상금 파킹", v: 0, off: true, s: `이미 ${HP.fmtMan(S.emergency)} — 목표 달성`, });
+      }
+      return { rows, eShort, eTarget };
+    }
+
+    function renderPlan(saveAmt) {
+      const { rows, eShort, eTarget } = savingPlan(saveAmt);
+      document.getElementById("plan-list").innerHTML = rows.map((r, i) => `
+        <div class="plan-row${r.off ? " off" : ""}">
+          <span class="plan-n">${r.off ? "✓" : i + 1}</span>
+          <div class="plan-t"><div class="t">${r.t}</div><div class="s">${r.s}</div></div>
+          <div class="plan-v">${r.off ? "완료" : HP.fmtMan(r.v) + "원"}</div>
+        </div>`).join("");
+
+      const note = document.getElementById("plan-note");
+      if (saveAmt <= 0) {
+        note.innerHTML = "저축·투자 금액을 먼저 정해 주세요.";
+      } else if (eShort > 0) {
+        const mo = Math.ceil(eShort / Math.max(1, saveAmt));
+        note.innerHTML = `비상금 ${HP.fmtMan(eTarget)}을 채우는 데 약 <b>${mo}개월</b>. 다 채우면 이 돈은 투자로 돌리세요.
+          <a href="../guide/youth.html" style="color:var(--accent);font-weight:700">청년 적금 자세히 →</a>`;
+      } else {
+        note.innerHTML = `비상금이 준비돼 있어 투자에 집중할 수 있는 상태예요.
+          <a href="../guide/youth.html" style="color:var(--accent);font-weight:700">청년 적금 자세히 →</a>`;
+      }
+    }
+
+    /* 목표 금액까지 몇 개월 — 미파악 지출을 찾으면 얼마나 당겨지는지 함께 */
+    function monthsText(m) {
+      if (!isFinite(m) || m <= 0) return "–";
+      if (m < 12) return `${m}<span class="unit">개월</span>`;
+      const y = Math.floor(m / 12), mo = m % 12;
+      return `${y}<span class="unit">년</span>${mo ? ` ${mo}<span class="unit">개월</span>` : ""}`;
+    }
+    function renderGoal(saveAmt, unknownAmt) {
+      const need = S.target;
+      const base = saveAmt > 0 ? Math.ceil(need / saveAmt) : Infinity;
+      document.getElementById("g-base").innerHTML = monthsText(base);
+      const card = document.getElementById("gc-found");
+      if (unknownAmt > 0.5 && saveAmt + unknownAmt > 0) {
+        card.style.display = "";
+        document.getElementById("g-found").innerHTML = monthsText(Math.ceil(need / (saveAmt + unknownAmt)));
+      } else {
+        card.style.display = "none"; // 미파악이 없으면 비교할 대상이 없다
+      }
+    }
 
     // 상태 → 입력칸(금액·%) 동기화
     function syncInputs() {
@@ -135,17 +271,38 @@
       // 저축액을 자산목표 계산기로 그대로 넘긴다 (도달 기간 모드로)
       document.getElementById("next-goal").href =
         HP.withParams("goal.html", { mode: "years", monthly: saveAmt, from: "salary" });
-      HP.donutPanel(document.getElementById("donut"), [
+      // 100%를 못 채운 몫은 '틀린 입력'이 아니라 '어디 갔는지 모르는 돈'이다
+      const unknownPct = Math.max(0, 100 - total);
+      const unknownAmt = (S.net * unknownPct) / 100;
+
+      const seg = [
         { value: fixedAmt, color: "var(--navy)", label: "고정지출", display: HP.fmtMan(fixedAmt) + "원" },
         { value: lifeAmt, color: LIFE_COLOR, label: "생활·여가", display: HP.fmtMan(lifeAmt) + "원" },
         { value: saveAmt, color: "var(--accent)", label: "저축·투자", display: HP.fmtMan(saveAmt) + "원" },
-      ], { centerLabel: Math.round(S.save) + "%", centerSub: "저축률" });
+      ];
+      if (unknownAmt > 0.5) {
+        seg.push({ value: unknownAmt, color: UNKNOWN_COLOR, label: "미파악", display: HP.fmtMan(unknownAmt) + "원" });
+      }
+      HP.donutPanel(document.getElementById("donut"), seg,
+        { centerLabel: Math.round(S.save) + "%", centerSub: "저축률" });
+
       const rt = Math.round(total);
       const box = document.getElementById("sum-box");
-      box.className = "sum-box " + (rt === 100 ? "ok" : "warn");
-      document.getElementById("sum-msg").textContent =
-        rt === 100 ? "배분 완료 — 남는 돈 없이 100%" : "합계가 100%가 되도록 맞춰보세요";
+      const msg = document.getElementById("sum-msg");
+      if (rt === 100) {
+        box.className = "sum-box ok";
+        msg.textContent = "배분 완료 — 남는 돈 없이 100%";
+      } else if (rt < 100) {
+        box.className = "sum-box";
+        msg.innerHTML = `미파악 <b>${HP.fmtMan(unknownAmt)}원</b> — 어디로 가는지 확인 안 된 돈이에요`;
+      } else {
+        box.className = "sum-box warn";
+        msg.textContent = `실수령액보다 ${HP.fmtMan(S.net * (rt - 100) / 100)}원 많아요`;
+      }
       document.getElementById("sum-total").textContent = `합계 ${rt}%`;
+
+      renderPlan(saveAmt);
+      renderGoal(saveAmt, unknownAmt);
     }
 
     // 월 실수령액 변경 → 비율 유지하며 금액 재계산
@@ -177,23 +334,40 @@
       };
     });
 
+    // 비상금·목표 금액
+    document.getElementById("emergency").oninput = (e) => { S.emergency = Math.max(0, +e.target.value || 0); render(); };
+    document.getElementById("goal-target").oninput = (e) => { S.target = Math.max(0, +e.target.value || 0); render(); };
+
     HP.mount("salary");
 
     // 링크로 넘어온 값 반영 (외부 입력이라 범위 검증을 거친다)
     const IN = HP.readParams({
       net: { min: 0, max: 100000 },
       save: { min: 0, max: 100 }, fixed: { min: 0, max: 100 }, life: { min: 0, max: 100 },
+      emergency: { min: 0, max: 1000000 }, target: { min: 10, max: 1000000 },
     });
     Object.assign(S, IN);
     if (IN.net !== undefined) document.getElementById("net").value = Math.round(S.net);
+    if (IN.emergency !== undefined) document.getElementById("emergency").value = S.emergency;
+    if (IN.target !== undefined) document.getElementById("goal-target").value = S.target;
     if (IN.save !== undefined || IN.fixed !== undefined || IN.life !== undefined) markCustom();
 
     syncInputs();
     render();
     HP.refreshAmountHints();
+    HP.refreshAdvanced(); // 링크 값이 접힌 영역에 있으면 펼친다
     HP.initShare(document.getElementById("share"), () => ({
-      net: S.net, save: S.save, fixed: S.fixed, life: S.life, from: "salary",
+      net: S.net, save: S.save, fixed: S.fixed, life: S.life,
+      emergency: S.emergency, target: S.target, from: "salary",
     }));
+
+    // 청년 적금 정보는 policy.json에서 가져온다 — 상품이 바뀌어도 따라간다
+    HPPolicy.loadPolicy().then((data) => {
+      const list = data.savings_products || [];
+      // 신규 가입이 끝난 상품을 권하면 안 된다 (안내문에 '종료'가 없는 것을 고른다)
+      YOUTH = list.find((p) => !/종료/.test(p.note || "")) || list[0] || null;
+      render();
+    });
   </script>
 </body>
 </html>

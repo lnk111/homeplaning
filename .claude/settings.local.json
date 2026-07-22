@@ -125,7 +125,9 @@
       "Bash(node --check assets/js/calc-home-goal.js)",
       "Bash(git commit -q -m 'feat: 생애최초 기본값 ON + 결과에 적용 사실 표시 *)",
       "Bash(git commit -q -m 'fix: 적금·배당 고정 바가 숨겨진 탭 값을 보여주던 문제 + 모바일 키보드 *)",
-      "Bash(git commit -q -m 'fix: 소득 라벨을 미혼 이용자에게도 맞게 + 한글 줄바꿈 교정 *)"
+      "Bash(git commit -q -m 'fix: 소득 라벨을 미혼 이용자에게도 맞게 + 한글 줄바꿈 교정 *)",
+      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python -c \"import json,io; d=json.load\\(io.open\\('data/policy.json',encoding='utf-8'\\)\\); [print\\('-',p.get\\('name'\\),'| 월최대',p.get\\('monthly_max_man'\\),'만 | 기여',p.get\\('gov_match_rate'\\),'| 기간',p.get\\('term_months'\\),'개월'\\) for p in d.get\\('savings_products',[]\\)]\")",
+      "Bash(git commit -q -m 'feat: 월급배분에 '\\\\''어디에 넣을까'\\\\''·'\\\\''미파악 지출'\\\\''·'\\\\''목표까지 몇 개월'\\\\'' 추가 *)"
     ]
   }
 }
