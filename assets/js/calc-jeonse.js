@@ -178,7 +178,7 @@ function renderRent(monthlyInterest, cashUsed) {
   }
   parts.push(`전환율 법정 상한은 <b>기준금리+2%와 연 10% 중 낮은 값</b>이며,
     계약 기간 중·갱신요구권 행사 때만 적용됩니다(신규 계약엔 미적용).
-    <a href="../guide/index.html#jeonse" style="color:var(--accent);font-weight:700">자세히 보기 →</a>`);
+    <a href="../guide/jeonse.html" style="color:var(--accent);font-weight:700">자세히 보기 →</a>`);
   note.innerHTML = parts.join(" ");
 }
 

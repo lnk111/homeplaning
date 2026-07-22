@@ -109,7 +109,11 @@
       "Bash(curl -s -o /dev/null -w \"variable-dynamic-subset: HTTP %{http_code}  \\(%{size_download} bytes\\)\\\\n\" \"https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css\")",
       "Bash(curl -s \"https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css\")",
       "Bash(git commit -q -m 'feat: 방문·전환 측정\\(GA4\\) 도입 + 폰트 4.6MB → 0.5MB *)",
-      "Bash(git commit -q -m 'fix: 모바일 가로 스크롤 제거 + 파비콘·홈화면 아이콘 추가 *)"
+      "Bash(git commit -q -m 'fix: 모바일 가로 스크롤 제거 + 파비콘·홈화면 아이콘 추가 *)",
+      "Bash(cd \"C:/Users/72949/Desktop/homeplaning\" *)",
+      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python \"C:\\\\Users\\\\72949\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-72949-Desktop-homeplaning\\\\b71528a4-fe78-43fa-92c3-7ecc12442b78\\\\scratchpad\\\\build_guide.py\")",
+      "PowerShell($env:PYTHONIOENCODING=\"utf-8\"; python \"C:\\\\Users\\\\72949\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-72949-Desktop-homeplaning\\\\b71528a4-fe78-43fa-92c3-7ecc12442b78\\\\scratchpad\\\\build_og.py\")",
+      "Bash(git commit -q -m 'feat: 재테크자료 8편을 개별 페이지로 분리 + 공유 썸네일 도입 *)"
     ]
   }
 }

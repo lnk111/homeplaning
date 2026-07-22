@@ -414,6 +414,18 @@ table.compare td.net { color: var(--accent-dark); font-weight: 800; }
 .insight .id { font-size: 13px; color: var(--text-2); line-height: 1.55; }
 .insight .id a { color: var(--accent); font-weight: 700; }
 
+/* ---------- 빵부스러기 내비 (문서 페이지) ---------- */
+.crumbs { font-size: 13px; color: var(--text-2); margin-bottom: 14px; display: flex;
+  flex-wrap: wrap; gap: 6px; align-items: center; }
+.crumbs a { color: var(--primary-dark); font-weight: 600; }
+.crumbs a:hover { text-decoration: underline; }
+.crumbs span[aria-current] { color: var(--text-3); }
+
+/* 문서 본문 — 읽기 편한 폭과 줄간격 */
+.article-body { max-width: 720px; }
+.article-body h3 { color: var(--navy); }
+.article-body table.compare { margin: 6px 0 4px; }
+
 /* ---------- 계산기 간 값 이어받기 / 결과 공유 ---------- */
 .handoff {
   display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px;
