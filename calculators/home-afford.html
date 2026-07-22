@@ -7,7 +7,7 @@
   <meta name="description" content="소득·나이·보유현금·지역만 넣으면 지금 내 조건으로 살 수 있는 적정 부동산 가격을 역산해 드립니다. 2026 LTV·DSR 반영." />
   <meta name="keywords" content="내집찾기 계산기, 살 수 있는 집값, 주택 구매력, 적정 매매가, 대출 한도 역산, 내 예산 아파트" />
   <link rel="canonical" href="https://homeplaning.kr/calculators/home-afford.html" />
-  <link rel="stylesheet" href="../assets/css/style.css?v=3" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=4" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="alternate icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -68,6 +68,14 @@
             <button class="chip" data-v="지방">지방</button>
           </div>
         </div>
+        <div class="adv">
+          <button type="button" class="adv-toggle" aria-expanded="false">
+            <span>자세히 설정</span>
+            <span class="adv-hint">생애최초·신혼·자녀, 금리·상환기간</span>
+            <span class="adv-mark" hidden>변경됨</span>
+            <span class="adv-caret">▾</span>
+          </button>
+          <div class="adv-body" hidden>
         <div class="field">
           <label>세대 구성</label>
           <div class="chips" id="household">
@@ -99,6 +107,8 @@
           <div class="chips" id="bank">
             <button class="chip on" data-v="은행">은행 (DSR 40%)</button>
             <button class="chip" data-v="2금융">2금융 (DSR 50%)</button>
+          </div>
+        </div>
           </div>
         </div>
       </div>
@@ -191,9 +201,9 @@
 
   <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/analytics.js?v=1"></script>
-  <script src="../assets/js/app.js?v=16"></script>
+  <script src="../assets/js/app.js?v=17"></script>
   <script src="../assets/js/policy.js?v=2"></script>
   <script src="../assets/js/calc-home-core.js?v=5"></script>
-  <script src="../assets/js/calc-home-afford.js?v=13"></script>
+  <script src="../assets/js/calc-home-afford.js?v=14"></script>
 </body>
 </html>

@@ -107,8 +107,58 @@ function mount(active) {
   initDropdowns();
   initReveal();
   initAmountHints();
+  initAdvanced();
   scrollActiveTabIntoView();
   initMiniResult();
+}
+
+/* ---------- 세부 설정 접기 ----------
+   입력칸이 11~12개면 처음 온 사람은 시작도 하기 전에 지친다.
+   자주 안 바꾸는 항목은 접어 두되, 값이 바뀌면 '변경됨'을 표시해
+   숨겨진 설정이 결과에 영향을 준다는 사실을 감추지 않는다. */
+const advPanels = [];
+
+function initAdvanced(root) {
+  (root || document).querySelectorAll(".adv").forEach((adv) => {
+    const body = adv.querySelector(".adv-body");
+    const btn = adv.querySelector(".adv-toggle");
+    if (!body || !btn) return;
+
+    const snapshot = () => [
+      ...[...body.querySelectorAll("input, select")].map((f) => (f.type === "checkbox" ? f.checked : f.value)),
+      ...[...body.querySelectorAll(".chip")].map((c) => c.classList.contains("on")),
+    ].join("|");
+    const initial = snapshot();
+    const mark = adv.querySelector(".adv-mark");
+
+    const setOpen = (open) => {
+      body.hidden = !open;
+      btn.setAttribute("aria-expanded", String(open));
+      adv.classList.toggle("open", open);
+    };
+    const refresh = () => {
+      if (mark) mark.hidden = snapshot() === initial;
+    };
+
+    btn.addEventListener("click", () => setOpen(body.hidden));
+    body.addEventListener("input", refresh);
+    body.addEventListener("change", refresh);
+    body.addEventListener("click", (e) => { if (e.target.closest(".chip")) setTimeout(refresh, 0); });
+
+    setOpen(false);
+    refresh();
+    // 계산기가 링크 값을 반영한 뒤 다시 부를 수 있게 등록해 둔다
+    advPanels.push({ snapshot, initial, setOpen, refresh });
+  });
+}
+
+/** 링크로 넘어온 값이 접힌 영역에 있으면 펼친다.
+    숨겨진 채로 결과만 달라지면 사용자가 이유를 알 수 없다. */
+function refreshAdvanced() {
+  advPanels.forEach((p) => {
+    if (p.snapshot() !== p.initial) p.setOpen(true);
+    p.refresh();
+  });
 }
 
 /* ---------- 모바일 고정 결과 바 ----------
@@ -723,4 +773,5 @@ window.HP = {
   donut, donutPanel, growthBars, stackedBars, lineChart, scenarioBars, linkFor, basePrefix,
   initAmountHints, refreshAmountHints,
   readParams, withParams, handoffNotice, handoffSource, shareUrl, initShare,
+  initAdvanced, refreshAdvanced,
 };

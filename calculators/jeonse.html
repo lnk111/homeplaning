@@ -7,7 +7,7 @@
   <meta name="description" content="전세 보증금을 넣으면 필요한 현금·전세대출 한도·월 이자를 계산합니다. 버팀목·청년전용·신혼부부 전세대출 비교와 전세가율(깡통전세) 위험까지 확인하세요." />
   <meta name="keywords" content="전세 계산기, 전세자금대출, 버팀목 전세대출, 청년 전세대출, 전세가율, 깡통전세, 전세보증금" />
   <link rel="canonical" href="https://homeplaning.kr/calculators/jeonse.html" />
-  <link rel="stylesheet" href="../assets/css/style.css?v=3" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=4" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="alternate icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -71,6 +71,14 @@
             <button class="chip" data-v="지방">지방</button>
           </div>
         </div>
+        <div class="adv">
+          <button type="button" class="adv-toggle" aria-expanded="false">
+            <span>자세히 설정</span>
+            <span class="adv-hint">신혼·무주택, 일반 금리, 월세 전환 비교</span>
+            <span class="adv-mark" hidden>변경됨</span>
+            <span class="adv-caret">▾</span>
+          </button>
+          <div class="adv-body" hidden>
         <div class="field">
           <label>세대 구성</label>
           <div class="chips" id="household">
@@ -104,6 +112,8 @@
         <div class="field">
           <label>여유자금 기대수익률 <span class="hint">월세 선택 시 남는 돈</span></label>
           <div class="input-suffix"><input class="input" type="number" id="yieldRate" value="4" min="0" step="0.5" inputmode="decimal" autocomplete="off"><span class="suffix">%</span></div>
+        </div>
+          </div>
         </div>
       </div>
 
@@ -201,8 +211,8 @@
 
   <script src="../assets/js/config.js?v=3"></script>
   <script src="../assets/js/analytics.js?v=1"></script>
-  <script src="../assets/js/app.js?v=16"></script>
+  <script src="../assets/js/app.js?v=17"></script>
   <script src="../assets/js/policy.js?v=2"></script>
-  <script src="../assets/js/calc-jeonse.js?v=6"></script>
+  <script src="../assets/js/calc-jeonse.js?v=7"></script>
 </body>
 </html>

@@ -219,6 +219,7 @@ function applyIncoming() {
     document.querySelectorAll(`#${k} .chip`).forEach((c) => c.classList.toggle("on", c.dataset.v === IN[k]));
   });
   HP.refreshAmountHints();
+  HP.refreshAdvanced(); // 링크 값이 접힌 영역에 있으면 펼친다
 
   const got = [];
   if (IN.cash !== undefined) got.push({ k: "종잣돈", v: HP.fmtMan(state.cash) + "원" });

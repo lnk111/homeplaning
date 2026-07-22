@@ -120,7 +120,8 @@
       "PowerShell(python -c \"import yaml,io; d=yaml.safe_load\\(io.open\\('.github/workflows/update-policy.yml',encoding='utf-8'\\)\\); s=d['jobs']['update-policy']['steps']; [print\\(i, repr\\(x.get\\('name','?'\\)\\)[:40], '| tee:', 'tee' in str\\(x.get\\('run',''\\)\\), '| readsLog:', 'update-policy.log' in str\\(x.get\\('with',{}\\).get\\('script',''\\)\\)\\) for i,x in enumerate\\(s\\)]\")",
       "Bash(git commit -q -m 'fix: 실패 이슈에 실제 오류 메시지를 싣는다 *)",
       "Bash(curl -s \"http://localhost:8000/assets/js/app.js?v=15\")",
-      "Bash(git commit -q -m 'feat: 사회초년생 기준으로 첫 화면·기본값 재정렬 + 모바일 결과 고정 바 *)"
+      "Bash(git commit -q -m 'feat: 사회초년생 기준으로 첫 화면·기본값 재정렬 + 모바일 결과 고정 바 *)",
+      "Bash(git commit -q -m 'feat: 계산기 입력칸 접기 — 처음 보는 항목 12개 → 4~5개 *)"
     ]
   }
 }
